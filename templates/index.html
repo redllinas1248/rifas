@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <title>Rifas</title>
 
     <style>
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -15,7 +17,7 @@
         }
 
         header {
-            background: #ffffff;
+            background: white;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
@@ -26,53 +28,160 @@
 
         main {
             max-width: 1100px;
-            margin: 40px auto;
+            margin: 30px auto;
             padding: 20px;
         }
 
-        .bienvenida {
+        .titulo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .rifas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .rifa {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        }
+
+        .rifa img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .contenido {
+            padding: 20px;
+        }
+
+        .contenido h2 {
+            margin-top: 0;
+        }
+
+        .descripcion {
+            color: #666;
+        }
+
+        .datos {
+            margin-top: 15px;
+        }
+
+        .boton {
+            display: block;
+            margin-top: 20px;
+            padding: 13px;
+            text-align: center;
+            background: #1877f2;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .sin-rifas {
             background: white;
             padding: 40px;
-            border-radius: 16px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-radius: 16px;
         }
 
-        .bienvenida h2 {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .bienvenida p {
-            color: #666;
-            font-size: 18px;
-        }
     </style>
+
 </head>
 
 <body>
 
 <header>
+
     <h1>🎟️ Rifas</h1>
+
 </header>
 
 <main>
 
-    <section class="bienvenida">
+    <div class="titulo">
 
-        <h2>Bienvenido a Rifas</h2>
+        <h2>🎁 Rifas disponibles</h2>
 
-        <p>
-            Próximamente podrás participar en nuestras rifas.
-        </p>
+        <p>Participa y gana increíbles premios.</p>
 
-        <p>
-            🎁 Premios · 🎟️ Boletos · 🏆 Ganadores
-        </p>
+    </div>
 
-    </section>
+
+    {% if rifas %}
+
+        <div class="rifas">
+
+            {% for rifa in rifas %}
+
+                <div class="rifa">
+
+                    {% if rifa.imagen_url %}
+
+                        <img
+                            src="{{ rifa.imagen_url }}"
+                            alt="{{ rifa.titulo }}"
+                        >
+
+                    {% endif %}
+
+                    <div class="contenido">
+
+                        <h2>
+                            {{ rifa.titulo }}
+                        </h2>
+
+                        <p class="descripcion">
+                            {{ rifa.descripcion or 'Participa en esta increíble rifa.' }}
+                        </p>
+
+                        <div class="datos">
+
+                            🎟️ {{ rifa.cantidad_boletos }} boletos
+
+                            <br>
+
+                            💰 ${{ "%.2f"|format(rifa.precio_boleto) }} MXN
+
+                        </div>
+
+                        <a
+                            href="#"
+                            class="boton"
+                        >
+                            PARTICIPAR
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="sin-rifas">
+
+            <h2>🎁 Próximamente</h2>
+
+            <p>
+                En este momento no hay rifas activas.
+            </p>
+
+        </div>
+
+    {% endif %}
 
 </main>
 
 </body>
+
 </html>
