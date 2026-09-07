@@ -44,6 +44,31 @@ def rifas():
     finally:
         db.close()
 
+@app.route("/rifas/prueba-db")
+def prueba_db():
 
+    db = get_db()
+
+    try:
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT
+                current_database() AS base_datos,
+                current_schema() AS esquema,
+                COUNT(*) AS total_rifas
+            FROM rf_rifas
+        """)
+
+        resultado = cursor.fetchone()
+
+        return {
+            "base_datos": resultado["base_datos"],
+            "esquema": resultado["esquema"],
+            "total_rifas": resultado["total_rifas"]
+        }
+
+    finally:
+        db.close()
 if __name__ == "__main__":
     app.run(debug=True)
