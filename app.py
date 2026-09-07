@@ -4,10 +4,18 @@ from db import get_db
 app = Flask(__name__)
 
 
+# ==========================================
+# PAGINA PRINCIPAL
+# ==========================================
+
 @app.route("/")
 def inicio():
     return render_template("index.html")
 
+
+# ==========================================
+# LISTADO DE RIFAS
+# ==========================================
 
 @app.route("/rifas")
 def rifas():
@@ -44,6 +52,11 @@ def rifas():
     finally:
         db.close()
 
+
+# ==========================================
+# PRUEBA DE CONEXION A POSTGRESQL
+# ==========================================
+
 @app.route("/rifas/prueba-db")
 def prueba_db():
 
@@ -70,5 +83,11 @@ def prueba_db():
 
     finally:
         db.close()
+
+
+# ==========================================
+# EJECUCION LOCAL
+# ==========================================
+
 if __name__ == "__main__":
     app.run(debug=True)
