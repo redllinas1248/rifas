@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Administración de Rifas</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 20px;
+        }
+
+        header .contenedor {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .encabezado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .encabezado h2 {
+            margin: 0;
+        }
+
+        .boton {
+            display: inline-block;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 9px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .boton-nuevo {
+            background: #1877f2;
+            color: white;
+        }
+
+        .boton-editar {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .boton-publicar {
+            background: #16a34a;
+            color: white;
+        }
+
+        .boton-finalizar {
+            background: #374151;
+            color: white;
+        }
+
+        .boton-cancelar {
+            background: #dc2626;
+            color: white;
+        }
+
+        .acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .acciones form {
+            margin: 0;
+        }
+
+        .tabla-contenedor {
+            background: white;
+            border-radius: 15px;
+            overflow-x: auto;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #f9fafb;
+            font-size: 14px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .titulo {
+            font-weight: bold;
+        }
+
+        .descripcion {
+            color: #666;
+            max-width: 280px;
+            margin-top: 4px;
+        }
+
+        .estado {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .estado.borrador {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .estado.activa {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .estado.finalizada {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .estado.cancelada {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .vacio {
+            background: white;
+            text-align: center;
+            padding: 60px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        }
+
+        .mensaje {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .mensaje.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .mensaje.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .precio {
+            font-weight: bold;
+        }
+
+        .fecha {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 700px) {
+
+            main {
+                margin: 15px auto;
+                padding: 12px;
+            }
+
+            .encabezado {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .boton-nuevo {
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="contenedor">
+
+        <h1>🎟️ Administración de Rifas</h1>
+
+    </div>
+
+</header>
+
+
+<main>
+
+    <!-- ==========================================
+         MENSAJES
+         ========================================== -->
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+
+        {% if mensajes %}
+
+            {% for categoria, mensaje in mensajes %}
+
+                <div class="mensaje {{ categoria }}">
+                    {{ mensaje }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- ==========================================
+         ENCABEZADO
+         ========================================== -->
+
+    <div class="encabezado">
+
+        <h2>Mis rifas</h2>
+
+        <a
+            href="{{ url_for('nueva_rifa') }}"
+            class="boton boton-nuevo"
+        >
+            + NUEVA RIFA
+        </a>
+
+    </div>
+
+
+    <!-- ==========================================
+         LISTA DE RIFAS
+         ========================================== -->
+
+    {% if rifas %}
+
+        <div class="tabla-contenedor">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Rifa</th>
+
+                        <th>Boletos</th>
+
+                        <th>Precio</th>
+
+                        <th>Estado</th>
+
+                        <th>Sorteo</th>
+
+                        <th>Acciones</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for rifa in rifas %}
+
+                        <tr>
+
+                            <td>
+                                #{{ rifa.id }}
+                            </td>
+
+
+                            <td>
+
+                                <div class="titulo">
+                                    {{ rifa.titulo }}
+                                </div>
+
+                                {% if rifa.descripcion %}
+
+                                    <div class="descripcion">
+                                        {{ rifa.descripcion }}
+                                    </div>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ rifa.cantidad_boletos }}
+                            </td>
+
+
+                            <td>
+
+                                <span class="precio">
+                                    ${{ "%.2f"|format(rifa.precio_boleto) }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="estado {{ rifa.estado }}"
+                                >
+                                    {{ rifa.estado }}
+                                </span>
+
+                            </td>
+
+
+                            <td class="fecha">
+
+                                {% if rifa.fecha_sorteo %}
+
+                                    {{ rifa.fecha_sorteo.strftime('%d/%m/%Y %H:%M') }}
+
+                                {% else %}
+
+                                    Sin definir
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="acciones">
+
+
+                                    <!-- EDITAR -->
+
+                                    <a
+                                        href="{{ url_for('editar_rifa', rifa_id=rifa.id) }}"
+                                        class="boton boton-editar"
+                                    >
+                                        ✏️ Editar
+                                    </a>
+
+
+                                    <!-- PUBLICAR -->
+
+                                    {% if rifa.estado == 'borrador' %}
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('publicar_rifa', rifa_id=rifa.id) }}"
+                                            onsubmit="return confirm('¿Deseas publicar esta rifa? Será visible para el público.');"
+                                        >
+
+                                            <button
+                                                type="submit"
+                                                class="boton boton-publicar"
+                                            >
+                                                🟢 Publicar
+                                            </button>
+
+                                        </form>
+
+                                    {% endif %}
+
+
+                                    <!-- FINALIZAR -->
+
+                                    {% if rifa.estado == 'activa' %}
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('finalizar_rifa', rifa_id=rifa.id) }}"
+                                            onsubmit="return confirm('¿Deseas finalizar esta rifa?');"
+                                        >
+
+                                            <button
+                                                type="submit"
+                                                class="boton boton-finalizar"
+                                            >
+                                                🏁 Finalizar
+                                            </button>
+
+                                        </form>
+
+                                    {% endif %}
+
+
+                                    <!-- CANCELAR -->
+
+                                    {% if rifa.estado == 'borrador' or rifa.estado == 'activa' %}
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('cancelar_rifa', rifa_id=rifa.id) }}"
+                                            onsubmit="return confirm('¿Seguro que deseas cancelar esta rifa?');"
+                                        >
+
+                                            <button
+                                                type="submit"
+                                                class="boton boton-cancelar"
+                                            >
+                                                🔴 Cancelar
+                                            </button>
+
+                                        </form>
+
+                                    {% endif %}
+
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="vacio">
+
+            <h2>🎁 No hay rifas todavía</h2>
+
+            <p>
+                Crea tu primera rifa para comenzar.
+            </p>
+
+            <br>
+
+            <a
+                href="{{ url_for('nueva_rifa') }}"
+                class="boton boton-nuevo"
+            >
+                + CREAR PRIMERA RIFA
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</main>
+
+</body>
+
+</html>
