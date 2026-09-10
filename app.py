@@ -66,6 +66,82 @@ def rifas():
 
 
 # ==========================================
+# DETALLE PUBLICO DE UNA RIFA
+# ==========================================
+
+@app.route("/rifas/<int:rifa_id>")
+def detalle_rifa(rifa_id):
+
+    db = get_db()
+
+    try:
+        cursor = db.cursor()
+
+        # --------------------------------------
+        # OBTENER RIFA
+        # --------------------------------------
+
+        cursor.execute("""
+            SELECT
+                id,
+                titulo,
+                descripcion,
+                imagen_url,
+                cantidad_boletos,
+                precio_boleto,
+                estado,
+                fecha_inicio,
+                fecha_fin,
+                fecha_sorteo
+            FROM rt_rifas
+            WHERE id = %s
+              AND estado = 'activa'
+        """, (rifa_id,))
+
+        rifa = cursor.fetchone()
+
+        if not rifa:
+
+            flash(
+                "La rifa no existe o ya no está disponible.",
+                "error"
+            )
+
+            return redirect(url_for("rifas"))
+
+        # --------------------------------------
+        # CONTAR BOLETOS
+        # --------------------------------------
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS total,
+                COUNT(*) FILTER (
+                    WHERE estado = 'disponible'
+                ) AS disponibles,
+                COUNT(*) FILTER (
+                    WHERE estado = 'reservado'
+                ) AS reservados,
+                COUNT(*) FILTER (
+                    WHERE estado = 'asignado'
+                ) AS asignados
+            FROM rt_boletos
+            WHERE rifa_id = %s
+        """, (rifa_id,))
+
+        estadisticas = cursor.fetchone()
+
+        return render_template(
+            "rifa_detalle.html",
+            rifa=rifa,
+            estadisticas=estadisticas
+        )
+
+    finally:
+        db.close()
+
+
+# ==========================================
 # PANEL ADMINISTRATIVO
 # ==========================================
 
@@ -146,7 +222,7 @@ def crear_rifa():
         return redirect(url_for("nueva_rifa"))
 
     # ==========================================
-    # VALIDAR CANTIDAD DE BOLETOS
+    # VALIDAR CANTIDAD
     # ==========================================
 
     try:
@@ -186,7 +262,7 @@ def crear_rifa():
         return redirect(url_for("nueva_rifa"))
 
     # ==========================================
-    # GUARDAR RIFA + GENERAR BOLETOS
+    # GUARDAR RIFA Y BOLETOS
     # ==========================================
 
     db = get_db()
@@ -241,7 +317,7 @@ def crear_rifa():
         rifa_id = cursor.fetchone()["id"]
 
         # --------------------------------------
-        # GENERAR BOLETOS AUTOMATICAMENTE
+        # GENERAR BOLETOS
         # --------------------------------------
 
         cursor.execute("""
@@ -265,7 +341,7 @@ def crear_rifa():
         boletos_generados = cursor.rowcount
 
         # --------------------------------------
-        # CONFIRMAR TODO
+        # CONFIRMAR
         # --------------------------------------
 
         db.commit()
@@ -285,8 +361,7 @@ def crear_rifa():
         print("ERROR AL CREAR RIFA:", error)
 
         flash(
-            "Ocurrió un error al crear la rifa. "
-            "La operación fue cancelada.",
+            "Ocurrió un error al crear la rifa.",
             "error"
         )
 
@@ -364,10 +439,6 @@ def actualizar_rifa(rifa_id):
     fecha_fin = request.form.get("fecha_fin", "").strip()
     fecha_sorteo = request.form.get("fecha_sorteo", "").strip()
 
-    # ==========================================
-    # VALIDAR TITULO
-    # ==========================================
-
     if not titulo:
 
         flash(
@@ -378,10 +449,6 @@ def actualizar_rifa(rifa_id):
         return redirect(
             url_for("editar_rifa", rifa_id=rifa_id)
         )
-
-    # ==========================================
-    # VALIDAR CANTIDAD
-    # ==========================================
 
     try:
 
@@ -401,10 +468,6 @@ def actualizar_rifa(rifa_id):
             url_for("editar_rifa", rifa_id=rifa_id)
         )
 
-    # ==========================================
-    # VALIDAR PRECIO
-    # ==========================================
-
     try:
 
         precio_boleto = float(precio_boleto)
@@ -423,10 +486,6 @@ def actualizar_rifa(rifa_id):
             url_for("editar_rifa", rifa_id=rifa_id)
         )
 
-    # ==========================================
-    # ACTUALIZAR
-    # ==========================================
-
     db = get_db()
 
     try:
@@ -434,12 +493,11 @@ def actualizar_rifa(rifa_id):
         cursor = db.cursor()
 
         # --------------------------------------
-        # OBTENER CANTIDAD ACTUAL
+        # OBTENER RIFA ACTUAL
         # --------------------------------------
 
         cursor.execute("""
-            SELECT
-                cantidad_boletos
+            SELECT cantidad_boletos
             FROM rt_rifas
             WHERE id = %s
         """, (rifa_id,))
@@ -458,7 +516,7 @@ def actualizar_rifa(rifa_id):
         cantidad_actual = rifa_actual["cantidad_boletos"]
 
         # --------------------------------------
-        # VERIFICAR SI YA EXISTEN BOLETOS
+        # COMPROBAR BOLETOS EXISTENTES
         # --------------------------------------
 
         cursor.execute("""
@@ -468,11 +526,6 @@ def actualizar_rifa(rifa_id):
         """, (rifa_id,))
 
         total_boletos = cursor.fetchone()["total"]
-
-        # --------------------------------------
-        # SI YA EXISTEN BOLETOS,
-        # NO PERMITIR CAMBIAR LA CANTIDAD
-        # --------------------------------------
 
         if total_boletos > 0 and cantidad_boletos != cantidad_actual:
 
@@ -489,7 +542,7 @@ def actualizar_rifa(rifa_id):
             )
 
         # --------------------------------------
-        # ACTUALIZAR RIFA
+        # ACTUALIZAR
         # --------------------------------------
 
         cursor.execute("""
@@ -516,17 +569,6 @@ def actualizar_rifa(rifa_id):
             fecha_sorteo,
             rifa_id
         ))
-
-        if cursor.rowcount == 0:
-
-            db.rollback()
-
-            flash(
-                "La rifa no existe.",
-                "error"
-            )
-
-            return redirect(url_for("admin_rifas"))
 
         db.commit()
 
@@ -559,7 +601,6 @@ def actualizar_rifa(rifa_id):
 
 # ==========================================
 # PUBLICAR RIFA
-# BORRADOR -> ACTIVA
 # ==========================================
 
 @app.route("/rifas/admin/publicar/<int:rifa_id>", methods=["POST"])
@@ -619,7 +660,6 @@ def publicar_rifa(rifa_id):
 
 # ==========================================
 # FINALIZAR RIFA
-# ACTIVA -> FINALIZADA
 # ==========================================
 
 @app.route("/rifas/admin/finalizar/<int:rifa_id>", methods=["POST"])
@@ -679,7 +719,6 @@ def finalizar_rifa(rifa_id):
 
 # ==========================================
 # CANCELAR RIFA
-# BORRADOR/ACTIVA -> CANCELADA
 # ==========================================
 
 @app.route("/rifas/admin/cancelar/<int:rifa_id>", methods=["POST"])
@@ -735,101 +774,6 @@ def cancelar_rifa(rifa_id):
         db.close()
 
     return redirect(url_for("admin_rifas"))
-
-
-# ==========================================
-# PRUEBA DE BOLETOS
-# ==========================================
-
-@app.route("/rifas/admin/boletos/<int:rifa_id>")
-def ver_boletos(rifa_id):
-
-    db = get_db()
-
-    try:
-
-        cursor = db.cursor()
-
-        # --------------------------------------
-        # OBTENER RIFA
-        # --------------------------------------
-
-        cursor.execute("""
-            SELECT
-                id,
-                titulo,
-                cantidad_boletos,
-                estado
-            FROM rt_rifas
-            WHERE id = %s
-        """, (rifa_id,))
-
-        rifa = cursor.fetchone()
-
-        if not rifa:
-
-            flash(
-                "La rifa no existe.",
-                "error"
-            )
-
-            return redirect(url_for("admin_rifas"))
-
-        # --------------------------------------
-        # CONTADORES
-        # --------------------------------------
-
-        cursor.execute("""
-            SELECT
-                COUNT(*) AS total,
-                COUNT(*) FILTER (
-                    WHERE estado = 'disponible'
-                ) AS disponibles,
-                COUNT(*) FILTER (
-                    WHERE estado = 'reservado'
-                ) AS reservados,
-                COUNT(*) FILTER (
-                    WHERE estado = 'asignado'
-                ) AS asignados
-            FROM rt_boletos
-            WHERE rifa_id = %s
-        """, (rifa_id,))
-
-        estadisticas = cursor.fetchone()
-
-        # --------------------------------------
-        # MOSTRAR BOLETOS
-        # --------------------------------------
-
-        cursor.execute("""
-            SELECT
-                id,
-                numero,
-                estado,
-                origen,
-                nombre,
-                numero_especial,
-                creado_en,
-                asignado_en
-            FROM rt_boletos
-            WHERE rifa_id = %s
-            ORDER BY numero ASC
-            LIMIT 500
-        """, (rifa_id,))
-
-        boletos = cursor.fetchall()
-
-        return render_template(
-            "admin_rifas.html",
-            rifas=[],
-            rifa_boletos=rifa,
-            boletos=boletos,
-            estadisticas=estadisticas
-        )
-
-    finally:
-
-        db.close()
 
 
 # ==========================================
