@@ -66,7 +66,7 @@ def rifas():
 
 
 # ==========================================
-# DETALLE PUBLICO DE UNA RIFA
+# DETALLE DE RIFA + BOLETOS
 # ==========================================
 
 @app.route("/rifas/<int:rifa_id>")
@@ -75,6 +75,7 @@ def detalle_rifa(rifa_id):
     db = get_db()
 
     try:
+
         cursor = db.cursor()
 
         # --------------------------------------
@@ -110,7 +111,23 @@ def detalle_rifa(rifa_id):
             return redirect(url_for("rifas"))
 
         # --------------------------------------
-        # CONTAR BOLETOS
+        # OBTENER BOLETOS
+        # --------------------------------------
+
+        cursor.execute("""
+            SELECT
+                id,
+                numero,
+                estado
+            FROM rt_boletos
+            WHERE rifa_id = %s
+            ORDER BY numero ASC
+        """, (rifa_id,))
+
+        boletos = cursor.fetchall()
+
+        # --------------------------------------
+        # ESTADISTICAS
         # --------------------------------------
 
         cursor.execute("""
@@ -134,10 +151,12 @@ def detalle_rifa(rifa_id):
         return render_template(
             "rifa_detalle.html",
             rifa=rifa,
+            boletos=boletos,
             estadisticas=estadisticas
         )
 
     finally:
+
         db.close()
 
 
@@ -151,6 +170,7 @@ def admin_rifas():
     db = get_db()
 
     try:
+
         cursor = db.cursor()
 
         cursor.execute("""
@@ -179,6 +199,7 @@ def admin_rifas():
         )
 
     finally:
+
         db.close()
 
 
@@ -208,10 +229,6 @@ def crear_rifa():
     fecha_fin = request.form.get("fecha_fin", "").strip()
     fecha_sorteo = request.form.get("fecha_sorteo", "").strip()
 
-    # ==========================================
-    # VALIDAR TITULO
-    # ==========================================
-
     if not titulo:
 
         flash(
@@ -220,10 +237,6 @@ def crear_rifa():
         )
 
         return redirect(url_for("nueva_rifa"))
-
-    # ==========================================
-    # VALIDAR CANTIDAD
-    # ==========================================
 
     try:
 
@@ -241,10 +254,6 @@ def crear_rifa():
 
         return redirect(url_for("nueva_rifa"))
 
-    # ==========================================
-    # VALIDAR PRECIO
-    # ==========================================
-
     try:
 
         precio_boleto = float(precio_boleto)
@@ -261,19 +270,11 @@ def crear_rifa():
 
         return redirect(url_for("nueva_rifa"))
 
-    # ==========================================
-    # GUARDAR RIFA Y BOLETOS
-    # ==========================================
-
     db = get_db()
 
     try:
 
         cursor = db.cursor()
-
-        # --------------------------------------
-        # CREAR RIFA
-        # --------------------------------------
 
         cursor.execute("""
             INSERT INTO rt_rifas (
@@ -317,7 +318,7 @@ def crear_rifa():
         rifa_id = cursor.fetchone()["id"]
 
         # --------------------------------------
-        # GENERAR BOLETOS
+        # GENERAR BOLETOS AUTOMATICAMENTE
         # --------------------------------------
 
         cursor.execute("""
@@ -339,10 +340,6 @@ def crear_rifa():
         ))
 
         boletos_generados = cursor.rowcount
-
-        # --------------------------------------
-        # CONFIRMAR
-        # --------------------------------------
 
         db.commit()
 
@@ -373,7 +370,7 @@ def crear_rifa():
 
 
 # ==========================================
-# EDITAR RIFA - FORMULARIO
+# EDITAR RIFA
 # ==========================================
 
 @app.route("/rifas/admin/editar/<int:rifa_id>")
@@ -492,10 +489,6 @@ def actualizar_rifa(rifa_id):
 
         cursor = db.cursor()
 
-        # --------------------------------------
-        # OBTENER RIFA ACTUAL
-        # --------------------------------------
-
         cursor.execute("""
             SELECT cantidad_boletos
             FROM rt_rifas
@@ -514,10 +507,6 @@ def actualizar_rifa(rifa_id):
             return redirect(url_for("admin_rifas"))
 
         cantidad_actual = rifa_actual["cantidad_boletos"]
-
-        # --------------------------------------
-        # COMPROBAR BOLETOS EXISTENTES
-        # --------------------------------------
 
         cursor.execute("""
             SELECT COUNT(*) AS total
@@ -540,10 +529,6 @@ def actualizar_rifa(rifa_id):
             return redirect(
                 url_for("editar_rifa", rifa_id=rifa_id)
             )
-
-        # --------------------------------------
-        # ACTUALIZAR
-        # --------------------------------------
 
         cursor.execute("""
             UPDATE rt_rifas
@@ -600,7 +585,7 @@ def actualizar_rifa(rifa_id):
 
 
 # ==========================================
-# PUBLICAR RIFA
+# PUBLICAR
 # ==========================================
 
 @app.route("/rifas/admin/publicar/<int:rifa_id>", methods=["POST"])
@@ -659,7 +644,7 @@ def publicar_rifa(rifa_id):
 
 
 # ==========================================
-# FINALIZAR RIFA
+# FINALIZAR
 # ==========================================
 
 @app.route("/rifas/admin/finalizar/<int:rifa_id>", methods=["POST"])
@@ -718,7 +703,7 @@ def finalizar_rifa(rifa_id):
 
 
 # ==========================================
-# CANCELAR RIFA
+# CANCELAR
 # ==========================================
 
 @app.route("/rifas/admin/cancelar/<int:rifa_id>", methods=["POST"])
@@ -781,6 +766,7 @@ def cancelar_rifa(rifa_id):
 # ==========================================
 
 if __name__ == "__main__":
+
     app.run(
         host="0.0.0.0",
         port=int(os.getenv("PORT", 5000)),

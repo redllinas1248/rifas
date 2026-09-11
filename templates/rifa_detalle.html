@@ -38,7 +38,7 @@
         }
 
         main {
-            max-width: 900px;
+            max-width: 1100px;
             margin: 30px auto;
             padding: 20px;
         }
@@ -97,7 +97,11 @@
             font-size: 14px;
         }
 
-        .participacion {
+        /* =====================================
+           SELECTOR DE BOLETOS
+        ====================================== */
+
+        .seccion-boletos {
             margin-top: 30px;
             padding: 25px;
             border-radius: 15px;
@@ -105,37 +109,120 @@
             border: 1px solid #e5e9ef;
         }
 
-        .participacion h2 {
+        .seccion-boletos h2 {
             margin-top: 0;
+            margin-bottom: 8px;
         }
 
-        .opciones {
+        .instruccion {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .leyenda {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .punto {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .punto-verde {
+            background: #22c55e;
+        }
+
+        .punto-rojo {
+            background: #ef4444;
+        }
+
+        .punto-azul {
+            background: #1877f2;
+        }
+
+        .boletos {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+            gap: 8px;
+            max-height: 450px;
+            overflow-y: auto;
+            padding: 5px;
         }
 
-        .opcion {
-            padding: 22px;
-            border-radius: 14px;
+        .boleto {
+            border: none;
+            border-radius: 9px;
+            padding: 12px 5px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .boleto-disponible {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .boleto-disponible:hover {
+            background: #bbf7d0;
+            transform: translateY(-2px);
+        }
+
+        .boleto-seleccionado {
+            background: #1877f2 !important;
+            color: white !important;
+            transform: scale(1.05);
+            box-shadow: 0 3px 10px rgba(24,119,242,0.35);
+        }
+
+        .boleto-ocupado {
+            background: #fee2e2;
+            color: #991b1b;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* =====================================
+           RESUMEN
+        ====================================== */
+
+        .resumen {
+            margin-top: 25px;
+            padding: 20px;
             background: white;
-            border: 2px solid #e1e5ea;
+            border-radius: 12px;
+            border: 2px solid #e5e9ef;
             text-align: center;
         }
 
-        .opcion h3 {
-            margin-top: 0;
-        }
-
-        .opcion p {
+        .resumen-titulo {
             color: #666;
-            line-height: 1.5;
+            font-size: 14px;
         }
 
-        .boton {
-            display: block;
+        .numero-seleccionado {
+            font-size: 38px;
+            font-weight: bold;
+            color: #1877f2;
+            margin: 5px 0 15px;
+        }
+
+        .boton-continuar {
             width: 100%;
+            max-width: 500px;
             border: none;
             padding: 15px;
             border-radius: 10px;
@@ -144,19 +231,17 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            text-decoration: none;
+            opacity: 0.45;
+            pointer-events: none;
         }
 
-        .boton:hover {
+        .boton-continuar.activo {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .boton-continuar.activo:hover {
             background: #0d65d9;
-        }
-
-        .boton-secundario {
-            background: #777;
-        }
-
-        .boton-secundario:hover {
-            background: #666;
         }
 
         .aviso {
@@ -183,8 +268,9 @@
                 grid-template-columns: 1fr;
             }
 
-            .opciones {
-                grid-template-columns: 1fr;
+            .boletos {
+                grid-template-columns:
+                    repeat(auto-fill, minmax(58px, 1fr));
             }
 
         }
@@ -277,68 +363,126 @@
             </div>
 
 
-            <div class="participacion">
+            <!-- =================================
+                 SELECTOR DE BOLETOS
+            ================================== -->
+
+            <div class="seccion-boletos">
 
                 <h2>
-                    🎟️ ¿Cómo quieres participar?
+                    🎟️ Elige tu número
                 </h2>
 
-                <p>
-                    Elige una de las opciones disponibles para
-                    obtener tu boleto.
+                <p class="instruccion">
+                    Selecciona un número disponible para continuar.
                 </p>
 
 
-                <div class="opciones">
+                <div class="leyenda">
 
-                    <div class="opcion">
+                    <div class="leyenda-item">
 
-                        <h3>
-                            🎬 Publicidad
-                        </h3>
+                        <span class="punto punto-verde"></span>
 
-                        <p>
-                            Obtén tu boleto viendo los anuncios
-                            publicitarios requeridos.
-                        </p>
-
-                        <a
-                            href="#"
-                            class="boton"
-                        >
-                            OBTENER CON PUBLICIDAD
-                        </a>
+                        Disponible
 
                     </div>
 
 
-                    <div class="opcion">
+                    <div class="leyenda-item">
 
-                        <h3>
-                            💳 Pago
-                        </h3>
+                        <span class="punto punto-azul"></span>
 
-                        <p>
-                            Obtén tu boleto mediante el pago
-                            correspondiente.
-                        </p>
+                        Seleccionado
 
-                        <button
-                            class="boton boton-secundario"
-                            disabled
-                        >
-                            PRÓXIMAMENTE
-                        </button>
+                    </div>
+
+
+                    <div class="leyenda-item">
+
+                        <span class="punto punto-rojo"></span>
+
+                        Ocupado
 
                     </div>
 
                 </div>
 
 
+                <div class="boletos">
+
+                    {% for boleto in boletos %}
+
+                        {% if boleto.estado == 'disponible' %}
+
+                            <button
+                                type="button"
+                                class="boleto boleto-disponible"
+                                data-id="{{ boleto.id }}"
+                                data-numero="{{ boleto.numero }}"
+                                onclick="seleccionarBoleto(this)"
+                            >
+                                {{ "%03d"|format(boleto.numero) }}
+                            </button>
+
+                        {% else %}
+
+                            <button
+                                type="button"
+                                class="boleto boleto-ocupado"
+                                disabled
+                            >
+                                {{ "%03d"|format(boleto.numero) }}
+                            </button>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- =================================
+                     RESUMEN DEL BOLETO
+                ================================== -->
+
+                <div class="resumen">
+
+                    <div class="resumen-titulo">
+                        Boleto seleccionado
+                    </div>
+
+
+                    <div
+                        class="numero-seleccionado"
+                        id="numeroSeleccionado"
+                    >
+                        —
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="continuar"
+                        class="boton-continuar"
+                        onclick="continuarPublicidad()"
+                    >
+                        CONTINUAR CON PUBLICIDAD
+                    </button>
+
+                </div>
+
+
                 <div class="aviso">
 
-                    ℹ️ En el siguiente paso podrás elegir el número
-                    de boleto que quieres intentar obtener.
+                    🔒 <strong>Importante:</strong>
+
+                    seleccionar el número todavía no lo asigna
+                    definitivamente.
+
+                    En el siguiente paso implementaremos una
+                    reserva temporal para evitar que dos personas
+                    intenten obtener el mismo boleto.
 
                 </div>
 
@@ -349,6 +493,100 @@
     </div>
 
 </main>
+
+
+<script>
+
+    let boletoSeleccionado = null;
+
+
+    function seleccionarBoleto(elemento) {
+
+        // --------------------------------------
+        // QUITAR SELECCION ANTERIOR
+        // --------------------------------------
+
+        const anteriores = document.querySelectorAll(
+            ".boleto-seleccionado"
+        );
+
+        anteriores.forEach(function(boleto) {
+
+            boleto.classList.remove(
+                "boleto-seleccionado"
+            );
+
+        });
+
+
+        // --------------------------------------
+        // SELECCIONAR NUEVO
+        // --------------------------------------
+
+        elemento.classList.add(
+            "boleto-seleccionado"
+        );
+
+
+        boletoSeleccionado = {
+
+            id: elemento.dataset.id,
+
+            numero: elemento.dataset.numero
+
+        };
+
+
+        // --------------------------------------
+        // MOSTRAR NUMERO
+        // --------------------------------------
+
+        document.getElementById(
+            "numeroSeleccionado"
+        ).textContent =
+            String(boletoSeleccionado.numero).padStart(
+                3,
+                "0"
+            );
+
+
+        // --------------------------------------
+        // ACTIVAR BOTON
+        // --------------------------------------
+
+        document.getElementById(
+            "continuar"
+        ).classList.add("activo");
+
+    }
+
+
+    function continuarPublicidad() {
+
+        if (!boletoSeleccionado) {
+
+            return;
+
+        }
+
+
+        /*
+         * TODAVIA NO ENVIAMOS NADA AL SERVIDOR.
+         *
+         * En el siguiente paso esta función enviará
+         * el ID del boleto al servidor para crear
+         * una reserva temporal.
+         */
+
+        alert(
+            "Boleto seleccionado: #" +
+            String(boletoSeleccionado.numero).padStart(3, "0") +
+            "\\n\\nEn el siguiente paso conectaremos la reserva y los anuncios."
+        );
+
+    }
+
+</script>
 
 </body>
 
