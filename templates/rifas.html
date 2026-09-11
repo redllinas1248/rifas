@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Rifas</title>
 
@@ -15,58 +19,61 @@
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            color: #222;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
         }
 
         header {
-            background: white;
+            background: #1877f2;
+            color: white;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            text-align: center;
         }
 
         header h1 {
             margin: 0;
+            font-size: 28px;
         }
 
-        main {
+        .contenedor {
+            width: 100%;
             max-width: 1100px;
             margin: 30px auto;
-            padding: 20px;
+            padding: 0 15px;
         }
 
         .titulo {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .titulo h2 {
-            font-size: 30px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .titulo p {
-            color: #666;
-            font-size: 17px;
+            color: #6b7280;
         }
 
-        .rifas {
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns:
+                repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
         }
 
         .rifa {
             background: white;
-            border-radius: 16px;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-            transition: transform 0.2s ease;
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.08);
+            transition: 0.2s;
         }
 
         .rifa:hover {
-            transform: translateY(-4px);
+            transform: translateY(-3px);
         }
 
         .rifa img {
@@ -76,56 +83,70 @@
             display: block;
         }
 
-        .contenido {
+        .rifa-contenido {
             padding: 20px;
         }
 
-        .contenido h2 {
+        .rifa h3 {
             margin-top: 0;
-            margin-bottom: 10px;
+            font-size: 22px;
         }
 
         .descripcion {
-            color: #666;
+            color: #6b7280;
             line-height: 1.5;
         }
 
         .datos {
-            margin-top: 15px;
-            line-height: 1.8;
-            font-size: 15px;
+            margin: 18px 0;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+
+        .dato {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+
+        .dato strong {
+            color: #111827;
         }
 
         .boton {
             display: block;
-            margin-top: 20px;
-            padding: 13px;
-            text-align: center;
+            width: 100%;
+            padding: 14px;
             background: #1877f2;
             color: white;
+            text-align: center;
             text-decoration: none;
             border-radius: 10px;
+            font-size: 17px;
             font-weight: bold;
+            border: none;
+            cursor: pointer;
         }
 
         .boton:hover {
-            background: #0d65d9;
+            background: #0f65d8;
         }
 
         .sin-rifas {
             background: white;
-            padding: 50px 20px;
+            padding: 40px;
+            border-radius: 15px;
             text-align: center;
-            border-radius: 16px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.06);
         }
 
-        .sin-rifas h2 {
-            margin-top: 0;
-        }
-
-        .sin-rifas p {
-            color: #666;
+        .flash {
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 15px;
+            border-radius: 10px;
+            background: #fee2e2;
+            color: #991b1b;
         }
 
     </style>
@@ -140,22 +161,40 @@
 
 </header>
 
-<main>
+
+<div class="contenedor">
 
     <div class="titulo">
 
-        <h2>🎁 Rifas disponibles</h2>
+        <h2>Participa en nuestras rifas</h2>
 
         <p>
-            Participa y gana increíbles premios.
+            Elige una rifa y selecciona tu boleto.
         </p>
 
     </div>
 
 
+    {% with mensajes = get_flashed_messages() %}
+
+        {% if mensajes %}
+
+            {% for mensaje in mensajes %}
+
+                <div class="flash">
+                    {{ mensaje }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
     {% if rifas %}
 
-        <div class="rifas">
+        <div class="grid">
 
             {% for rifa in rifas %}
 
@@ -168,46 +207,84 @@
                             alt="{{ rifa.titulo }}"
                         >
 
+                    {% else %}
+
+                        <div
+                            style="
+                                height:220px;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                background:#e5e7eb;
+                                font-size:60px;
+                            "
+                        >
+                            🎁
+                        </div>
+
                     {% endif %}
 
 
-                    <div class="contenido">
+                    <div class="rifa-contenido">
 
-                        <h2>
+                        <h3>
                             {{ rifa.titulo }}
-                        </h2>
+                        </h3>
 
 
-                        <p class="descripcion">
+                        {% if rifa.descripcion %}
 
-                            {{ rifa.descripcion or
-                            'Participa en esta increíble rifa.' }}
+                            <div class="descripcion">
 
-                        </p>
+                                {{ rifa.descripcion }}
+
+                            </div>
+
+                        {% endif %}
 
 
                         <div class="datos">
 
-                            🎟️
-                            <strong>{{ rifa.cantidad_boletos }}</strong>
-                            boletos
+                            <div class="dato">
 
-                            <br>
+                                <span>
+                                    Boletos
+                                </span>
 
-                            💰
-                            <strong>
-                                ${{ "%.2f"|format(rifa.precio_boleto) }}
-                            </strong>
-                            MXN
+                                <strong>
+                                    {{ rifa.cantidad_boletos }}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="dato">
+
+                                <span>
+                                    Precio
+                                </span>
+
+                                <strong>
+                                    ${{ "%.2f"|format(
+                                        rifa.precio_boleto
+                                    ) }}
+                                </strong>
+
+                            </div>
 
                         </div>
 
 
                         <a
-                            href="{{ url_for('detalle_rifa', rifa_id=rifa.id) }}"
                             class="boton"
+                            href="{{ url_for(
+                                'participar',
+                                rifa_id=rifa.id
+                            ) }}"
                         >
-                            PARTICIPAR
+
+                            🎟️ Participar
+
                         </a>
 
                     </div>
@@ -218,23 +295,23 @@
 
         </div>
 
-
     {% else %}
 
         <div class="sin-rifas">
 
-            <h2>🎁 Próximamente</h2>
+            <h2>
+                No hay rifas activas
+            </h2>
 
             <p>
-                En este momento no hay rifas activas.
+                Regresa pronto para participar.
             </p>
 
         </div>
 
     {% endif %}
 
-</main>
+</div>
 
 </body>
-
 </html>

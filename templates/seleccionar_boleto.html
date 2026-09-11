@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Selecciona tu boleto
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        header {
+            background: #1877f2;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .contenedor {
+            width: 100%;
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .titulo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .titulo h2 {
+            margin-bottom: 8px;
+        }
+
+        .titulo p {
+            color: #6b7280;
+        }
+
+        .leyenda {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 14px;
+        }
+
+        .cuadro {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+        }
+
+        .verde {
+            background: #dcfce7;
+            border: 1px solid #22c55e;
+        }
+
+        .rojo {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+        }
+
+        .amarillo {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+        }
+
+        .boletos {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fill, minmax(70px, 1fr));
+            gap: 8px;
+        }
+
+        .boleto {
+            position: relative;
+        }
+
+        .boleto input {
+            display: none;
+        }
+
+        .boleto label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 55px;
+            background: #dcfce7;
+            border: 2px solid #22c55e;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.15s;
+        }
+
+        .boleto label:hover {
+            transform: scale(1.04);
+        }
+
+        .boleto input:checked + label {
+            background: #1877f2;
+            border-color: #0f65d8;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .ocupado label {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+            cursor: not-allowed;
+            opacity: 0.75;
+        }
+
+        .reservado label {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .boton-continuar {
+            margin-top: 30px;
+            width: 100%;
+            padding: 16px;
+            background: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .boton-continuar:hover {
+            background: #0f65d8;
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #eff6ff;
+            border-radius: 10px;
+            color: #1e40af;
+            line-height: 1.5;
+        }
+
+        .flash {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .volver {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #1877f2;
+            text-decoration: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<header>
+
+    <h1>
+        🎟️ {{ rifa.titulo }}
+    </h1>
+
+</header>
+
+
+<div class="contenedor">
+
+
+    <div class="card">
+
+
+        {% with mensajes = get_flashed_messages() %}
+
+            {% if mensajes %}
+
+                {% for mensaje in mensajes %}
+
+                    <div class="flash">
+                        {{ mensaje }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <div class="titulo">
+
+            <h2>
+                Elige tu número
+            </h2>
+
+            <p>
+                Selecciona uno de los boletos disponibles.
+            </p>
+
+        </div>
+
+
+        <div class="leyenda">
+
+            <div class="leyenda-item">
+
+                <span class="cuadro verde"></span>
+
+                Disponible
+
+            </div>
+
+
+            <div class="leyenda-item">
+
+                <span class="cuadro amarillo"></span>
+
+                Reservado
+
+            </div>
+
+
+            <div class="leyenda-item">
+
+                <span class="cuadro rojo"></span>
+
+                Ocupado
+
+            </div>
+
+        </div>
+
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'reservar_boleto',
+                rifa_id=rifa.id
+            ) }}"
+        >
+
+
+            <div class="boletos">
+
+
+                {% for boleto in boletos %}
+
+
+                    {% if boleto.estado == 'disponible' %}
+
+                        <div class="boleto">
+
+                            <input
+                                type="radio"
+                                name="numero"
+                                id="boleto{{ boleto.numero }}"
+                                value="{{ boleto.numero }}"
+                                required
+                            >
+
+                            <label
+                                for="boleto{{ boleto.numero }}"
+                            >
+                                {{ "%03d"|format(
+                                    boleto.numero
+                                ) }}
+                            </label>
+
+                        </div>
+
+
+                    {% elif boleto.estado == 'reservado' %}
+
+                        <div class="boleto reservado">
+
+                            <label>
+                                {{ "%03d"|format(
+                                    boleto.numero
+                                ) }}
+                            </label>
+
+                        </div>
+
+
+                    {% else %}
+
+                        <div class="boleto ocupado">
+
+                            <label>
+                                {{ "%03d"|format(
+                                    boleto.numero
+                                ) }}
+                            </label>
+
+                        </div>
+
+                    {% endif %}
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+            <div class="info">
+
+                <strong>
+                    🔐 Reserva segura
+                </strong>
+
+                <br>
+
+                Al seleccionar un boleto, el sistema lo
+                reservará temporalmente para ti.
+
+                Después comenzaremos el proceso de los
+                anuncios para acreditar tu participación.
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="boton-continuar"
+            >
+
+                🎟️ Continuar con mi boleto
+
+            </button>
+
+
+        </form>
+
+
+        <a
+            href="{{ url_for('rifas') }}"
+            class="volver"
+        >
+
+            ← Volver a las rifas
+
+        </a>
+
+
+    </div>
+
+</div>
+
+
+</body>
+
+</html>
