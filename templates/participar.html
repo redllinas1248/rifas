@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Participar | {{ rifa.titulo }}</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0d6efd, #084298);
+            color: white;
+            padding: 22px 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .header p {
+            margin: 7px 0 0;
+            opacity: .9;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 25px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,.08);
+            margin-bottom: 20px;
+        }
+
+        .rifa-info {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .rifa-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 14px;
+            background: #eee;
+        }
+
+        .rifa-info h2 {
+            margin-top: 0;
+            font-size: 25px;
+        }
+
+        .descripcion {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .precio {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0d6efd;
+            margin-top: 15px;
+        }
+
+        .titulo-seccion {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+
+        .boletos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+            gap: 10px;
+        }
+
+        .boleto {
+            position: relative;
+        }
+
+        .boleto input {
+            display: none;
+        }
+
+        .boleto label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 52px;
+            border: 2px solid #d1d5db;
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: .2s;
+        }
+
+        .boleto label:hover {
+            border-color: #0d6efd;
+            background: #eef5ff;
+            transform: translateY(-2px);
+        }
+
+        .boleto input:checked + label {
+            background: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+            transform: scale(1.03);
+        }
+
+        .boton-reservar {
+            display: block;
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            background: #198754;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 16px;
+            margin-top: 25px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .boton-reservar:hover {
+            background: #157347;
+        }
+
+        .boton-reservar:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .volver {
+            display: inline-block;
+            text-decoration: none;
+            color: #0d6efd;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .mensaje {
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .mensaje.error {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .mensaje.success {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .sin-boletos {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        @media (max-width: 700px) {
+
+            .rifa-info {
+                grid-template-columns: 1fr;
+            }
+
+            .rifa-image {
+                height: 220px;
+            }
+
+            .boletos {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+        }
+
+        @media (max-width: 400px) {
+
+            .boletos {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .boleto label {
+                height: 48px;
+                font-size: 14px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+
+    <h1>🎟️ Participar en la rifa</h1>
+
+    <p>Selecciona tu boleto</p>
+
+</div>
+
+
+<div class="container">
+
+    <a
+        href="{{ url_for('rifas') }}"
+        class="volver"
+    >
+        ← Volver a las rifas
+    </a>
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="mensaje {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- INFORMACIÓN DE LA RIFA -->
+
+    <div class="card">
+
+        <div class="rifa-info">
+
+            <div>
+
+                {% if rifa.imagen_url %}
+
+                    <img
+                        src="{{ rifa.imagen_url }}"
+                        alt="{{ rifa.titulo }}"
+                        class="rifa-image"
+                    >
+
+                {% else %}
+
+                    <div
+                        class="rifa-image"
+                        style="
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            font-size:50px;
+                        "
+                    >
+                        🎁
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div>
+
+                <h2>
+                    {{ rifa.titulo }}
+                </h2>
+
+                {% if rifa.descripcion %}
+
+                    <div class="descripcion">
+                        {{ rifa.descripcion }}
+                    </div>
+
+                {% endif %}
+
+                <div class="precio">
+
+                    {% if rifa.precio_boleto is not none %}
+
+                        ${{ "%.2f"|format(rifa.precio_boleto) }}
+
+                    {% else %}
+
+                        Gratis
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SELECCIÓN DE BOLETO -->
+
+    <div class="card">
+
+        <h2 class="titulo-seccion">
+            🎟️ Elige tu boleto
+        </h2>
+
+        <p class="subtitulo">
+            Selecciona un número disponible para continuar.
+        </p>
+
+
+        {% if boletos %}
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'reservar_boleto',
+                    rifa_id=rifa.id
+                ) }}"
+                id="formReserva"
+            >
+
+                <div class="boletos">
+
+                    {% for boleto in boletos %}
+
+                        <div class="boleto">
+
+                            <input
+                                type="radio"
+                                name="boleto_id"
+                                id="boleto_{{ boleto.id }}"
+                                value="{{ boleto.id }}"
+                                required
+                            >
+
+                            <label
+                                for="boleto_{{ boleto.id }}"
+                            >
+                                {{ boleto.numero }}
+                            </label>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="boton-reservar"
+                    id="botonReservar"
+                    disabled
+                >
+                    🔒 Reservar este boleto
+                </button>
+
+            </form>
+
+        {% else %}
+
+            <div class="sin-boletos">
+
+                <h3>
+                    😔 No hay boletos disponibles
+                </h3>
+
+                <p>
+                    Todos los boletos de esta rifa están ocupados.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const boletos = document.querySelectorAll(
+        'input[name="boleto_id"]'
+    );
+
+    const boton = document.getElementById(
+        'botonReservar'
+    );
+
+
+    boletos.forEach(function(boleto) {
+
+        boleto.addEventListener(
+            'change',
+            function() {
+
+                boton.disabled = false;
+
+                boton.textContent =
+                    '🔒 Reservar boleto #' +
+                    this.nextElementSibling.textContent.trim();
+
+            }
+        );
+
+    });
+
+
+    const formulario = document.getElementById(
+        'formReserva'
+    );
+
+
+    if (formulario) {
+
+        formulario.addEventListener(
+            'submit',
+            function() {
+
+                boton.disabled = true;
+
+                boton.textContent =
+                    '⏳ Reservando boleto...';
+
+            }
+        );
+
+    }
+
+</script>
+
+</body>
+</html>
