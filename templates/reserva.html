@@ -225,6 +225,38 @@
             cursor: not-allowed;
         }
 
+        .boton-continuar {
+
+            display: block;
+
+            width: 100%;
+
+            text-align: center;
+
+            text-decoration: none;
+
+            border-radius: 12px;
+
+            padding: 16px;
+
+            background: #16a34a;
+
+            color: white;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            margin-top: 20px;
+
+            box-sizing: border-box;
+        }
+
+        .boton-continuar:hover {
+
+            background: #15803d;
+        }
+
         .completado {
 
             text-align: center;
@@ -434,6 +466,7 @@
 
             {% else %}
 
+
                 <div class="completado">
 
                     🎉 ¡Has completado los 5 videos!
@@ -444,27 +477,59 @@
 
                 </div>
 
+
+                {% if boleto.estado == 'acreditado' %}
+
+                    <a
+                        href="{{ url_for(
+                            'datos_participante',
+                            reserva_token=boleto.reserva_token
+                        ) }}"
+                        class="boton-continuar"
+                    >
+
+                        ➡️ Continuar con mis datos
+
+                    </a>
+
+                {% elif boleto.estado == 'asignado' %}
+
+                    <a
+                        href="{{ url_for(
+                            'tarjeta_participacion',
+                            reserva_token=boleto.reserva_token
+                        ) }}"
+                        class="boton-continuar"
+                    >
+
+                        🎫 Ver mi tarjeta de participación
+
+                    </a>
+
+                {% endif %}
+
+
             {% endif %}
 
 
         </div>
 
 
-        <div class="advertencia">
+        {% if boleto.estado == 'reservado' %}
 
-            <strong>Importante:</strong>
+            <div class="advertencia">
 
-            Tu boleto está reservado exclusivamente
-            para esta participación.
+                <strong>Importante:</strong>
 
-            No cierres esta página hasta completar
-            el proceso.
+                Tu boleto está reservado exclusivamente
+                para esta participación.
 
-            Una vez completados los 5 videos,
-            podremos continuar con tus datos
-            para generar tu tarjeta de participación.
+                No cierres esta página hasta completar
+                el proceso.
 
-        </div>
+            </div>
+
+        {% endif %}
 
 
     </div>
