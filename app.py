@@ -1,17 +1,7 @@
 import os
-import uuid
-from datetime import datetime, timedelta
+import secrets
 
-from flask import (
-    Flask,
-    render_template,
-    request,
-    redirect,
-    url_for,
-    flash,
-    session
-)
-
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from db import get_db
 
 
@@ -22,22 +12,19 @@ app.secret_key = os.getenv(
     "rifas-clave-local"
 )
 
-# Tiempo que un boleto permanece reservado
-TIEMPO_RESERVA_MINUTOS = 15
 
-
-# =========================================================
-# PAGINA PRINCIPAL
-# =========================================================
+# ============================================================
+# INICIO
+# ============================================================
 
 @app.route("/")
 def inicio():
     return render_template("index.html")
 
 
-# =========================================================
+# ============================================================
 # LISTADO PUBLICO DE RIFAS
-# =========================================================
+# ============================================================
 
 @app.route("/rifas")
 def rifas():
@@ -75,9 +62,9 @@ def rifas():
         db.close()
 
 
-# =========================================================
-# SELECCIONAR BOLETO
-# =========================================================
+# ============================================================
+# PARTICIPAR
+# ============================================================
 
 @app.route("/rifas/participar/<int:rifa_id>")
 def participar(rifa_id):
@@ -85,11 +72,12 @@ def participar(rifa_id):
     db = get_db()
 
     try:
+
         cursor = db.cursor()
 
-        # -------------------------------------------------
-        # Verificar que la rifa exista y esté activa
-        # -------------------------------------------------
+        # ----------------------------------------------------
+        # Buscar rifa
+        # ----------------------------------------------------
 
         cursor.execute("""
             SELECT
@@ -99,68 +87,42 @@ def participar(rifa_id):
                 imagen_url,
                 cantidad_boletos,
                 precio_boleto,
-                estado,
-                fecha_inicio,
-                fecha_fin,
-                fecha_sorteo
+                estado
             FROM rt_rifas
             WHERE id = %s
+              AND estado = 'activa'
         """, (rifa_id,))
 
         rifa = cursor.fetchone()
 
         if not rifa:
-            flash("La rifa no existe.", "error")
-            return redirect(url_for("rifas"))
 
-        if rifa["estado"] != "activa":
             flash(
-                "Esta rifa todavía no está disponible para participar.",
+                "La rifa no existe o ya no está disponible.",
                 "error"
             )
+
             return redirect(url_for("rifas"))
 
-        # -------------------------------------------------
-        # Liberar reservas vencidas
-        # -------------------------------------------------
-
-        cursor.execute("""
-            UPDATE rt_boletos
-            SET
-                estado = 'disponible',
-                origen = NULL,
-                reserva_token = NULL,
-                reservado_en = NULL
-            WHERE
-                rifa_id = %s
-                AND estado = 'reservado'
-                AND reservado_en < (
-                    CURRENT_TIMESTAMP - INTERVAL '15 minutes'
-                )
-        """, (rifa_id,))
-
-        db.commit()
-
-        # -------------------------------------------------
-        # Obtener boletos
-        # -------------------------------------------------
+        # ----------------------------------------------------
+        # Obtener boletos disponibles
+        # ----------------------------------------------------
 
         cursor.execute("""
             SELECT
                 id,
                 numero,
-                estado,
-                origen,
-                reservado_en
+                estado
             FROM rt_boletos
             WHERE rifa_id = %s
+              AND estado = 'disponible'
             ORDER BY numero ASC
         """, (rifa_id,))
 
         boletos = cursor.fetchall()
 
         return render_template(
-            "seleccionar_boleto.html",
+            "participar.html",
             rifa=rifa,
             boletos=boletos
         )
@@ -169,9 +131,9 @@ def participar(rifa_id):
         db.close()
 
 
-# =========================================================
+# ============================================================
 # RESERVAR BOLETO
-# =========================================================
+# ============================================================
 
 @app.route(
     "/rifas/participar/<int:rifa_id>/reservar",
@@ -179,18 +141,12 @@ def participar(rifa_id):
 )
 def reservar_boleto(rifa_id):
 
-    numero = request.form.get("numero", "").strip()
+    boleto_id = request.form.get("boleto_id", "").strip()
 
-    # -----------------------------------------------------
-    # Validar número
-    # -----------------------------------------------------
-
-    try:
-        numero = int(numero)
-    except (ValueError, TypeError):
+    if not boleto_id:
 
         flash(
-            "El número de boleto no es válido.",
+            "Selecciona un boleto.",
             "error"
         )
 
@@ -207,67 +163,37 @@ def reservar_boleto(rifa_id):
 
         cursor = db.cursor()
 
-        # -------------------------------------------------
-        # Limpiar reservas vencidas
-        # -------------------------------------------------
-
-        cursor.execute("""
-            UPDATE rt_boletos
-            SET
-                estado = 'disponible',
-                origen = NULL,
-                reserva_token = NULL,
-                reservado_en = NULL
-            WHERE
-                rifa_id = %s
-                AND estado = 'reservado'
-                AND reservado_en < (
-                    CURRENT_TIMESTAMP - INTERVAL '15 minutes'
-                )
-        """, (rifa_id,))
-
-        # -------------------------------------------------
-        # Generar token único de reserva
-        # -------------------------------------------------
-
-        token = str(uuid.uuid4())
-
-        # -------------------------------------------------
-        # Buscar y bloquear el boleto
+        # ----------------------------------------------------
+        # Buscar boleto disponible
         #
-        # FOR UPDATE es MUY importante.
-        #
-        # Si dos personas intentan tomar el mismo boleto
-        # al mismo tiempo, PostgreSQL bloquea la fila.
-        # -------------------------------------------------
+        # FOR UPDATE evita que dos personas puedan reservar
+        # simultáneamente el mismo boleto.
+        # ----------------------------------------------------
 
         cursor.execute("""
             SELECT
                 id,
+                rifa_id,
                 numero,
                 estado
             FROM rt_boletos
-            WHERE
-                rifa_id = %s
-                AND numero = %s
+            WHERE id = %s
+              AND rifa_id = %s
+              AND estado = 'disponible'
             FOR UPDATE
         """, (
-            rifa_id,
-            numero
+            boleto_id,
+            rifa_id
         ))
 
         boleto = cursor.fetchone()
-
-        # -------------------------------------------------
-        # Boleto inexistente
-        # -------------------------------------------------
 
         if not boleto:
 
             db.rollback()
 
             flash(
-                "El boleto seleccionado no existe.",
+                "Ese boleto ya no está disponible. Selecciona otro.",
                 "error"
             )
 
@@ -278,67 +204,60 @@ def reservar_boleto(rifa_id):
                 )
             )
 
-        # -------------------------------------------------
-        # Boleto ocupado
-        # -------------------------------------------------
+        # ----------------------------------------------------
+        # Crear token secreto de reserva
+        # ----------------------------------------------------
 
-        if boleto["estado"] != "disponible":
+        reserva_token = secrets.token_urlsafe(32)
 
-            db.rollback()
-
-            flash(
-                "Ese boleto ya no está disponible. "
-                "Por favor selecciona otro.",
-                "error"
-            )
-
-            return redirect(
-                url_for(
-                    "participar",
-                    rifa_id=rifa_id
-                )
-            )
-
-        # -------------------------------------------------
-        # Reservar
-        # -------------------------------------------------
+        # ----------------------------------------------------
+        # Reservar boleto
+        # ----------------------------------------------------
 
         cursor.execute("""
             UPDATE rt_boletos
             SET
                 estado = 'reservado',
-                origen = 'publicidad',
                 reserva_token = %s,
-                reservado_en = CURRENT_TIMESTAMP
+                reservado_en = NOW()
             WHERE
                 id = %s
+                AND estado = 'disponible'
         """, (
-            token,
+            reserva_token,
             boleto["id"]
         ))
 
+        if cursor.rowcount != 1:
+
+            db.rollback()
+
+            flash(
+                "No fue posible reservar el boleto.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "participar",
+                    rifa_id=rifa_id
+                )
+            )
+
         db.commit()
 
-        # -------------------------------------------------
-        # Guardar la reserva en la sesión
-        # -------------------------------------------------
+        # ----------------------------------------------------
+        # Guardar información mínima en sesión
+        # ----------------------------------------------------
 
-        session["rifa_id"] = rifa_id
+        session["reserva_token"] = reserva_token
         session["boleto_id"] = boleto["id"]
-        session["boleto_numero"] = boleto["numero"]
-        session["reserva_token"] = token
-        session["videos_completados"] = 0
-
-        # -------------------------------------------------
-        # Por ahora mostramos pantalla de prueba.
-        #
-        # Aquí posteriormente irá Google Rewarded.
-        # -------------------------------------------------
+        session["rifa_id"] = rifa_id
 
         return redirect(
             url_for(
-                "publicidad",
-                rifa_id=rifa_id
+                "reserva",
+                reserva_token=reserva_token
             )
         )
 
@@ -368,47 +287,12 @@ def reservar_boleto(rifa_id):
         db.close()
 
 
-# =========================================================
-# PANTALLA DE PUBLICIDAD
-# =========================================================
+# ============================================================
+# PANTALLA DE RESERVA
+# ============================================================
 
-@app.route("/rifas/publicidad/<int:rifa_id>")
-def publicidad(rifa_id):
-
-    # -----------------------------------------------------
-    # Verificar sesión
-    # -----------------------------------------------------
-
-    if session.get("rifa_id") != rifa_id:
-
-        flash(
-            "No tienes una reserva activa.",
-            "error"
-        )
-
-        return redirect(
-            url_for(
-                "participar",
-                rifa_id=rifa_id
-            )
-        )
-
-    boleto_id = session.get("boleto_id")
-    token = session.get("reserva_token")
-
-    if not boleto_id or not token:
-
-        flash(
-            "La reserva no es válida.",
-            "error"
-        )
-
-        return redirect(
-            url_for(
-                "participar",
-                rifa_id=rifa_id
-            )
-        )
+@app.route("/rifas/reserva/<reserva_token>")
+def reserva(reserva_token):
 
     db = get_db()
 
@@ -416,9 +300,9 @@ def publicidad(rifa_id):
 
         cursor = db.cursor()
 
-        # -------------------------------------------------
-        # Comprobar que la reserva siga vigente
-        # -------------------------------------------------
+        # ----------------------------------------------------
+        # Buscar reserva
+        # ----------------------------------------------------
 
         cursor.execute("""
             SELECT
@@ -428,120 +312,116 @@ def publicidad(rifa_id):
                 b.estado,
                 b.reserva_token,
                 b.reservado_en,
-                r.titulo
+                r.titulo,
+                r.descripcion,
+                r.imagen_url
             FROM rt_boletos b
             INNER JOIN rt_rifas r
                 ON r.id = b.rifa_id
             WHERE
-                b.id = %s
-                AND b.rifa_id = %s
+                b.reserva_token = %s
         """, (
-            boleto_id,
-            rifa_id
+            reserva_token,
         ))
 
         boleto = cursor.fetchone()
 
         if not boleto:
 
-            session.clear()
-
             flash(
-                "La reserva no existe.",
-                "error"
-            )
-
-            return redirect(url_for("rifas"))
-
-        # -------------------------------------------------
-        # Verificar token
-        # -------------------------------------------------
-
-        if boleto["reserva_token"] != token:
-
-            session.clear()
-
-            flash(
-                "La reserva no pertenece a esta sesión.",
+                "La reserva no existe o ya no está disponible.",
                 "error"
             )
 
             return redirect(
-                url_for(
-                    "participar",
-                    rifa_id=rifa_id
-                )
+                url_for("rifas")
             )
 
-        # -------------------------------------------------
-        # Verificar estado
-        # -------------------------------------------------
+        # ----------------------------------------------------
+        # Seguridad:
+        # solo mostramos reservas activas
+        # ----------------------------------------------------
 
-        if boleto["estado"] != "reservado":
-
-            session.clear()
+        if boleto["estado"] not in (
+            "reservado",
+            "acreditado",
+            "asignado"
+        ):
 
             flash(
-                "El boleto ya no está reservado.",
+                "Esta reserva ya no está disponible.",
                 "error"
             )
 
             return redirect(
-                url_for(
-                    "participar",
-                    rifa_id=rifa_id
-                )
+                url_for("rifas")
             )
 
-        # -------------------------------------------------
-        # Verificar tiempo
-        # -------------------------------------------------
+        # ----------------------------------------------------
+        # Buscar progreso de publicidad
+        # ----------------------------------------------------
 
-        if boleto["reservado_en"]:
+        cursor.execute("""
+            SELECT
+                id,
+                boleto_id,
+                videos_completados,
+                total_videos,
+                estado,
+                creado_en,
+                actualizado_en
+            FROM rt_progreso_publicidad
+            WHERE boleto_id = %s
+            LIMIT 1
+        """, (
+            boleto["id"],
+        ))
 
-            limite = boleto["reservado_en"] + timedelta(
-                minutes=TIEMPO_RESERVA_MINUTOS
-            )
+        progreso = cursor.fetchone()
 
-            if datetime.now() > limite:
+        # ----------------------------------------------------
+        # Si todavía no existe progreso, crearlo
+        # ----------------------------------------------------
 
-                cursor.execute("""
-                    UPDATE rt_boletos
-                    SET
-                        estado = 'disponible',
-                        origen = NULL,
-                        reserva_token = NULL,
-                        reservado_en = NULL
-                    WHERE id = %s
-                """, (boleto_id,))
+        if not progreso:
 
-                db.commit()
-
-                session.clear()
-
-                flash(
-                    "El tiempo de reserva terminó. "
-                    "Puedes seleccionar otro boleto.",
-                    "error"
+            cursor.execute("""
+                INSERT INTO rt_progreso_publicidad (
+                    boleto_id,
+                    videos_completados,
+                    total_videos,
+                    estado,
+                    creado_en,
+                    actualizado_en
                 )
-
-                return redirect(
-                    url_for(
-                        "participar",
-                        rifa_id=rifa_id
-                    )
+                VALUES (
+                    %s,
+                    0,
+                    5,
+                    'en_proceso',
+                    NOW(),
+                    NOW()
                 )
+                RETURNING
+                    id,
+                    boleto_id,
+                    videos_completados,
+                    total_videos,
+                    estado,
+                    creado_en,
+                    actualizado_en
+            """, (
+                boleto["id"],
+            ))
 
-        videos_completados = session.get(
-            "videos_completados",
-            0
-        )
+            progreso = cursor.fetchone()
+
+            db.commit()
 
         return render_template(
-            "publicidad.html",
+            "reserva.html",
             boleto=boleto,
-            videos_completados=videos_completados,
-            videos_totales=5
+            progreso=progreso
         )
 
     finally:
@@ -549,9 +429,235 @@ def publicidad(rifa_id):
         db.close()
 
 
-# =========================================================
+# ============================================================
+# SIMULAR VIDEO COMPLETADO
+#
+# ESTA RUTA ES TEMPORAL.
+#
+# Después será reemplazada por la confirmación real
+# de Google Rewarded.
+# ============================================================
+
+@app.route(
+    "/rifas/reserva/<reserva_token>/video",
+    methods=["POST"]
+)
+def completar_video(reserva_token):
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        # ----------------------------------------------------
+        # Buscar boleto
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            SELECT
+                id,
+                rifa_id,
+                numero,
+                estado,
+                reserva_token
+            FROM rt_boletos
+            WHERE reserva_token = %s
+            FOR UPDATE
+        """, (
+            reserva_token,
+        ))
+
+        boleto = cursor.fetchone()
+
+        if not boleto:
+
+            db.rollback()
+
+            flash(
+                "Reserva no encontrada.",
+                "error"
+            )
+
+            return redirect(
+                url_for("rifas")
+            )
+
+        # ----------------------------------------------------
+        # Solo permitir progreso mientras esté reservado
+        # ----------------------------------------------------
+
+        if boleto["estado"] != "reservado":
+
+            db.rollback()
+
+            flash(
+                "Esta reserva ya no puede recibir publicidad.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "reserva",
+                    reserva_token=reserva_token
+                )
+            )
+
+        # ----------------------------------------------------
+        # Obtener progreso
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            SELECT
+                id,
+                videos_completados,
+                total_videos,
+                estado
+            FROM rt_progreso_publicidad
+            WHERE boleto_id = %s
+            FOR UPDATE
+        """, (
+            boleto["id"],
+        ))
+
+        progreso = cursor.fetchone()
+
+        if not progreso:
+
+            cursor.execute("""
+                INSERT INTO rt_progreso_publicidad (
+                    boleto_id,
+                    videos_completados,
+                    total_videos,
+                    estado,
+                    creado_en,
+                    actualizado_en
+                )
+                VALUES (
+                    %s,
+                    0,
+                    5,
+                    'en_proceso',
+                    NOW(),
+                    NOW()
+                )
+                RETURNING
+                    id,
+                    videos_completados,
+                    total_videos,
+                    estado
+            """, (
+                boleto["id"],
+            ))
+
+            progreso = cursor.fetchone()
+
+        # ----------------------------------------------------
+        # Evitar pasar de 5
+        # ----------------------------------------------------
+
+        videos_actuales = progreso["videos_completados"]
+        total_videos = progreso["total_videos"]
+
+        if videos_actuales >= total_videos:
+
+            db.rollback()
+
+            flash(
+                "Los 5 videos ya fueron completados.",
+                "success"
+            )
+
+            return redirect(
+                url_for(
+                    "reserva",
+                    reserva_token=reserva_token
+                )
+            )
+
+        # ----------------------------------------------------
+        # Incrementar exactamente UN video
+        # ----------------------------------------------------
+
+        nuevos_videos = videos_actuales + 1
+
+        nuevo_estado = (
+            "completado"
+            if nuevos_videos >= total_videos
+            else "en_proceso"
+        )
+
+        cursor.execute("""
+            UPDATE rt_progreso_publicidad
+            SET
+                videos_completados = %s,
+                estado = %s,
+                actualizado_en = NOW()
+            WHERE boleto_id = %s
+        """, (
+            nuevos_videos,
+            nuevo_estado,
+            boleto["id"]
+        ))
+
+        # ----------------------------------------------------
+        # Al completar los 5:
+        #
+        # reservado -> acreditado
+        # ----------------------------------------------------
+
+        if nuevos_videos >= total_videos:
+
+            cursor.execute("""
+                UPDATE rt_boletos
+                SET
+                    estado = 'acreditado',
+                    actualizado_en = NOW()
+                WHERE
+                    id = %s
+                    AND estado = 'reservado'
+            """, (
+                boleto["id"],
+            ))
+
+        db.commit()
+
+        return redirect(
+            url_for(
+                "reserva",
+                reserva_token=reserva_token
+            )
+        )
+
+    except Exception as error:
+
+        db.rollback()
+
+        print(
+            "ERROR AL REGISTRAR VIDEO:",
+            error
+        )
+
+        flash(
+            "No fue posible registrar el video.",
+            "error"
+        )
+
+        return redirect(
+            url_for(
+                "reserva",
+                reserva_token=reserva_token
+            )
+        )
+
+    finally:
+
+        db.close()
+
+
+# ============================================================
 # PANEL ADMINISTRATIVO
-# =========================================================
+# ============================================================
 
 @app.route("/rifas/admin")
 def admin_rifas():
@@ -592,9 +698,9 @@ def admin_rifas():
         db.close()
 
 
-# =========================================================
+# ============================================================
 # NUEVA RIFA
-# =========================================================
+# ============================================================
 
 @app.route("/rifas/admin/nueva")
 def nueva_rifa():
@@ -603,10 +709,6 @@ def nueva_rifa():
         "nueva_rifa.html"
     )
 
-
-# =========================================================
-# CREAR RIFA
-# =========================================================
 
 @app.route(
     "/rifas/admin/nueva",
@@ -674,7 +776,10 @@ def crear_rifa():
         if cantidad_boletos <= 0:
             raise ValueError
 
-    except (ValueError, TypeError):
+    except (
+        ValueError,
+        TypeError
+    ):
 
         flash(
             "La cantidad de boletos debe ser mayor que cero.",
@@ -694,7 +799,10 @@ def crear_rifa():
         if precio_boleto < 0:
             raise ValueError
 
-    except (ValueError, TypeError):
+    except (
+        ValueError,
+        TypeError
+    ):
 
         flash(
             "El precio del boleto no es válido.",
@@ -752,10 +860,39 @@ def crear_rifa():
 
         rifa_id = cursor.fetchone()["id"]
 
+        # ----------------------------------------------------
+        # Generar automáticamente los boletos
+        # ----------------------------------------------------
+
+        for numero in range(
+            1,
+            cantidad_boletos + 1
+        ):
+
+            cursor.execute("""
+                INSERT INTO rt_boletos (
+                    rifa_id,
+                    numero,
+                    estado,
+                    origen,
+                    creado_en
+                )
+                VALUES (
+                    %s,
+                    %s,
+                    'disponible',
+                    'sistema',
+                    NOW()
+                )
+            """, (
+                rifa_id,
+                numero
+            ))
+
         db.commit()
 
         flash(
-            f"Rifa creada correctamente. ID: {rifa_id}",
+            f"Rifa creada correctamente con {cantidad_boletos} boletos.",
             "success"
         )
 
@@ -786,9 +923,9 @@ def crear_rifa():
         db.close()
 
 
-# =========================================================
+# ============================================================
 # EDITAR RIFA
-# =========================================================
+# ============================================================
 
 @app.route(
     "/rifas/admin/editar/<int:rifa_id>"
@@ -815,7 +952,9 @@ def editar_rifa(rifa_id):
                 fecha_sorteo
             FROM rt_rifas
             WHERE id = %s
-        """, (rifa_id,))
+        """, (
+            rifa_id,
+        ))
 
         rifa = cursor.fetchone()
 
@@ -840,10 +979,6 @@ def editar_rifa(rifa_id):
 
         db.close()
 
-
-# =========================================================
-# ACTUALIZAR RIFA
-# =========================================================
 
 @app.route(
     "/rifas/admin/editar/<int:rifa_id>",
@@ -894,7 +1029,7 @@ def actualizar_rifa(rifa_id):
     if not titulo:
 
         flash(
-            "El título es obligatorio.",
+            "El título de la rifa es obligatorio.",
             "error"
         )
 
@@ -914,7 +1049,10 @@ def actualizar_rifa(rifa_id):
         if cantidad_boletos <= 0:
             raise ValueError
 
-    except (ValueError, TypeError):
+    except (
+        ValueError,
+        TypeError
+    ):
 
         flash(
             "La cantidad de boletos no es válida.",
@@ -937,7 +1075,10 @@ def actualizar_rifa(rifa_id):
         if precio_boleto < 0:
             raise ValueError
 
-    except (ValueError, TypeError):
+    except (
+        ValueError,
+        TypeError
+    ):
 
         flash(
             "El precio del boleto no es válido.",
@@ -982,6 +1123,19 @@ def actualizar_rifa(rifa_id):
             rifa_id
         ))
 
+        if cursor.rowcount == 0:
+
+            db.rollback()
+
+            flash(
+                "La rifa no existe.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin_rifas")
+            )
+
         db.commit()
 
         flash(
@@ -998,12 +1152,12 @@ def actualizar_rifa(rifa_id):
         db.rollback()
 
         print(
-            "ERROR AL ACTUALIZAR:",
+            "ERROR AL ACTUALIZAR RIFA:",
             error
         )
 
         flash(
-            "Ocurrió un error al actualizar.",
+            "Ocurrió un error al actualizar la rifa.",
             "error"
         )
 
@@ -1019,9 +1173,9 @@ def actualizar_rifa(rifa_id):
         db.close()
 
 
-# =========================================================
+# ============================================================
 # PUBLICAR
-# =========================================================
+# ============================================================
 
 @app.route(
     "/rifas/admin/publicar/<int:rifa_id>",
@@ -1043,7 +1197,9 @@ def publicar_rifa(rifa_id):
             WHERE
                 id = %s
                 AND estado = 'borrador'
-        """, (rifa_id,))
+        """, (
+            rifa_id,
+        ))
 
         if cursor.rowcount == 0:
 
@@ -1068,12 +1224,12 @@ def publicar_rifa(rifa_id):
         db.rollback()
 
         print(
-            "ERROR AL PUBLICAR:",
+            "ERROR AL PUBLICAR RIFA:",
             error
         )
 
         flash(
-            "Ocurrió un error al publicar.",
+            "Ocurrió un error al publicar la rifa.",
             "error"
         )
 
@@ -1086,9 +1242,9 @@ def publicar_rifa(rifa_id):
     )
 
 
-# =========================================================
+# ============================================================
 # FINALIZAR
-# =========================================================
+# ============================================================
 
 @app.route(
     "/rifas/admin/finalizar/<int:rifa_id>",
@@ -1110,7 +1266,9 @@ def finalizar_rifa(rifa_id):
             WHERE
                 id = %s
                 AND estado = 'activa'
-        """, (rifa_id,))
+        """, (
+            rifa_id,
+        ))
 
         if cursor.rowcount == 0:
 
@@ -1135,12 +1293,12 @@ def finalizar_rifa(rifa_id):
         db.rollback()
 
         print(
-            "ERROR AL FINALIZAR:",
+            "ERROR AL FINALIZAR RIFA:",
             error
         )
 
         flash(
-            "Ocurrió un error al finalizar.",
+            "Ocurrió un error al finalizar la rifa.",
             "error"
         )
 
@@ -1153,9 +1311,9 @@ def finalizar_rifa(rifa_id):
     )
 
 
-# =========================================================
+# ============================================================
 # CANCELAR
-# =========================================================
+# ============================================================
 
 @app.route(
     "/rifas/admin/cancelar/<int:rifa_id>",
@@ -1177,7 +1335,9 @@ def cancelar_rifa(rifa_id):
             WHERE
                 id = %s
                 AND estado IN ('borrador', 'activa')
-        """, (rifa_id,))
+        """, (
+            rifa_id,
+        ))
 
         if cursor.rowcount == 0:
 
@@ -1202,12 +1362,12 @@ def cancelar_rifa(rifa_id):
         db.rollback()
 
         print(
-            "ERROR AL CANCELAR:",
+            "ERROR AL CANCELAR RIFA:",
             error
         )
 
         flash(
-            "Ocurrió un error al cancelar.",
+            "Ocurrió un error al cancelar la rifa.",
             "error"
         )
 
@@ -1220,9 +1380,9 @@ def cancelar_rifa(rifa_id):
     )
 
 
-# =========================================================
+# ============================================================
 # EJECUCION LOCAL
-# =========================================================
+# ============================================================
 
 if __name__ == "__main__":
     app.run(
