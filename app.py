@@ -120,13 +120,57 @@ def liberar_reservas_expiradas(db):
 
     return len(ids)
 
+
 # ============================================================
 # INICIO
 # ============================================================
 
 @app.route("/")
 def inicio():
-    return render_template("index.html")
+
+    db = get_db()
+
+    try:
+
+        # ----------------------------------------------------
+        # Limpiar reservas expiradas
+        # ----------------------------------------------------
+
+        liberadas = liberar_reservas_expiradas(db)
+
+        if liberadas > 0:
+            db.commit()
+
+        # ----------------------------------------------------
+        # Traer las 3 rifas activas más recientes
+        # ----------------------------------------------------
+
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT
+                id,
+                titulo,
+                descripcion,
+                imagen_url,
+                cantidad_boletos,
+                precio_boleto
+            FROM rt_rifas
+            WHERE estado = 'activa'
+            ORDER BY creado_en DESC
+            LIMIT 3
+        """)
+
+        rifas_destacadas = cursor.fetchall()
+
+        return render_template(
+            "index.html",
+            rifas_destacadas=rifas_destacadas
+        )
+
+    finally:
+
+        db.close()
 
 
 # ============================================================
@@ -139,6 +183,19 @@ def rifas():
     db = get_db()
 
     try:
+
+        # ----------------------------------------------------
+        # Limpiar reservas expiradas
+        # ----------------------------------------------------
+
+        liberadas = liberar_reservas_expiradas(db)
+
+        if liberadas > 0:
+            db.commit()
+
+        # ----------------------------------------------------
+        # Listar rifas activas
+        # ----------------------------------------------------
 
         cursor = db.cursor()
 
@@ -181,6 +238,15 @@ def participar(rifa_id):
     db = get_db()
 
     try:
+
+        # ----------------------------------------------------
+        # Limpiar reservas expiradas ANTES de listar
+        # ----------------------------------------------------
+
+        liberadas = liberar_reservas_expiradas(db)
+
+        if liberadas > 0:
+            db.commit()
 
         cursor = db.cursor()
 
@@ -279,6 +345,14 @@ def reservar_boleto(rifa_id):
     db = get_db()
 
     try:
+
+        # ----------------------------------------------------
+        # Limpiar reservas expiradas primero
+        # (así el boleto seleccionado podría volver a estar
+        #  disponible si su reserva previa expiró)
+        # ----------------------------------------------------
+
+        liberar_reservas_expiradas(db)
 
         cursor = db.cursor()
 
@@ -419,6 +493,15 @@ def reserva(reserva_token):
 
     try:
 
+        # ----------------------------------------------------
+        # Limpiar reservas expiradas primero
+        # ----------------------------------------------------
+
+        liberadas = liberar_reservas_expiradas(db)
+
+        if liberadas > 0:
+            db.commit()
+
         cursor = db.cursor()
 
         # ----------------------------------------------------
@@ -451,7 +534,8 @@ def reserva(reserva_token):
         if not boleto:
 
             flash(
-                "La reserva no existe o ya no está disponible.",
+                "La reserva expiró o ya no está disponible. "
+                "Puedes elegir otro boleto.",
                 "error"
             )
 
@@ -575,6 +659,12 @@ def completar_video(reserva_token):
         cursor = db.cursor()
 
         # ----------------------------------------------------
+        # Limpiar reservas expiradas primero
+        # ----------------------------------------------------
+
+        liberar_reservas_expiradas(db)
+
+        # ----------------------------------------------------
         # Buscar boleto
         # ----------------------------------------------------
 
@@ -599,7 +689,7 @@ def completar_video(reserva_token):
             db.rollback()
 
             flash(
-                "Reserva no encontrada.",
+                "Reserva no encontrada o expirada.",
                 "error"
             )
 
