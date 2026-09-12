@@ -1,6 +1,11 @@
 import os
 import secrets
 
+from datetime import (
+    datetime,
+    timedelta
+)
+
 from flask import (
     Flask,
     render_template,
@@ -21,6 +26,99 @@ app.secret_key = os.getenv(
     "rifas-clave-local"
 )
 
+
+# ============================================================
+# CONFIGURACIÓN DE RESERVAS
+#
+# Horas que un boleto puede estar "reservado" sin actividad
+# antes de liberarse automáticamente.
+#
+# Se puede sobreescribir con la variable de entorno
+# RESERVA_TTL_HORAS.
+# ============================================================
+
+RESERVA_TTL_HORAS = int(
+    os.getenv(
+        "RESERVA_TTL_HORAS",
+        "1"
+    )
+)
+
+
+# ============================================================
+# HELPER: LIBERAR RESERVAS EXPIRADAS
+#
+# Se llama "lazy": no usamos cron ni Celery. Cada vez que
+# alguien entra a una ruta relevante, primero limpiamos.
+#
+# Devuelve la cantidad de boletos liberados.
+# ============================================================
+
+def liberar_reservas_expiradas(db):
+
+    cursor = db.cursor()
+
+    # --------------------------------------------------------
+    # Calcular el punto de corte
+    # --------------------------------------------------------
+
+    cutoff = datetime.now() - timedelta(
+        hours=RESERVA_TTL_HORAS
+    )
+
+    # --------------------------------------------------------
+    # Buscar boletos reservados cuya reserva ya expiró
+    # --------------------------------------------------------
+
+    cursor.execute("""
+        SELECT
+            id
+        FROM rt_boletos
+        WHERE
+            estado = 'reservado'
+            AND reservado_en IS NOT NULL
+            AND reservado_en < %s
+    """, (
+        cutoff,
+    ))
+
+    filas = cursor.fetchall()
+
+    if not filas:
+
+        return 0
+
+    ids = [fila["id"] for fila in filas]
+
+    # --------------------------------------------------------
+    # Borrar el progreso de publicidad asociado
+    # (para que si alguien más reserve, empiece limpio)
+    # --------------------------------------------------------
+
+    cursor.execute("""
+        DELETE FROM rt_progreso_publicidad
+        WHERE boleto_id = ANY(%s)
+    """, (
+        ids,
+    ))
+
+    # --------------------------------------------------------
+    # Liberar los boletos
+    # --------------------------------------------------------
+
+    cursor.execute("""
+        UPDATE rt_boletos
+        SET
+            estado = 'disponible',
+            reserva_token = NULL,
+            reservado_en = NULL,
+            actualizado_en = NOW()
+        WHERE id = ANY(%s)
+    """, (
+        ids,
+    ))
+
+    return len(ids)
 
 # ============================================================
 # INICIO
@@ -232,10 +330,6 @@ def reservar_boleto(rifa_id):
 
         # ----------------------------------------------------
         # Reservar boleto
-        #
-        # IMPORTANTE:
-        # No usamos actualizado_en porque esa columna
-        # no existe en rt_boletos.
         # ----------------------------------------------------
 
         cursor.execute("""
@@ -243,7 +337,8 @@ def reservar_boleto(rifa_id):
             SET
                 estado = 'reservado',
                 reserva_token = %s,
-                reservado_en = NOW()
+                reservado_en = NOW(),
+                actualizado_en = NOW()
             WHERE
                 id = %s
                 AND rifa_id = %s
@@ -659,7 +754,8 @@ def completar_video(reserva_token):
             cursor.execute("""
                 UPDATE rt_boletos
                 SET
-                    estado = 'acreditado'
+                    estado = 'acreditado',
+                    actualizado_en = NOW()
                 WHERE
                     id = %s
                     AND estado = 'reservado'
@@ -695,6 +791,382 @@ def completar_video(reserva_token):
                 "reserva",
                 reserva_token=reserva_token
             )
+        )
+
+    finally:
+
+        db.close()
+
+
+# ============================================================
+# FORMULARIO DE DATOS DEL PARTICIPANTE
+#
+# Solo accesible cuando el boleto esté "acreditado"
+# ============================================================
+
+@app.route("/rifas/reserva/<reserva_token>/datos")
+def datos_participante(reserva_token):
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT
+                b.id,
+                b.rifa_id,
+                b.numero,
+                b.estado,
+                b.reserva_token,
+                b.nombre,
+                b.numero_especial,
+                r.titulo,
+                r.descripcion,
+                r.imagen_url
+            FROM rt_boletos b
+            INNER JOIN rt_rifas r
+                ON r.id = b.rifa_id
+            WHERE b.reserva_token = %s
+        """, (
+            reserva_token,
+        ))
+
+        boleto = cursor.fetchone()
+
+        if not boleto:
+
+            flash(
+                "La reserva no existe.",
+                "error"
+            )
+
+            return redirect(
+                url_for("rifas")
+            )
+
+        # ----------------------------------------------------
+        # Solo permitir si ya completó los 5 videos
+        # ----------------------------------------------------
+
+        if boleto["estado"] not in (
+            "acreditado",
+            "asignado"
+        ):
+
+            flash(
+                "Primero debes completar los 5 videos.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "reserva",
+                    reserva_token=reserva_token
+                )
+            )
+
+        # ----------------------------------------------------
+        # Si ya está asignado, mandarlo directo a la tarjeta
+        # ----------------------------------------------------
+
+        if boleto["estado"] == "asignado":
+
+            return redirect(
+                url_for(
+                    "tarjeta_participacion",
+                    reserva_token=reserva_token
+                )
+            )
+
+        return render_template(
+            "datos_participante.html",
+            boleto=boleto
+        )
+
+    finally:
+
+        db.close()
+
+
+# ============================================================
+# GUARDAR DATOS DEL PARTICIPANTE
+# ============================================================
+
+@app.route(
+    "/rifas/reserva/<reserva_token>/datos",
+    methods=["POST"]
+)
+def guardar_datos_participante(reserva_token):
+
+    nombre = request.form.get(
+        "nombre",
+        ""
+    ).strip()
+
+    numero_especial = request.form.get(
+        "numero_especial",
+        ""
+    ).strip()
+
+    # --------------------------------------------------------
+    # Validar nombre
+    # --------------------------------------------------------
+
+    if not nombre:
+
+        flash(
+            "El nombre es obligatorio.",
+            "error"
+        )
+
+        return redirect(
+            url_for(
+                "datos_participante",
+                reserva_token=reserva_token
+            )
+        )
+
+    if len(nombre) > 200:
+
+        flash(
+            "El nombre es demasiado largo (máximo 200 caracteres).",
+            "error"
+        )
+
+        return redirect(
+            url_for(
+                "datos_participante",
+                reserva_token=reserva_token
+            )
+        )
+
+    # --------------------------------------------------------
+    # Validar número especial (opcional)
+    #
+    # En la BD es VARCHAR(50), así que lo tratamos como texto.
+    # --------------------------------------------------------
+
+    if numero_especial and len(numero_especial) > 50:
+
+        flash(
+            "El número especial es demasiado largo (máximo 50 caracteres).",
+            "error"
+        )
+
+        return redirect(
+            url_for(
+                "datos_participante",
+                reserva_token=reserva_token
+            )
+        )
+
+    if not numero_especial:
+
+        numero_especial = None
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        # ----------------------------------------------------
+        # Bloquear fila para evitar doble envío
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            SELECT
+                id,
+                estado
+            FROM rt_boletos
+            WHERE reserva_token = %s
+            FOR UPDATE
+        """, (
+            reserva_token,
+        ))
+
+        boleto = cursor.fetchone()
+
+        if not boleto:
+
+            db.rollback()
+
+            flash(
+                "Reserva no encontrada.",
+                "error"
+            )
+
+            return redirect(
+                url_for("rifas")
+            )
+
+        # ----------------------------------------------------
+        # Solo permitir si aún no fue asignado
+        # ----------------------------------------------------
+
+        if boleto["estado"] not in (
+            "acreditado",
+            "asignado"
+        ):
+
+            db.rollback()
+
+            flash(
+                "Esta reserva no puede registrar datos todavía.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "reserva",
+                    reserva_token=reserva_token
+                )
+            )
+
+        # ----------------------------------------------------
+        # Guardar datos y pasar a "asignado"
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            UPDATE rt_boletos
+            SET
+                nombre = %s,
+                numero_especial = %s,
+                estado = 'asignado',
+                asignado_en = NOW(),
+                actualizado_en = NOW()
+            WHERE
+                id = %s
+                AND estado IN ('acreditado', 'asignado')
+        """, (
+            nombre,
+            numero_especial,
+            boleto["id"]
+        ))
+
+        if cursor.rowcount != 1:
+
+            db.rollback()
+
+            flash(
+                "No fue posible guardar los datos.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "datos_participante",
+                    reserva_token=reserva_token
+                )
+            )
+
+        db.commit()
+
+        return redirect(
+            url_for(
+                "tarjeta_participacion",
+                reserva_token=reserva_token
+            )
+        )
+
+    except Exception as error:
+
+        db.rollback()
+
+        print(
+            "ERROR AL GUARDAR DATOS:",
+            error
+        )
+
+        flash(
+            "Ocurrió un error al guardar los datos.",
+            "error"
+        )
+
+        return redirect(
+            url_for(
+                "datos_participante",
+                reserva_token=reserva_token
+            )
+        )
+
+    finally:
+
+        db.close()
+
+
+# ============================================================
+# TARJETA FINAL DE PARTICIPACIÓN
+# ============================================================
+
+@app.route("/rifas/tarjeta/<reserva_token>")
+def tarjeta_participacion(reserva_token):
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT
+                b.id,
+                b.rifa_id,
+                b.numero,
+                b.estado,
+                b.reserva_token,
+                b.nombre,
+                b.numero_especial,
+                b.creado_en,
+                b.asignado_en,
+                r.titulo,
+                r.descripcion,
+                r.imagen_url,
+                r.fecha_sorteo
+            FROM rt_boletos b
+            INNER JOIN rt_rifas r
+                ON r.id = b.rifa_id
+            WHERE b.reserva_token = %s
+        """, (
+            reserva_token,
+        ))
+
+        boleto = cursor.fetchone()
+
+        if not boleto:
+
+            flash(
+                "La participación no existe.",
+                "error"
+            )
+
+            return redirect(
+                url_for("rifas")
+            )
+
+        # ----------------------------------------------------
+        # Solo mostrar si ya está asignado
+        # ----------------------------------------------------
+
+        if boleto["estado"] != "asignado":
+
+            flash(
+                "Aún debes completar los pasos para ver tu tarjeta.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "reserva",
+                    reserva_token=reserva_token
+                )
+            )
+
+        return render_template(
+            "tarjeta_participacion.html",
+            boleto=boleto
         )
 
     finally:
