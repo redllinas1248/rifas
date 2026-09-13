@@ -173,6 +173,19 @@ def inicio():
         db.close()
 
 
+@app.route("/privacidad")
+def privacidad():
+    return render_template("privacidad.html")
+
+@app.route("/terminos")
+def terminos():
+    return render_template("terminos.html")
+
+@app.route("/contacto")
+def contacto():
+    return render_template("contacto.html")
+
+
 # ============================================================
 # LISTADO PUBLICO DE RIFAS
 # ============================================================
