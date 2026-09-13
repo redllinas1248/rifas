@@ -153,6 +153,7 @@
             background: #374151;
             cursor: not-allowed;
             box-shadow: none;
+            transform: none;
         }
 
         .boton-continuar {
@@ -223,6 +224,52 @@
             text-align: center;
         }
 
+        /* ============================================
+           OVERLAY DE CARGA DEL ANUNCIO
+        ============================================ */
+
+        .overlay-ad {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 9999;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .overlay-ad.activo { display: flex; }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(139, 92, 246, 0.2);
+            border-top-color: #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .overlay-ad h3 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+        .overlay-ad p {
+            color: #a5b4fc;
+            font-size: 14px;
+            margin: 0;
+        }
+
         @media (max-width: 500px) {
             .contenedor { margin-top: 20px; }
             .tarjeta { padding: 18px; }
@@ -282,11 +329,13 @@
 
             {% if progreso.videos_completados < progreso.total_videos %}
 
-                <form method="POST" action="{{ url_for('completar_video', reserva_token=boleto.reserva_token) }}">
-                    <button class="boton" type="submit">
-                        ▶️ Ver siguiente video
-                    </button>
-                </form>
+                <button
+                    id="btnVerVideo"
+                    class="boton"
+                    type="button"
+                >
+                    ▶️ Ver siguiente video
+                </button>
 
             {% else %}
 
@@ -335,5 +384,187 @@
 
 </div>
 
+
+<!-- ============================================
+     OVERLAY MIENTRAS CARGA EL ANUNCIO
+============================================= -->
+
+<div class="overlay-ad" id="overlayAd">
+
+    <div class="spinner"></div>
+
+    <h3>⏳ Preparando tu video...</h3>
+
+    <p>Esto puede tomar unos segundos.</p>
+
+</div>
+
+
+<!-- ============================================
+     GOOGLE H5 GAMES ADS (Ad Placement API)
+     Modo prueba activado (data-adbreak-test="on")
+============================================= -->
+
+<script
+    async
+    data-adbreak-test="on"
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2084405192549609"
+    crossorigin="anonymous"
+></script>
+
+
+<script>
+
+    // ============================================================
+    // INICIALIZACIÓN DE LA API DE GOOGLE
+    // ============================================================
+
+    window.adsbygoogle = window.adsbygoogle || [];
+
+    var adBreak = adConfig = function(o) {
+        adsbygoogle.push(o);
+    };
+
+    adConfig({
+        sound: 'on',
+        preloadAdBreaks: 'auto',
+        onReady: function() {
+            console.log('✅ Google Ad Placement API lista');
+        }
+    });
+
+
+    // ============================================================
+    // BOTÓN: VER SIGUIENTE VIDEO
+    // ============================================================
+
+    const boton = document.getElementById('btnVerVideo');
+    const overlay = document.getElementById('overlayAd');
+
+    if (boton) {
+
+        boton.addEventListener('click', function() {
+
+            // ------------------------------------------------
+            // Estado visual inicial
+            // ------------------------------------------------
+
+            boton.disabled = true;
+            boton.textContent = '⏳ Cargando anuncio...';
+
+            overlay.classList.add('activo');
+
+
+            // ------------------------------------------------
+            // Llamar a la API de Google
+            // ------------------------------------------------
+
+            adBreak({
+
+                type: 'reward',
+                name: 'rewarded_video',
+
+                beforeAd: function() {
+                    console.log('🎬 Anuncio a punto de mostrarse');
+                    overlay.classList.remove('activo');
+                },
+
+                afterAd: function() {
+                    console.log('🎬 Anuncio finalizado');
+                },
+
+                beforeReward: function(showAdFn) {
+                    // Google nos da la función que muestra el anuncio
+                    showAdFn();
+                },
+
+                adViewed: function() {
+
+                    // ------------------------------------------
+                    // 🎉 El usuario vio el anuncio completo
+                    // ------------------------------------------
+
+                    console.log('✅ adViewed — enviando confirmación');
+
+                    fetch(
+                        '{{ url_for("confirmar_video", reserva_token=boleto.reserva_token) }}',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            credentials: 'same-origin'
+                        }
+                    )
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(data) {
+
+                        if (data.success) {
+
+                            // Recargar para ver el progreso actualizado
+                            window.location.reload();
+
+                        } else {
+
+                            alert(
+                                'No se pudo confirmar el video.\n' +
+                                (data.error || 'Inténtalo de nuevo.')
+                            );
+
+                            boton.disabled = false;
+                            boton.textContent = '▶️ Ver siguiente video';
+
+                        }
+
+                    })
+                    .catch(function(error) {
+
+                        console.error('Error al confirmar:', error);
+
+                        alert(
+                            'Error de conexión. Inténtalo de nuevo.'
+                        );
+
+                        boton.disabled = false;
+                        boton.textContent = '▶️ Ver siguiente video';
+
+                    });
+
+                },
+
+                adDismissed: function() {
+
+                    // ------------------------------------------
+                    // El usuario cerró el anuncio antes de terminar
+                    // ------------------------------------------
+
+                    console.log('❌ Anuncio cerrado sin completar');
+
+                    overlay.classList.remove('activo');
+
+                    alert(
+                        'Debes ver el video completo para acreditar tu boleto.'
+                    );
+
+                    boton.disabled = false;
+                    boton.textContent = '▶️ Ver siguiente video';
+
+                },
+
+                adBreakDone: function(placementInfo) {
+                    console.log('📊 adBreakDone:', placementInfo);
+                }
+
+            });
+
+        });
+
+    }
+
+</script>
+
 </body>
+
 </html>
