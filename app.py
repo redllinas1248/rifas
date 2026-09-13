@@ -18,7 +18,8 @@ from flask import (
     url_for,
     flash,
     session,
-    abort
+    abort,
+    jsonify
 )
 
 from db import get_db
