@@ -1243,6 +1243,121 @@ def admin_login():
 
 
 # ============================================================
+# PARTICIPANTES DE UN SORTEO
+# ============================================================
+
+@app.route("/rifas/admin/participantes/<int:rifa_id>")
+@admin_required
+def admin_participantes(rifa_id):
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        # ----------------------------------------------------
+        # Datos de la rifa
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            SELECT
+                id,
+                titulo,
+                descripcion,
+                estado,
+                cantidad_boletos,
+                fecha_sorteo
+            FROM rt_rifas
+            WHERE id = %s
+        """, (
+            rifa_id,
+        ))
+
+        rifa = cursor.fetchone()
+
+        if not rifa:
+
+            flash(
+                "El sorteo no existe.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin_rifas")
+            )
+
+        # ----------------------------------------------------
+        # Estadísticas rápidas del sorteo
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) FILTER (
+                    WHERE estado = 'disponible'
+                ) AS disponibles,
+                COUNT(*) FILTER (
+                    WHERE estado = 'reservado'
+                ) AS reservados,
+                COUNT(*) FILTER (
+                    WHERE estado = 'acreditado'
+                ) AS acreditados,
+                COUNT(*) FILTER (
+                    WHERE estado = 'asignado'
+                ) AS asignados
+            FROM rt_boletos
+            WHERE rifa_id = %s
+        """, (
+            rifa_id,
+        ))
+
+        stats = cursor.fetchone()
+
+        # ----------------------------------------------------
+        # Listado de participantes
+        #
+        # Solo mostramos boletos que ya tienen dueño
+        # (reservado, acreditado o asignado).
+        # Los "disponible" no son participantes.
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            SELECT
+                id,
+                numero,
+                estado,
+                nombre,
+                numero_especial,
+                reservado_en,
+                asignado_en,
+                reserva_token
+            FROM rt_boletos
+            WHERE rifa_id = %s
+              AND estado IN (
+                  'reservado',
+                  'acreditado',
+                  'asignado'
+              )
+            ORDER BY numero ASC
+        """, (
+            rifa_id,
+        ))
+
+        participantes = cursor.fetchall()
+
+        return render_template(
+            "admin_participantes.html",
+            rifa=rifa,
+            participantes=participantes,
+            stats=stats
+        )
+
+    finally:
+
+        db.close()
+
+
+# ============================================================
 # LOGOUT DE ADMINISTRACIÓN
 # ============================================================
 

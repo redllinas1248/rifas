@@ -149,6 +149,15 @@
                             </td>
                             <td>
                                 <div class="acciones">
+
+<a
+    href="{{ url_for('admin_participantes', rifa_id=rifa.id) }}"
+    class="boton"
+    style="background:#8b5cf6; color:white;"
+>
+    👥 Ver participantes
+</a>
+
                                     <a href="{{ url_for('editar_rifa', rifa_id=rifa.id) }}" class="boton boton-editar">✏️ Editar</a>
 
                                     {% if rifa.estado == 'borrador' %}
