@@ -132,17 +132,17 @@
                                 {% if rifa.descripcion %}<div class="descripcion">{{ rifa.descripcion }}</div>{% endif %}
                             </td>
                             <td>
-                                {% set stats = stats_por_rifa | selectattr('id', 'equalto', rifa.id) | first %}
-                                {% if stats %}
-                                    <div class="stats-rifa">
-                                        <span>D: <strong>{{ stats.disponibles }}</strong></span>
-                                        <span>R: <strong>{{ stats.reservados }}</strong></span>
-                                        <span>A: <strong>{{ stats.acreditados + stats.asignados }}</strong></span>
-                                    </div>
-                                {% else %}
-                                    <span style="color:#4b5563;">—</span>
-                                {% endif %}
-                            </td>
+    {% set stats = stats_por_rifa.get(rifa.id) %}
+    {% if stats %}
+        <div class="stats-rifa" style="display:flex; gap:12px; font-size:13px;">
+            <span title="Disponibles">🟢 <strong style="color:#e8ecf4;">{{ stats.disponibles }}</strong></span>
+            <span title="Reservados">🔵 <strong style="color:#60a5fa;">{{ stats.reservados }}</strong></span>
+            <span title="Acreditados/Asignados">🟡 <strong style="color:#34d399;">{{ stats.acreditados + stats.asignados }}</strong></span>
+        </div>
+    {% else %}
+        <span style="color:#4b5563;">—</span>
+    {% endif %}
+</td>
                             <td><span class="estado {{ rifa.estado }}">{{ rifa.estado }}</span></td>
                             <td class="fecha">
                                 {% if rifa.fecha_sorteo %}{{ rifa.fecha_sorteo.strftime('%d/%m/%Y %H:%M') }}{% else %}Sin definir{% endif %}
