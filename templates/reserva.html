@@ -422,8 +422,18 @@
     const overlayTitulo = document.getElementById('overlayTitulo');
     const overlayTexto = document.getElementById('overlayTexto');
 
-    // Bandera: ¿la API de Google está disponible y lista?
-    let googleAdReady = false;
+    // ============================================================
+// MODO SIMULADO FORZADO
+//
+// Google H5 Games Ads aún no aprueba la cuenta.
+// Mientras tanto, forzamos el modo simulado para que
+// el flujo funcione. Cuando Google apruebe, cambia
+// FORZAR_MODO_SIMULADO a false y listo.
+// ============================================================
+
+const FORZAR_MODO_SIMULADO = true;
+
+let googleAdReady = false;
 
     // Bandera: ¿ya se intentó procesar el clic?
     let procesando = false;
@@ -629,7 +639,7 @@
             boton.textContent = '⏳ Cargando anuncio...';
 
 
-            if (googleAdReady) {
+            if (googleAdReady && !FORZAR_MODO_SIMULADO) {
 
                 // Google aprobado → modo real
                 modoGoogleAds();
