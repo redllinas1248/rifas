@@ -1,3 +1,5 @@
+from datetime import timezone
+from zoneinfo import ZoneInfo
 import os
 import secrets
 
@@ -40,6 +42,28 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax",       # Mitiga CSRF
     PERMANENT_SESSION_LIFETIME=timedelta(hours=2)
 )
+
+# ============================================================
+# ZONA HORARIA
+#
+# PostgreSQL guarda con NOW() en UTC. Convertimos a hora
+# de México al mostrar en templates con el filtro `mx`.
+# ============================================================
+
+TZ_MEXICO = ZoneInfo("America/Mexico_City")
+
+
+@app.template_filter("mx")
+def filtro_mx(dt):
+
+    if dt is None:
+        return None
+
+    return (
+        dt
+        .replace(tzinfo=timezone.utc)
+        .astimezone(TZ_MEXICO)
+    )
 
 
 # ============================================================
