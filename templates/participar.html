@@ -7,6 +7,9 @@
 
     <title>Participar gratis | {{ rifa.titulo }}</title>
 
+    <meta name="theme-color" content="#0a0d18">
+    <meta name="color-scheme" content="dark">
+
     <style>
 
         * { box-sizing: border-box; }
@@ -14,20 +17,29 @@
         body {
             margin: 0;
             font-family: Arial, Helvetica, sans-serif;
-            background: #f4f6f9;
-            color: #1f2937;
+            background: #0a0d18;
+            color: #e8ecf4;
+            -webkit-font-smoothing: antialiased;
         }
 
         .header {
-            background: linear-gradient(135deg, #0d6efd, #084298);
+            background: linear-gradient(135deg, #1e1b4b, #0a0d18);
+            border-bottom: 1px solid #232942;
             color: white;
-            padding: 22px 15px;
+            padding: 25px 15px;
             text-align: center;
         }
 
-        .header h1 { margin: 0; font-size: 25px; }
+        .header h1 {
+            margin: 0;
+            font-size: 25px;
+            background: linear-gradient(135deg, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-        .header p { margin: 7px 0 0; opacity: .9; }
+        .header p { margin: 7px 0 0; color: #8a93ab; }
 
         .container {
             width: 100%;
@@ -37,10 +49,10 @@
         }
 
         .card {
-            background: white;
+            background: #141827;
+            border: 1px solid #232942;
             border-radius: 18px;
-            padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,.08);
+            padding: 22px;
             margin-bottom: 20px;
         }
 
@@ -56,35 +68,41 @@
             height: 220px;
             object-fit: cover;
             border-radius: 14px;
-            background: #eee;
+            background: #1e293b;
         }
 
-        .rifa-info h2 { margin-top: 0; font-size: 25px; }
+        .rifa-info h2 {
+            margin-top: 0;
+            font-size: 25px;
+            color: #e8ecf4;
+        }
 
         .descripcion {
-            color: #555;
+            color: #8a93ab;
             line-height: 1.6;
         }
 
         .badge-gratis {
             display: inline-block;
-            background: #d1fae5;
-            color: #065f46;
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
             padding: 6px 14px;
             border-radius: 50px;
             font-size: 13px;
             font-weight: bold;
             margin-top: 10px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .titulo-seccion {
             text-align: center;
             margin-bottom: 10px;
+            color: #e8ecf4;
         }
 
         .subtitulo {
             text-align: center;
-            color: #6b7280;
+            color: #8a93ab;
             margin-bottom: 25px;
         }
 
@@ -103,25 +121,27 @@
             align-items: center;
             justify-content: center;
             height: 52px;
-            border: 2px solid #d1d5db;
+            border: 2px solid #232942;
             border-radius: 10px;
-            background: #fff;
+            background: #0a0d18;
+            color: #e8ecf4;
             cursor: pointer;
             font-weight: bold;
             transition: .2s;
         }
 
         .boleto label:hover {
-            border-color: #0d6efd;
-            background: #eef5ff;
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
             transform: translateY(-2px);
         }
 
         .boleto input:checked + label {
-            background: #0d6efd;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             color: white;
-            border-color: #0d6efd;
-            transform: scale(1.03);
+            border-color: #8b5cf6;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
         }
 
         .boton-reservar {
@@ -129,7 +149,7 @@
             width: 100%;
             border: none;
             border-radius: 12px;
-            background: #198754;
+            background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             font-size: 18px;
             font-weight: bold;
@@ -137,22 +157,31 @@
             margin-top: 25px;
             cursor: pointer;
             transition: .2s;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
         }
 
-        .boton-reservar:hover { background: #157347; }
+        .boton-reservar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 28px rgba(16, 185, 129, 0.5);
+        }
 
         .boton-reservar:disabled {
-            background: #9ca3af;
+            background: #374151;
             cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
 
         .volver {
             display: inline-block;
             text-decoration: none;
-            color: #0d6efd;
+            color: #a5b4fc;
             font-weight: bold;
             margin-bottom: 15px;
+            transition: 0.2s;
         }
+
+        .volver:hover { color: #8b5cf6; }
 
         .mensaje {
             padding: 14px;
@@ -161,20 +190,28 @@
             text-align: center;
         }
 
-        .mensaje.error { background: #f8d7da; color: #842029; }
+        .mensaje.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
 
-        .mensaje.success { background: #d1e7dd; color: #0f5132; }
+        .mensaje.success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
 
         .sin-boletos {
             text-align: center;
             padding: 30px;
-            color: #777;
+            color: #8a93ab;
         }
 
         .aviso-gratis {
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            color: #065f46;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #34d399;
             padding: 15px;
             border-radius: 12px;
             text-align: center;
@@ -182,6 +219,8 @@
             margin-top: 20px;
             line-height: 1.5;
         }
+
+        .aviso-gratis strong { color: #10b981; }
 
         @media (max-width: 700px) {
             .rifa-info { grid-template-columns: 1fr; }

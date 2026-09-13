@@ -4,23 +4,15 @@
 <head>
 
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <!-- SEO -->
     <title>Sorteos Gratuitos | Participa sin pagar</title>
 
-    <meta
-        name="description"
-        content="Participa gratis en nuestros sorteos. Sin pagos, sin tarjetas. Solo mira videos cortos y gana tu boleto para ganar premios increíbles."
-    >
+    <meta name="description" content="Participa gratis en nuestros sorteos. Sin pagos, sin tarjetas. Solo mira videos cortos y gana tu boleto para ganar premios increíbles.">
 
-    <meta name="theme-color" content="#1877f2">
+    <meta name="theme-color" content="#0a0d18">
+    <meta name="color-scheme" content="dark">
 
-    <!-- Open Graph (para compartir en WhatsApp / Facebook) -->
     <meta property="og:title" content="Sorteos Gratuitos">
     <meta property="og:description" content="Participa gratis y gana premios increíbles.">
     <meta property="og:type" content="website">
@@ -28,15 +20,14 @@
 
     <style>
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
             font-family: Arial, Helvetica, sans-serif;
-            background: #f4f6f9;
-            color: #1f2937;
+            background: #0a0d18;
+            color: #e8ecf4;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* ============================================
@@ -44,462 +35,332 @@
         ============================================ */
 
         .hero {
-
             background:
-                linear-gradient(
-                    135deg,
-                    #1877f2,
-                    #0d5ec4
-                );
-
-            color: white;
-
-            padding: 70px 20px 80px;
-
+                radial-gradient(circle at top, rgba(139, 92, 246, 0.15), transparent 60%),
+                radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.12), transparent 50%),
+                linear-gradient(135deg, #0a0d18, #0f1424);
+            padding: 80px 20px 90px;
             text-align: center;
+            border-bottom: 1px solid #232942;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.25), transparent 70%);
+            pointer-events: none;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
         .hero-badge {
-
             display: inline-block;
-
-            background: rgba(255,255,255,0.18);
-
-            color: white;
-
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
             padding: 8px 18px;
-
             border-radius: 50px;
-
             font-size: 13px;
-
             font-weight: bold;
-
             letter-spacing: 1px;
-
             margin-bottom: 20px;
-
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            position: relative;
+            z-index: 1;
         }
 
         .hero h1 {
-
             margin: 0;
-
-            font-size: 44px;
-
+            font-size: 46px;
             font-weight: bold;
-
             letter-spacing: -1px;
-
             line-height: 1.1;
+            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
         }
 
         .hero-sub {
-
             margin: 18px auto 30px;
-
             max-width: 520px;
-
             font-size: 18px;
-
-            opacity: 0.95;
-
+            color: #8a93ab;
             line-height: 1.5;
+            position: relative;
+            z-index: 1;
         }
 
         .hero-boton {
-
             display: inline-block;
-
             padding: 16px 36px;
-
-            background: white;
-
-            color: #1877f2;
-
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
             font-size: 18px;
-
             font-weight: bold;
-
             border-radius: 50px;
-
             text-decoration: none;
-
-            box-shadow:
-                0 8px 24px
-                rgba(0,0,0,0.15);
-
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
             transition: 0.2s;
+            position: relative;
+            z-index: 1;
         }
 
         .hero-boton:hover {
-
             transform: translateY(-2px);
-
-            box-shadow:
-                0 12px 30px
-                rgba(0,0,0,0.20);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.55);
         }
 
         /* ============================================
-           SECCIÓN "CÓMO FUNCIONA"
+           CÓMO FUNCIONA
         ============================================ */
 
         .como-funciona {
-
-            background: white;
-
-            padding: 60px 20px;
-
+            background: #0a0d18;
+            padding: 70px 20px;
         }
 
         .como-funciona-contenedor {
-
             max-width: 1000px;
-
             margin: 0 auto;
         }
 
         .como-funciona h2 {
-
             text-align: center;
-
             font-size: 32px;
-
             margin: 0 0 15px;
+            color: #e8ecf4;
         }
 
         .como-funciona-sub {
-
             text-align: center;
-
-            color: #6b7280;
-
+            color: #8a93ab;
             margin: 0 0 50px;
-
             font-size: 17px;
         }
 
         .pasos {
-
             display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(220px, 1fr));
-
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 30px;
         }
 
         .paso {
-
             text-align: center;
+            padding: 30px 20px;
+            background: #141827;
+            border: 1px solid #232942;
+            border-radius: 16px;
+            transition: 0.2s;
+        }
 
-            padding: 20px;
+        .paso:hover {
+            border-color: #3b82f6;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.15);
         }
 
         .paso-numero {
-
             display: inline-flex;
-
             align-items: center;
-
             justify-content: center;
-
             width: 60px;
-
             height: 60px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #1877f2,
-                    #0d5ec4
-                );
-
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             color: white;
-
             border-radius: 50%;
-
             font-size: 26px;
-
             font-weight: bold;
-
             margin-bottom: 20px;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
         }
 
         .paso h3 {
-
             margin: 0 0 10px;
-
             font-size: 20px;
+            color: #e8ecf4;
         }
 
         .paso p {
-
-            color: #6b7280;
-
+            color: #8a93ab;
             line-height: 1.6;
-
             margin: 0;
-
             font-size: 15px;
         }
 
         /* ============================================
-           BANNER DE TRANSPARENCIA
+           TRANSPARENCIA
         ============================================ */
 
         .transparencia {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #ecfdf5,
-                    #d1fae5
-                );
-
-            border-top: 1px solid #a7f3d0;
-
-            border-bottom: 1px solid #a7f3d0;
-
-            padding: 25px 20px;
-
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.03));
+            border-top: 1px solid rgba(16, 185, 129, 0.25);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 30px 20px;
             text-align: center;
-
-            color: #065f46;
+            color: #34d399;
         }
 
         .transparencia strong {
-
             font-size: 17px;
-
             display: block;
-
             margin-bottom: 5px;
+            color: #10b981;
         }
 
         .transparencia p {
-
             margin: 0;
-
             font-size: 15px;
-
-            opacity: 0.9;
+            color: #8a93ab;
         }
 
         /* ============================================
-           SORTEOS ACTIVOS
+           SORTEOS
         ============================================ */
 
         .contenedor {
-
             width: 100%;
-
             max-width: 1100px;
-
             margin: 0 auto;
-
-            padding: 60px 20px;
+            padding: 70px 20px;
         }
 
         .seccion-titulo {
-
             text-align: center;
-
             margin-bottom: 40px;
         }
 
         .seccion-titulo h2 {
-
             margin: 0 0 10px;
-
             font-size: 30px;
+            color: #e8ecf4;
         }
 
         .seccion-titulo p {
-
-            color: #6b7280;
-
+            color: #8a93ab;
             margin: 0;
-
             font-size: 16px;
         }
 
         .grid {
-
             display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(280px, 1fr));
-
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
         }
 
         .rifa {
-
-            background: white;
-
-            border-radius: 15px;
-
+            background: #141827;
+            border: 1px solid #232942;
+            border-radius: 16px;
             overflow: hidden;
-
-            box-shadow:
-                0 5px 20px
-                rgba(0,0,0,0.08);
-
             transition: 0.2s;
-
             display: flex;
-
             flex-direction: column;
         }
 
         .rifa:hover {
-
             transform: translateY(-4px);
-
-            box-shadow:
-                0 12px 30px
-                rgba(0,0,0,0.12);
+            border-color: #3b82f6;
+            box-shadow: 0 16px 40px rgba(59, 130, 246, 0.2);
         }
 
         .rifa-imagen {
-
             width: 100%;
-
             height: 200px;
-
             object-fit: cover;
-
             display: block;
         }
 
         .rifa-placeholder {
-
             width: 100%;
-
             height: 200px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #1877f2,
-                    #0d5ec4
-                );
-
+            background: linear-gradient(135deg, #1e293b, #0f1424);
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
             font-size: 60px;
-
-            color: white;
+            color: #8b5cf6;
         }
 
         .rifa-contenido {
-
-            padding: 20px;
-
+            padding: 22px;
             flex: 1;
-
             display: flex;
-
             flex-direction: column;
         }
 
         .rifa-titulo {
-
             margin: 0 0 10px;
-
             font-size: 20px;
-
-            color: #111827;
+            color: #e8ecf4;
         }
 
         .rifa-descripcion {
-
-            color: #6b7280;
-
+            color: #8a93ab;
             line-height: 1.5;
-
             margin: 0 0 15px;
-
             flex: 1;
-
             font-size: 15px;
         }
 
         .rifa-datos {
-
             display: flex;
-
             justify-content: space-between;
-
             padding: 12px 0;
-
-            border-top: 1px solid #f3f4f6;
-
+            border-top: 1px solid #232942;
             font-size: 14px;
-
             margin-bottom: 15px;
         }
 
         .rifa-dato {
-
             text-align: center;
-
             flex: 1;
         }
 
         .rifa-dato strong {
-
             display: block;
-
-            color: #111827;
-
+            color: #e8ecf4;
             font-size: 16px;
-
             margin-bottom: 3px;
         }
 
+        .rifa-dato strong.verde { color: #10b981; }
+
         .rifa-dato span {
-
-            color: #6b7280;
-
+            color: #8a93ab;
             font-size: 12px;
         }
 
         .rifa-boton {
-
             display: block;
-
             width: 100%;
-
-            padding: 12px;
-
-            background: #1877f2;
-
+            padding: 13px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             color: white;
-
             text-align: center;
-
             text-decoration: none;
-
             border-radius: 10px;
-
             font-weight: bold;
-
             font-size: 15px;
-
             transition: 0.2s;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
         }
 
         .rifa-boton:hover {
-
-            background: #0f65d8;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
         }
 
         /* ============================================
@@ -507,38 +368,26 @@
         ============================================ */
 
         .sin-rifas {
-
-            background: white;
-
+            background: #141827;
+            border: 1px solid #232942;
             padding: 60px 30px;
-
-            border-radius: 15px;
-
+            border-radius: 16px;
             text-align: center;
-
-            box-shadow:
-                0 5px 20px
-                rgba(0,0,0,0.06);
         }
 
         .sin-rifas h2 {
-
             margin: 0 0 10px;
-
             font-size: 24px;
+            color: #e8ecf4;
         }
 
         .sin-rifas p {
-
-            color: #6b7280;
-
+            color: #8a93ab;
             margin: 0 0 25px;
         }
 
         .sin-rifas-icono {
-
             font-size: 70px;
-
             margin-bottom: 15px;
         }
 
@@ -547,249 +396,109 @@
         ============================================ */
 
         footer {
-
-            background: #111827;
-
-            color: #9ca3af;
-
+            background: #050810;
+            border-top: 1px solid #232942;
+            color: #8a93ab;
             padding: 40px 20px 30px;
-
             text-align: center;
-
             font-size: 14px;
         }
 
         .footer-links {
-
             margin-bottom: 20px;
-
             display: flex;
-
             justify-content: center;
-
             flex-wrap: wrap;
-
             gap: 8px 20px;
         }
 
         .footer-links a {
-
-            color: #d1d5db;
-
+            color: #a5b4fc;
             text-decoration: none;
-
             font-size: 14px;
+            transition: 0.2s;
         }
 
         .footer-links a:hover {
-
-            color: white;
-
-            text-decoration: underline;
+            color: #8b5cf6;
         }
 
         .footer-marca {
-
             font-weight: bold;
-
-            color: white;
-
+            color: #e8ecf4;
             font-size: 16px;
-
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
 
         .footer-copy {
-
-            opacity: 0.7;
-
+            opacity: 0.6;
             font-size: 13px;
         }
 
-        /* ============================================
-           RESPONSIVE
-        ============================================ */
-
         @media (max-width: 600px) {
-
-            .hero {
-
-                padding: 50px 20px 60px;
-            }
-
-            .hero h1 {
-
-                font-size: 32px;
-            }
-
-            .hero-sub {
-
-                font-size: 16px;
-            }
-
-            .como-funciona h2 {
-
-                font-size: 26px;
-            }
-
-            .seccion-titulo h2 {
-
-                font-size: 24px;
-            }
-
-            .como-funciona {
-
-                padding: 40px 20px;
-            }
-
-            .contenedor {
-
-                padding: 40px 20px;
-            }
-
+            .hero { padding: 55px 20px 65px; }
+            .hero h1 { font-size: 34px; }
+            .hero-sub { font-size: 16px; }
+            .como-funciona h2 { font-size: 26px; }
+            .seccion-titulo h2 { font-size: 24px; }
+            .como-funciona { padding: 45px 20px; }
+            .contenedor { padding: 45px 20px; }
         }
 
     </style>
 
 </head>
 
-
 <body>
 
 
-<!-- ============================================
-     HERO
-============================================= -->
-
 <section class="hero">
 
-    <div class="hero-badge">
+    <div class="hero-badge">✨ 100% GRATUITO · SIN PAGOS</div>
 
-        ✨ 100% GRATUITO · SIN PAGOS
-
-    </div>
-
-    <h1>
-
-        Sorteos Gratuitos
-
-    </h1>
+    <h1>Sorteos Gratuitos</h1>
 
     <p class="hero-sub">
-
         Participa sin pagar nada. Mira videos cortos,
-        obtén tu boleto y participa por premios
-        increíbles.
-
+        obtén tu boleto y participa por premios increíbles.
     </p>
 
-    <a
-        href="{{ url_for('rifas') }}"
-        class="hero-boton"
-    >
-
+    <a href="{{ url_for('rifas') }}" class="hero-boton">
         🎁 Ver sorteos activos
-
     </a>
 
 </section>
 
 
-<!-- ============================================
-     CÓMO FUNCIONA
-============================================= -->
-
 <section class="como-funciona">
 
     <div class="como-funciona-contenedor">
 
-        <h2>
-
-            ¿Cómo funciona?
-
-        </h2>
+        <h2>¿Cómo funciona?</h2>
 
         <p class="como-funciona-sub">
-
             Participar es muy fácil. Solo 3 pasos.
-
         </p>
-
 
         <div class="pasos">
 
-
             <div class="paso">
-
-                <div class="paso-numero">
-
-                    1
-
-                </div>
-
-                <h3>
-
-                    🎟️ Reserva tu boleto
-
-                </h3>
-
-                <p>
-
-                    Elige un número disponible en el
-                    sorteo que más te guste.
-
-                </p>
-
+                <div class="paso-numero">1</div>
+                <h3>🎟️ Reserva tu boleto</h3>
+                <p>Elige un número disponible en el sorteo que más te guste.</p>
             </div>
 
-
             <div class="paso">
-
-                <div class="paso-numero">
-
-                    2
-
-                </div>
-
-                <h3>
-
-                    ▶️ Mira 5 videos
-
-                </h3>
-
-                <p>
-
-                    Completa 5 videos cortos para
-                    acreditar tu boleto. Sin pagar nada.
-
-                </p>
-
+                <div class="paso-numero">2</div>
+                <h3>▶️ Mira 5 videos</h3>
+                <p>Completa 5 videos cortos para acreditar tu boleto. Sin pagar nada.</p>
             </div>
 
-
             <div class="paso">
-
-                <div class="paso-numero">
-
-                    3
-
-                </div>
-
-                <h3>
-
-                    🎉 ¡Listo!
-
-                </h3>
-
-                <p>
-
-                    Guarda tu tarjeta de participación
-                    y espera la fecha del sorteo.
-
-                </p>
-
+                <div class="paso-numero">3</div>
+                <h3>🎉 ¡Listo!</h3>
+                <p>Guarda tu comprobante y espera la fecha del sorteo.</p>
             </div>
-
 
         </div>
 
@@ -798,48 +507,23 @@
 </section>
 
 
-<!-- ============================================
-     BANNER DE TRANSPARENCIA
-============================================= -->
-
 <div class="transparencia">
 
-    <strong>
+    <strong>🔒 Sin pagos, sin tarjetas, sin suscripciones</strong>
 
-        🔒 Sin pagos, sin tarjetas, sin suscripciones
-
-    </strong>
-
-    <p>
-
-        Nuestros sorteos son 100% gratuitos.
-        Nunca te pediremos dinero para participar.
-
-    </p>
+    <p>Nuestros sorteos son 100% gratuitos. Nunca te pediremos dinero para participar.</p>
 
 </div>
 
-
-<!-- ============================================
-     SORTEOS ACTIVOS
-============================================= -->
 
 <div class="contenedor">
 
     {% if rifas_destacadas %}
 
         <div class="seccion-titulo">
-
             <h2>🎁 Sorteos activos</h2>
-
-            <p>
-
-                Estos son los sorteos más recientes.
-
-            </p>
-
+            <p>Estos son los sorteos más recientes.</p>
         </div>
-
 
         <div class="grid">
 
@@ -847,95 +531,36 @@
 
                 <div class="rifa">
 
-
                     {% if rifa.imagen_url %}
-
-                        <img
-                            class="rifa-imagen"
-                            src="{{ rifa.imagen_url }}"
-                            alt="{{ rifa.titulo }}"
-                            loading="lazy"
-                        >
-
+                        <img class="rifa-imagen" src="{{ rifa.imagen_url }}" alt="{{ rifa.titulo }}" loading="lazy">
                     {% else %}
-
-                        <div class="rifa-placeholder">
-
-                            🎁
-
-                        </div>
-
+                        <div class="rifa-placeholder">🎁</div>
                     {% endif %}
-
 
                     <div class="rifa-contenido">
 
-
-                        <h3 class="rifa-titulo">
-
-                            {{ rifa.titulo }}
-
-                        </h3>
-
+                        <h3 class="rifa-titulo">{{ rifa.titulo }}</h3>
 
                         {% if rifa.descripcion %}
-
-                            <p class="rifa-descripcion">
-
-                                {{ rifa.descripcion }}
-
-                            </p>
-
+                            <p class="rifa-descripcion">{{ rifa.descripcion }}</p>
                         {% endif %}
 
-
                         <div class="rifa-datos">
-
-
                             <div class="rifa-dato">
-
-                                <strong>
-
-                                    {{ rifa.cantidad_boletos }}
-
-                                </strong>
-
+                                <strong>{{ rifa.cantidad_boletos }}</strong>
                                 <span>Boletos</span>
-
                             </div>
-
-
                             <div class="rifa-dato">
-
-                                <strong>
-
-                                    Gratis
-
-                                </strong>
-
+                                <strong class="verde">Gratis</strong>
                                 <span>Participación</span>
-
                             </div>
-
-
                         </div>
 
-
-                        <a
-                            class="rifa-boton"
-                            href="{{ url_for(
-                                'participar',
-                                rifa_id=rifa.id
-                            ) }}"
-                        >
-
+                        <a class="rifa-boton" href="{{ url_for('participar', rifa_id=rifa.id) }}">
                             🎟️ Participar gratis
-
                         </a>
 
-
                     </div>
-
 
                 </div>
 
@@ -943,102 +568,39 @@
 
         </div>
 
-
     {% else %}
 
         <div class="sin-rifas">
-
-            <div class="sin-rifas-icono">
-
-                🎁
-
-            </div>
-
-            <h2>
-
-                Próximamente nuevos sorteos
-
-            </h2>
-
-            <p>
-
-                En este momento no hay sorteos activos.
-                Vuelve pronto.
-
-            </p>
-
-            <a
-                href="{{ url_for('rifas') }}"
-                class="rifa-boton"
-                style="display:inline-block; width:auto; padding:12px 28px;"
-            >
-
+            <div class="sin-rifas-icono">🎁</div>
+            <h2>Próximamente nuevos sorteos</h2>
+            <p>En este momento no hay sorteos activos. Vuelve pronto.</p>
+            <a href="{{ url_for('rifas') }}" class="rifa-boton" style="display:inline-block; width:auto; padding:12px 28px;">
                 Ver todos los sorteos
-
             </a>
-
         </div>
 
     {% endif %}
 
-
 </div>
 
 
-<!-- ============================================
-     FOOTER
-============================================= -->
-
 <footer>
 
-    <div class="footer-marca">
-
-        🎁 appazueta.lat
-
-    </div>
+    <div class="footer-marca">🎁 appazueta.lat</div>
 
     <div class="footer-links">
-
-        <a href="{{ url_for('inicio') }}">
-
-            Inicio
-
-        </a>
-
-        <a href="{{ url_for('rifas') }}">
-
-            Sorteos
-
-        </a>
-
-        <a href="{{ url_for('privacidad') }}">
-
-            Aviso de privacidad
-
-        </a>
-
-        <a href="{{ url_for('terminos') }}">
-
-            Términos y condiciones
-
-        </a>
-
-        <a href="{{ url_for('contacto') }}">
-
-            Contacto
-
-        </a>
-
+        <a href="{{ url_for('inicio') }}">Inicio</a>
+        <a href="{{ url_for('rifas') }}">Sorteos</a>
+        <a href="{{ url_for('privacidad') }}">Aviso de privacidad</a>
+        <a href="{{ url_for('terminos') }}">Términos y condiciones</a>
+        <a href="{{ url_for('contacto') }}">Contacto</a>
     </div>
 
     <div class="footer-copy">
-
         © 2026 appazueta.lat · Todos los derechos reservados
-
     </div>
 
 </footer>
-
 
 </body>
 

@@ -8,6 +8,9 @@
 
     <title>Tu boleto - {{ boleto.titulo }}</title>
 
+    <meta name="theme-color" content="#0a0d18">
+    <meta name="color-scheme" content="dark">
+
     <style>
 
         * { box-sizing: border-box; }
@@ -15,19 +18,27 @@
         body {
             margin: 0;
             font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #eef4ff, #f8fafc);
-            color: #1f2937;
+            background: #0a0d18;
+            color: #e8ecf4;
+            -webkit-font-smoothing: antialiased;
         }
 
         header {
-            background: #1877f2;
+            background: linear-gradient(135deg, #1e1b4b, #0a0d18);
+            border-bottom: 1px solid #232942;
             color: white;
-            padding: 20px;
+            padding: 22px;
             text-align: center;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.12);
         }
 
-        header h1 { margin: 0; font-size: 25px; }
+        header h1 {
+            margin: 0;
+            font-size: 25px;
+            background: linear-gradient(135deg, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
         .contenedor {
             width: 100%;
@@ -37,10 +48,10 @@
         }
 
         .tarjeta {
-            background: white;
+            background: #141827;
+            border: 1px solid #232942;
             border-radius: 20px;
             padding: 25px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.10);
             margin-bottom: 20px;
         }
 
@@ -56,12 +67,13 @@
             text-align: center;
             font-size: 24px;
             margin-bottom: 10px;
+            color: #e8ecf4;
         }
 
         .boleto {
             text-align: center;
-            background: #eff6ff;
-            border: 2px dashed #1877f2;
+            background: rgba(59, 130, 246, 0.08);
+            border: 2px dashed #3b82f6;
             border-radius: 15px;
             padding: 20px;
             margin: 20px 0;
@@ -69,14 +81,18 @@
 
         .boleto small {
             display: block;
-            color: #6b7280;
+            color: #8a93ab;
             margin-bottom: 8px;
         }
 
         .numero {
             font-size: 48px;
             font-weight: bold;
-            color: #1877f2;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
         }
 
         .progreso { margin-top: 25px; }
@@ -86,21 +102,24 @@
             font-size: 20px;
             font-weight: bold;
             margin-bottom: 15px;
+            color: #e8ecf4;
         }
 
         .barra {
             width: 100%;
             height: 22px;
-            background: #e5e7eb;
+            background: #0a0d18;
+            border: 1px solid #232942;
             border-radius: 20px;
             overflow: hidden;
         }
 
         .barra-interna {
             height: 100%;
-            background: #1877f2;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
             width: {{ (progreso.videos_completados / progreso.total_videos * 100)|round(0) }}%;
             transition: width .3s ease;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
         }
 
         .contador {
@@ -108,6 +127,7 @@
             font-size: 18px;
             margin: 12px 0 20px;
             font-weight: bold;
+            color: #e8ecf4;
         }
 
         .boton {
@@ -115,18 +135,24 @@
             border: none;
             border-radius: 12px;
             padding: 16px;
-            background: #1877f2;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             color: white;
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+            transition: 0.2s;
         }
 
-        .boton:hover { background: #0f65d8; }
+        .boton:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.6);
+        }
 
         .boton:disabled {
-            background: #9ca3af;
+            background: #374151;
             cursor: not-allowed;
+            box-shadow: none;
         }
 
         .boton-continuar {
@@ -136,23 +162,28 @@
             text-decoration: none;
             border-radius: 12px;
             padding: 16px;
-            background: #16a34a;
+            background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             font-size: 18px;
             font-weight: bold;
             margin-top: 20px;
             box-sizing: border-box;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            transition: 0.2s;
         }
 
-        .boton-continuar:hover { background: #15803d; }
+        .boton-continuar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 28px rgba(16, 185, 129, 0.6);
+        }
 
         .completado {
             text-align: center;
             padding: 20px;
-            background: #ecfdf5;
-            border: 1px solid #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.4);
             border-radius: 15px;
-            color: #065f46;
+            color: #34d399;
             font-weight: bold;
             font-size: 18px;
         }
@@ -160,25 +191,32 @@
         .advertencia {
             margin-top: 20px;
             padding: 15px;
-            background: #fff7ed;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.3);
             border-radius: 12px;
-            color: #9a3412;
+            color: #fbbf24;
             font-size: 14px;
             line-height: 1.5;
         }
+
+        .advertencia strong { color: #f59e0b; }
 
         .volver {
             display: block;
             text-align: center;
             margin-top: 20px;
-            color: #1877f2;
+            color: #a5b4fc;
             text-decoration: none;
             font-weight: bold;
+            transition: 0.2s;
         }
 
+        .volver:hover { color: #8b5cf6; }
+
         .flash {
-            background: #fee2e2;
-            color: #991b1b;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 20px;
@@ -268,7 +306,7 @@
                 {% elif boleto.estado == 'asignado' %}
 
                     <a href="{{ url_for('tarjeta_participacion', reserva_token=boleto.reserva_token) }}" class="boton-continuar">
-                        🎫 Ver mi comprobante de participación
+                        🎫 Ver mi comprobante
                     </a>
 
                 {% endif %}

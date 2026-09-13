@@ -8,6 +8,9 @@
 
     <title>Mi participación - {{ boleto.titulo }}</title>
 
+    <meta name="theme-color" content="#0a0d18">
+    <meta name="color-scheme" content="dark">
+
     <style>
 
         * { box-sizing: border-box; }
@@ -15,16 +18,17 @@
         body {
             margin: 0;
             font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #eef4ff, #f8fafc);
-            color: #1f2937;
+            background: #0a0d18;
+            color: #e8ecf4;
+            -webkit-font-smoothing: antialiased;
         }
 
         header {
-            background: linear-gradient(135deg, #16a34a, #15803d);
+            background: linear-gradient(135deg, #10b981, #047857);
             color: white;
             padding: 25px;
             text-align: center;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
         }
 
         header h1 { margin: 0; font-size: 26px; }
@@ -37,10 +41,10 @@
         }
 
         .tarjeta {
-            background: white;
+            background: #141827;
+            border: 1px solid #232942;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
         .imagen {
@@ -53,12 +57,12 @@
         .imagen-placeholder {
             width: 100%;
             height: 200px;
-            background: linear-gradient(135deg, #1877f2, #0f65d8);
+            background: linear-gradient(135deg, #1e1b4b, #0f1424);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 80px;
-            color: white;
+            color: #8b5cf6;
         }
 
         .contenido { padding: 30px; }
@@ -68,12 +72,12 @@
             font-size: 22px;
             font-weight: bold;
             margin-bottom: 10px;
-            color: #111827;
+            color: #e8ecf4;
         }
 
         .descripcion {
             text-align: center;
-            color: #6b7280;
+            color: #8a93ab;
             margin-bottom: 20px;
             font-size: 15px;
             line-height: 1.5;
@@ -81,8 +85,8 @@
 
         .boleto-grande {
             text-align: center;
-            background: #eff6ff;
-            border: 3px dashed #1877f2;
+            background: rgba(59, 130, 246, 0.08);
+            border: 3px dashed #3b82f6;
             border-radius: 18px;
             padding: 20px;
             margin: 20px 0;
@@ -90,7 +94,7 @@
 
         .boleto-grande small {
             display: block;
-            color: #6b7280;
+            color: #8a93ab;
             margin-bottom: 8px;
             font-size: 13px;
             letter-spacing: 2px;
@@ -100,13 +104,16 @@
         .boleto-grande .numero {
             font-size: 56px;
             font-weight: bold;
-            color: #1877f2;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             line-height: 1;
         }
 
         .datos {
             margin-top: 25px;
-            border-top: 1px solid #e5e7eb;
+            border-top: 1px solid #232942;
             padding-top: 20px;
         }
 
@@ -115,15 +122,18 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 0;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 1px solid #1a1f33;
         }
 
         .dato:last-child { border-bottom: none; }
 
-        .dato span { color: #6b7280; font-size: 14px; }
+        .dato span {
+            color: #8a93ab;
+            font-size: 14px;
+        }
 
         .dato strong {
-            color: #111827;
+            color: #e8ecf4;
             font-size: 15px;
             text-align: right;
             word-break: break-word;
@@ -132,24 +142,25 @@
 
         .codigo-reserva {
             margin-top: 25px;
-            background: #f9fafb;
+            background: #0a0d18;
+            border: 1px solid #232942;
             padding: 15px;
             border-radius: 12px;
             font-size: 13px;
             text-align: center;
-            color: #6b7280;
+            color: #8a93ab;
             word-break: break-all;
         }
 
         .codigo-reserva code {
-            color: #111827;
+            color: #a5b4fc;
             font-weight: bold;
         }
 
         .nota {
             margin-top: 15px;
             text-align: center;
-            color: #6b7280;
+            color: #8a93ab;
             font-size: 13px;
             line-height: 1.5;
         }
@@ -172,25 +183,64 @@
             border: none;
             cursor: pointer;
             font-family: inherit;
+            transition: 0.2s;
         }
 
-        .boton-primario { background: #1877f2; color: white; }
-        .boton-primario:hover { background: #0f65d8; }
+        .boton-primario {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        }
 
-        .boton-guardar { background: #16a34a; color: white; }
-        .boton-guardar:hover { background: #15803d; }
-        .boton-guardar:disabled { background: #9ca3af; cursor: not-allowed; }
+        .boton-primario:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.6);
+        }
 
-        .boton-imprimir { background: #f59e0b; color: white; }
-        .boton-imprimir:hover { background: #d97706; }
+        .boton-guardar {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
 
-        .boton-secundario { background: #e5e7eb; color: #111827; }
-        .boton-secundario:hover { background: #d1d5db; }
+        .boton-guardar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 28px rgba(16, 185, 129, 0.6);
+        }
+
+        .boton-guardar:disabled {
+            background: #374151;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .boton-imprimir {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .boton-imprimir:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 28px rgba(245, 158, 11, 0.6);
+        }
+
+        .boton-secundario {
+            background: #1e293b;
+            color: #e8ecf4;
+            border: 1px solid #232942;
+        }
+
+        .boton-secundario:hover {
+            background: #232942;
+        }
 
         .cargando {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.55);
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
             color: white;
             display: none;
             align-items: center;
@@ -206,11 +256,18 @@
 
         @media print {
 
-            body { background: white; }
+            body { background: white; color: black; }
             header, .acciones, .cargando { display: none !important; }
             .contenedor { margin: 0; padding: 0; max-width: 100%; }
-            .tarjeta { box-shadow: none; border-radius: 0; }
+            .tarjeta { box-shadow: none; border-radius: 0; border: none; }
             .imagen { max-height: 220px; }
+            .boleto-grande .numero {
+                -webkit-text-fill-color: #1877f2;
+                color: #1877f2;
+            }
+            .datos { color: black; }
+            .dato span { color: #666; }
+            .dato strong { color: black; }
         }
 
         @media (max-width: 500px) {
@@ -278,7 +335,7 @@
 
                 <div class="dato">
                     <span>Costo de participación</span>
-                    <strong style="color: #16a34a;">Gratis ✅</strong>
+                    <strong style="color: #10b981;">Gratis ✅</strong>
                 </div>
 
             </div>
@@ -345,7 +402,7 @@
         overlay.classList.add("activo");
 
         html2canvas(tarjeta, {
-            backgroundColor: "#ffffff",
+            backgroundColor: "#141827",
             scale: 2,
             useCORS: true,
             allowTaint: false,

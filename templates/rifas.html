@@ -9,6 +9,9 @@
 
     <meta name="description" content="Lista de sorteos gratuitos activos. Participa sin pagar nada.">
 
+    <meta name="theme-color" content="#0a0d18">
+    <meta name="color-scheme" content="dark">
+
     <style>
 
         * { box-sizing: border-box; }
@@ -16,18 +19,27 @@
         body {
             margin: 0;
             font-family: Arial, Helvetica, sans-serif;
-            background: #f4f6f9;
-            color: #1f2937;
+            background: #0a0d18;
+            color: #e8ecf4;
+            -webkit-font-smoothing: antialiased;
         }
 
         header {
-            background: #1877f2;
+            background: linear-gradient(135deg, #141827, #0a0d18);
+            border-bottom: 1px solid #232942;
             color: white;
-            padding: 20px;
+            padding: 22px 20px;
             text-align: center;
         }
 
-        header h1 { margin: 0; font-size: 28px; }
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            background: linear-gradient(135deg, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
         .contenedor {
             width: 100%;
@@ -38,22 +50,26 @@
 
         .titulo {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
-        .titulo h2 { margin-bottom: 8px; }
+        .titulo h2 {
+            margin-bottom: 8px;
+            color: #e8ecf4;
+        }
 
-        .titulo p { color: #6b7280; }
+        .titulo p { color: #8a93ab; }
 
         .badge-gratis {
             display: inline-block;
-            background: #d1fae5;
-            color: #065f46;
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
             padding: 6px 14px;
             border-radius: 50px;
             font-size: 13px;
             font-weight: bold;
             margin-bottom: 15px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .grid {
@@ -63,18 +79,19 @@
         }
 
         .rifa {
-            background: white;
-            border-radius: 15px;
+            background: #141827;
+            border: 1px solid #232942;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
             transition: 0.2s;
             display: flex;
             flex-direction: column;
         }
 
         .rifa:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
+            border-color: #3b82f6;
+            box-shadow: 0 16px 40px rgba(59, 130, 246, 0.2);
         }
 
         .rifa img {
@@ -90,22 +107,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1877f2, #0d5ec4);
+            background: linear-gradient(135deg, #1e293b, #0f1424);
             font-size: 60px;
-            color: white;
+            color: #8b5cf6;
         }
 
         .rifa-contenido {
-            padding: 20px;
+            padding: 22px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
 
-        .rifa h3 { margin-top: 0; font-size: 22px; }
+        .rifa h3 {
+            margin-top: 0;
+            font-size: 22px;
+            color: #e8ecf4;
+        }
 
         .descripcion {
-            color: #6b7280;
+            color: #8a93ab;
             line-height: 1.5;
             flex: 1;
         }
@@ -113,10 +134,11 @@
         .datos {
             margin: 18px 0;
             padding: 15px;
-            background: #f8fafc;
+            background: #0a0d18;
             border-radius: 10px;
             display: flex;
             justify-content: space-around;
+            border: 1px solid #232942;
         }
 
         .dato {
@@ -126,13 +148,15 @@
 
         .dato strong {
             display: block;
-            color: #111827;
+            color: #e8ecf4;
             font-size: 17px;
             margin-bottom: 3px;
         }
 
+        .dato strong.verde { color: #10b981; }
+
         .dato span {
-            color: #6b7280;
+            color: #8a93ab;
             font-size: 12px;
         }
 
@@ -140,7 +164,7 @@
             display: block;
             width: 100%;
             padding: 14px;
-            background: #1877f2;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             color: white;
             text-align: center;
             text-decoration: none;
@@ -149,29 +173,39 @@
             font-weight: bold;
             border: none;
             cursor: pointer;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+            transition: 0.2s;
         }
 
-        .boton:hover { background: #0f65d8; }
+        .boton:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
+        }
 
         .sin-rifas {
-            background: white;
+            background: #141827;
+            border: 1px solid #232942;
             padding: 40px;
-            border-radius: 15px;
+            border-radius: 16px;
             text-align: center;
         }
+
+        .sin-rifas h2 { color: #e8ecf4; }
 
         .flash {
             max-width: 700px;
             margin: 20px auto;
             padding: 15px;
             border-radius: 10px;
-            background: #fee2e2;
-            color: #991b1b;
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         footer {
-            background: #111827;
-            color: #9ca3af;
+            background: #050810;
+            border-top: 1px solid #232942;
+            color: #8a93ab;
             padding: 40px 20px 30px;
             text-align: center;
             font-size: 14px;
@@ -187,11 +221,12 @@
         }
 
         .footer-links a {
-            color: #d1d5db;
+            color: #a5b4fc;
             text-decoration: none;
+            transition: 0.2s;
         }
 
-        .footer-links a:hover { color: white; text-decoration: underline; }
+        .footer-links a:hover { color: #8b5cf6; }
 
     </style>
 
@@ -254,7 +289,7 @@
                                 <span>Boletos</span>
                             </div>
                             <div class="dato">
-                                <strong>Gratis</strong>
+                                <strong class="verde">Gratis</strong>
                                 <span>Participación</span>
                             </div>
                         </div>
@@ -275,7 +310,7 @@
 
         <div class="sin-rifas">
             <h2>🎁 Próximamente nuevos sorteos</h2>
-            <p>En este momento no hay sorteos activos. Vuelve pronto.</p>
+            <p style="color:#8a93ab;">En este momento no hay sorteos activos. Vuelve pronto.</p>
         </div>
 
     {% endif %}
@@ -292,7 +327,7 @@
         <a href="{{ url_for('contacto') }}">Contacto</a>
     </div>
 
-    <div style="opacity:0.7; font-size:13px;">
+    <div style="opacity:0.6; font-size:13px;">
         © 2026 appazueta.lat · Todos los derechos reservados
     </div>
 
