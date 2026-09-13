@@ -10,7 +10,21 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Rifas</title>
+    <!-- SEO -->
+    <title>Sorteos Gratuitos | Participa sin pagar</title>
+
+    <meta
+        name="description"
+        content="Participa gratis en nuestros sorteos. Sin pagos, sin tarjetas. Solo mira videos cortos y gana tu boleto para ganar premios increíbles."
+    >
+
+    <meta name="theme-color" content="#1877f2">
+
+    <!-- Open Graph (para compartir en WhatsApp / Facebook) -->
+    <meta property="og:title" content="Sorteos Gratuitos">
+    <meta property="og:description" content="Participa gratis y gana premios increíbles.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://appazueta.lat">
 
     <style>
 
@@ -45,26 +59,51 @@
             text-align: center;
         }
 
+        .hero-badge {
+
+            display: inline-block;
+
+            background: rgba(255,255,255,0.18);
+
+            color: white;
+
+            padding: 8px 18px;
+
+            border-radius: 50px;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            letter-spacing: 1px;
+
+            margin-bottom: 20px;
+
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
         .hero h1 {
 
             margin: 0;
 
-            font-size: 42px;
+            font-size: 44px;
 
             font-weight: bold;
 
             letter-spacing: -1px;
+
+            line-height: 1.1;
         }
 
-        .hero p {
+        .hero-sub {
 
             margin: 18px auto 30px;
 
-            max-width: 500px;
+            max-width: 520px;
 
             font-size: 18px;
 
-            opacity: 0.92;
+            opacity: 0.95;
 
             line-height: 1.5;
         }
@@ -104,7 +143,153 @@
         }
 
         /* ============================================
-           DESTACADAS
+           SECCIÓN "CÓMO FUNCIONA"
+        ============================================ */
+
+        .como-funciona {
+
+            background: white;
+
+            padding: 60px 20px;
+
+        }
+
+        .como-funciona-contenedor {
+
+            max-width: 1000px;
+
+            margin: 0 auto;
+        }
+
+        .como-funciona h2 {
+
+            text-align: center;
+
+            font-size: 32px;
+
+            margin: 0 0 15px;
+        }
+
+        .como-funciona-sub {
+
+            text-align: center;
+
+            color: #6b7280;
+
+            margin: 0 0 50px;
+
+            font-size: 17px;
+        }
+
+        .pasos {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+
+            gap: 30px;
+        }
+
+        .paso {
+
+            text-align: center;
+
+            padding: 20px;
+        }
+
+        .paso-numero {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            width: 60px;
+
+            height: 60px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #1877f2,
+                    #0d5ec4
+                );
+
+            color: white;
+
+            border-radius: 50%;
+
+            font-size: 26px;
+
+            font-weight: bold;
+
+            margin-bottom: 20px;
+        }
+
+        .paso h3 {
+
+            margin: 0 0 10px;
+
+            font-size: 20px;
+        }
+
+        .paso p {
+
+            color: #6b7280;
+
+            line-height: 1.6;
+
+            margin: 0;
+
+            font-size: 15px;
+        }
+
+        /* ============================================
+           BANNER DE TRANSPARENCIA
+        ============================================ */
+
+        .transparencia {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ecfdf5,
+                    #d1fae5
+                );
+
+            border-top: 1px solid #a7f3d0;
+
+            border-bottom: 1px solid #a7f3d0;
+
+            padding: 25px 20px;
+
+            text-align: center;
+
+            color: #065f46;
+        }
+
+        .transparencia strong {
+
+            font-size: 17px;
+
+            display: block;
+
+            margin-bottom: 5px;
+        }
+
+        .transparencia p {
+
+            margin: 0;
+
+            font-size: 15px;
+
+            opacity: 0.9;
+        }
+
+        /* ============================================
+           SORTEOS ACTIVOS
         ============================================ */
 
         .contenedor {
@@ -243,6 +428,8 @@
             margin: 0 0 15px;
 
             flex: 1;
+
+            font-size: 15px;
         }
 
         .rifa-datos {
@@ -316,7 +503,7 @@
         }
 
         /* ============================================
-           SIN RIFAS
+           SIN SORTEOS
         ============================================ */
 
         .sin-rifas {
@@ -361,13 +548,62 @@
 
         footer {
 
-            text-align: center;
-
-            padding: 30px 20px;
+            background: #111827;
 
             color: #9ca3af;
 
+            padding: 40px 20px 30px;
+
+            text-align: center;
+
             font-size: 14px;
+        }
+
+        .footer-links {
+
+            margin-bottom: 20px;
+
+            display: flex;
+
+            justify-content: center;
+
+            flex-wrap: wrap;
+
+            gap: 8px 20px;
+        }
+
+        .footer-links a {
+
+            color: #d1d5db;
+
+            text-decoration: none;
+
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+
+            color: white;
+
+            text-decoration: underline;
+        }
+
+        .footer-marca {
+
+            font-weight: bold;
+
+            color: white;
+
+            font-size: 16px;
+
+            margin-bottom: 5px;
+        }
+
+        .footer-copy {
+
+            opacity: 0.7;
+
+            font-size: 13px;
         }
 
         /* ============================================
@@ -386,9 +622,14 @@
                 font-size: 32px;
             }
 
-            .hero p {
+            .hero-sub {
 
                 font-size: 16px;
+            }
+
+            .como-funciona h2 {
+
+                font-size: 26px;
             }
 
             .seccion-titulo h2 {
@@ -396,11 +637,20 @@
                 font-size: 24px;
             }
 
+            .como-funciona {
+
+                padding: 40px 20px;
+            }
+
+            .contenedor {
+
+                padding: 40px 20px;
+            }
+
         }
 
     </style>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2084405192549609"
-     crossorigin="anonymous"></script>
+
 </head>
 
 
@@ -413,12 +663,23 @@
 
 <section class="hero">
 
-    <h1>🎟️ Rifas</h1>
+    <div class="hero-badge">
 
-    <p>
+        ✨ 100% GRATUITO · SIN PAGOS
 
-        Participa en nuestras rifas y gana
-        increíbles premios.
+    </div>
+
+    <h1>
+
+        Sorteos Gratuitos
+
+    </h1>
+
+    <p class="hero-sub">
+
+        Participa sin pagar nada. Mira videos cortos,
+        obtén tu boleto y participa por premios
+        increíbles.
 
     </p>
 
@@ -427,7 +688,7 @@
         class="hero-boton"
     >
 
-        Ver rifas disponibles
+        🎁 Ver sorteos activos
 
     </a>
 
@@ -435,21 +696,145 @@
 
 
 <!-- ============================================
-     RIFAS DESTACADAS
+     CÓMO FUNCIONA
+============================================= -->
+
+<section class="como-funciona">
+
+    <div class="como-funciona-contenedor">
+
+        <h2>
+
+            ¿Cómo funciona?
+
+        </h2>
+
+        <p class="como-funciona-sub">
+
+            Participar es muy fácil. Solo 3 pasos.
+
+        </p>
+
+
+        <div class="pasos">
+
+
+            <div class="paso">
+
+                <div class="paso-numero">
+
+                    1
+
+                </div>
+
+                <h3>
+
+                    🎟️ Reserva tu boleto
+
+                </h3>
+
+                <p>
+
+                    Elige un número disponible en el
+                    sorteo que más te guste.
+
+                </p>
+
+            </div>
+
+
+            <div class="paso">
+
+                <div class="paso-numero">
+
+                    2
+
+                </div>
+
+                <h3>
+
+                    ▶️ Mira 5 videos
+
+                </h3>
+
+                <p>
+
+                    Completa 5 videos cortos para
+                    acreditar tu boleto. Sin pagar nada.
+
+                </p>
+
+            </div>
+
+
+            <div class="paso">
+
+                <div class="paso-numero">
+
+                    3
+
+                </div>
+
+                <h3>
+
+                    🎉 ¡Listo!
+
+                </h3>
+
+                <p>
+
+                    Guarda tu tarjeta de participación
+                    y espera la fecha del sorteo.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================
+     BANNER DE TRANSPARENCIA
+============================================= -->
+
+<div class="transparencia">
+
+    <strong>
+
+        🔒 Sin pagos, sin tarjetas, sin suscripciones
+
+    </strong>
+
+    <p>
+
+        Nuestros sorteos son 100% gratuitos.
+        Nunca te pediremos dinero para participar.
+
+    </p>
+
+</div>
+
+
+<!-- ============================================
+     SORTEOS ACTIVOS
 ============================================= -->
 
 <div class="contenedor">
-
 
     {% if rifas_destacadas %}
 
         <div class="seccion-titulo">
 
-            <h2>🎁 Rifas activas</h2>
+            <h2>🎁 Sorteos activos</h2>
 
             <p>
 
-                Estas son las rifas más recientes.
+                Estos son los sorteos más recientes.
 
             </p>
 
@@ -469,6 +854,7 @@
                             class="rifa-imagen"
                             src="{{ rifa.imagen_url }}"
                             alt="{{ rifa.titulo }}"
+                            loading="lazy"
                         >
 
                     {% else %}
@@ -523,13 +909,11 @@
 
                                 <strong>
 
-                                    ${{ "%.2f"|format(
-                                        rifa.precio_boleto
-                                    ) }}
+                                    Gratis
 
                                 </strong>
 
-                                <span>Precio</span>
+                                <span>Participación</span>
 
                             </div>
 
@@ -545,7 +929,7 @@
                             ) }}"
                         >
 
-                            🎟️ Participar
+                            🎟️ Participar gratis
 
                         </a>
 
@@ -572,13 +956,13 @@
 
             <h2>
 
-                Próximamente
+                Próximamente nuevos sorteos
 
             </h2>
 
             <p>
 
-                En este momento no hay rifas activas.
+                En este momento no hay sorteos activos.
                 Vuelve pronto.
 
             </p>
@@ -589,7 +973,7 @@
                 style="display:inline-block; width:auto; padding:12px 28px;"
             >
 
-                Ver todas las rifas
+                Ver todos los sorteos
 
             </a>
 
@@ -601,32 +985,57 @@
 </div>
 
 
-<footer style="text-align: center; padding: 30px 20px; color: #9ca3af; font-size: 14px;">
+<!-- ============================================
+     FOOTER
+============================================= -->
 
-    <div style="margin-bottom: 15px;">
+<footer>
 
-        <a href="{{ url_for('privacidad') }}"
-           style="color: #6b7280; text-decoration: none; margin: 0 10px;">
+    <div class="footer-marca">
+
+        🎁 appazueta.lat
+
+    </div>
+
+    <div class="footer-links">
+
+        <a href="{{ url_for('inicio') }}">
+
+            Inicio
+
+        </a>
+
+        <a href="{{ url_for('rifas') }}">
+
+            Sorteos
+
+        </a>
+
+        <a href="{{ url_for('privacidad') }}">
+
             Aviso de privacidad
+
         </a>
 
-        ·
+        <a href="{{ url_for('terminos') }}">
 
-        <a href="{{ url_for('terminos') }}"
-           style="color: #6b7280; text-decoration: none; margin: 0 10px;">
             Términos y condiciones
+
         </a>
 
-        ·
+        <a href="{{ url_for('contacto') }}">
 
-        <a href="{{ url_for('contacto') }}"
-           style="color: #6b7280; text-decoration: none; margin: 0 10px;">
             Contacto
+
         </a>
 
     </div>
 
-    © 2026 appazueta.lat · Todos los derechos reservados
+    <div class="footer-copy">
+
+        © 2026 appazueta.lat · Todos los derechos reservados
+
+    </div>
 
 </footer>
 

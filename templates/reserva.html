@@ -4,513 +4,276 @@
 <head>
 
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Tu boleto - {{ boleto.titulo }}</title>
 
     <style>
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
-
             margin: 0;
-
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #eef4ff,
-                    #f8fafc
-                );
-
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #eef4ff, #f8fafc);
             color: #1f2937;
         }
 
         header {
-
             background: #1877f2;
-
             color: white;
-
             padding: 20px;
-
             text-align: center;
-
-            box-shadow:
-                0 3px 12px
-                rgba(0,0,0,0.12);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.12);
         }
 
-        header h1 {
-
-            margin: 0;
-
-            font-size: 25px;
-        }
+        header h1 { margin: 0; font-size: 25px; }
 
         .contenedor {
-
             width: 100%;
-
             max-width: 650px;
-
             margin: 30px auto;
-
             padding: 0 15px;
         }
 
         .tarjeta {
-
             background: white;
-
             border-radius: 20px;
-
             padding: 25px;
-
-            box-shadow:
-                0 8px 30px
-                rgba(0,0,0,0.10);
-
+            box-shadow: 0 8px 30px rgba(0,0,0,0.10);
             margin-bottom: 20px;
         }
 
         .imagen {
-
             width: 100%;
-
             height: 220px;
-
             object-fit: cover;
-
             border-radius: 15px;
-
             margin-bottom: 20px;
         }
 
         .titulo {
-
             text-align: center;
-
             font-size: 24px;
-
             margin-bottom: 10px;
         }
 
         .boleto {
-
             text-align: center;
-
             background: #eff6ff;
-
             border: 2px dashed #1877f2;
-
             border-radius: 15px;
-
             padding: 20px;
-
             margin: 20px 0;
         }
 
         .boleto small {
-
             display: block;
-
             color: #6b7280;
-
             margin-bottom: 8px;
         }
 
         .numero {
-
             font-size: 48px;
-
             font-weight: bold;
-
             color: #1877f2;
         }
 
-        .progreso {
-
-            margin-top: 25px;
-        }
+        .progreso { margin-top: 25px; }
 
         .progreso-titulo {
-
             text-align: center;
-
             font-size: 20px;
-
             font-weight: bold;
-
             margin-bottom: 15px;
         }
 
         .barra {
-
             width: 100%;
-
             height: 22px;
-
             background: #e5e7eb;
-
             border-radius: 20px;
-
             overflow: hidden;
         }
 
         .barra-interna {
-
             height: 100%;
-
             background: #1877f2;
-
-            width:
-                {{ (progreso.videos_completados / progreso.total_videos * 100)|round(0) }}%;
-
+            width: {{ (progreso.videos_completados / progreso.total_videos * 100)|round(0) }}%;
             transition: width .3s ease;
         }
 
         .contador {
-
             text-align: center;
-
             font-size: 18px;
-
             margin: 12px 0 20px;
-
             font-weight: bold;
         }
 
         .boton {
-
             width: 100%;
-
             border: none;
-
             border-radius: 12px;
-
             padding: 16px;
-
             background: #1877f2;
-
             color: white;
-
             font-size: 18px;
-
             font-weight: bold;
-
             cursor: pointer;
         }
 
-        .boton:hover {
-
-            background: #0f65d8;
-        }
+        .boton:hover { background: #0f65d8; }
 
         .boton:disabled {
-
             background: #9ca3af;
-
             cursor: not-allowed;
         }
 
         .boton-continuar {
-
             display: block;
-
             width: 100%;
-
             text-align: center;
-
             text-decoration: none;
-
             border-radius: 12px;
-
             padding: 16px;
-
             background: #16a34a;
-
             color: white;
-
             font-size: 18px;
-
             font-weight: bold;
-
             margin-top: 20px;
-
             box-sizing: border-box;
         }
 
-        .boton-continuar:hover {
-
-            background: #15803d;
-        }
+        .boton-continuar:hover { background: #15803d; }
 
         .completado {
-
             text-align: center;
-
             padding: 20px;
-
             background: #ecfdf5;
-
             border: 1px solid #10b981;
-
             border-radius: 15px;
-
             color: #065f46;
-
             font-weight: bold;
-
             font-size: 18px;
         }
 
         .advertencia {
-
             margin-top: 20px;
-
             padding: 15px;
-
             background: #fff7ed;
-
             border-radius: 12px;
-
             color: #9a3412;
-
             font-size: 14px;
-
             line-height: 1.5;
         }
 
         .volver {
-
             display: block;
-
             text-align: center;
-
             margin-top: 20px;
-
             color: #1877f2;
-
             text-decoration: none;
-
             font-weight: bold;
         }
 
         .flash {
-
             background: #fee2e2;
-
             color: #991b1b;
-
             padding: 15px;
-
             border-radius: 12px;
-
             margin-bottom: 20px;
-
             text-align: center;
         }
 
         @media (max-width: 500px) {
-
-            .contenedor {
-
-                margin-top: 20px;
-            }
-
-            .tarjeta {
-
-                padding: 18px;
-            }
-
-            .numero {
-
-                font-size: 40px;
-            }
-
+            .contenedor { margin-top: 20px; }
+            .tarjeta { padding: 18px; }
+            .numero { font-size: 40px; }
         }
 
     </style>
 
 </head>
 
-
 <body>
 
-
 <header>
-
     <h1>🎟️ Tu participación</h1>
-
 </header>
 
 
 <div class="contenedor">
 
-
     {% with mensajes = get_flashed_messages() %}
-
         {% if mensajes %}
-
             {% for mensaje in mensajes %}
-
-                <div class="flash">
-
-                    {{ mensaje }}
-
-                </div>
-
+                <div class="flash">{{ mensaje }}</div>
             {% endfor %}
-
         {% endif %}
-
     {% endwith %}
 
 
     <div class="tarjeta">
 
-
         {% if boleto.imagen_url %}
-
-            <img
-                class="imagen"
-                src="{{ boleto.imagen_url }}"
-                alt="{{ boleto.titulo }}"
-            >
-
+            <img class="imagen" src="{{ boleto.imagen_url }}" alt="{{ boleto.titulo }}">
         {% endif %}
 
-
-        <div class="titulo">
-
-            {{ boleto.titulo }}
-
-        </div>
-
+        <div class="titulo">{{ boleto.titulo }}</div>
 
         <div class="boleto">
-
-            <small>
-                TU NÚMERO DE BOLETO
-            </small>
-
-            <div class="numero">
-
-                #{{ boleto.numero }}
-
-            </div>
-
+            <small>TU NÚMERO DE BOLETO</small>
+            <div class="numero">#{{ boleto.numero }}</div>
         </div>
 
 
         <div class="progreso">
 
-
             <div class="progreso-titulo">
-
                 Completa los 5 videos
-
             </div>
-
 
             <div class="barra">
-
                 <div class="barra-interna"></div>
-
             </div>
 
-
             <div class="contador">
-
-                {{ progreso.videos_completados }}
-                /
-                {{ progreso.total_videos }}
-
-                videos completados
-
+                {{ progreso.videos_completados }} / {{ progreso.total_videos }} videos completados
             </div>
 
 
             {% if progreso.videos_completados < progreso.total_videos %}
 
-                <form
-                    method="POST"
-                    action="{{ url_for(
-                        'completar_video',
-                        reserva_token=boleto.reserva_token
-                    ) }}"
-                >
-
-                    <button
-                        class="boton"
-                        type="submit"
-                    >
-
-                        ▶️ Ver siguiente publicidad
-
+                <form method="POST" action="{{ url_for('completar_video', reserva_token=boleto.reserva_token) }}">
+                    <button class="boton" type="submit">
+                        ▶️ Ver siguiente video
                     </button>
-
                 </form>
 
             {% else %}
 
-
                 <div class="completado">
-
                     🎉 ¡Has completado los 5 videos!
-
                     <br><br>
-
                     Tu boleto ya está acreditado.
-
                 </div>
 
 
                 {% if boleto.estado == 'acreditado' %}
 
-                    <a
-                        href="{{ url_for(
-                            'datos_participante',
-                            reserva_token=boleto.reserva_token
-                        ) }}"
-                        class="boton-continuar"
-                    >
-
+                    <a href="{{ url_for('datos_participante', reserva_token=boleto.reserva_token) }}" class="boton-continuar">
                         ➡️ Continuar con mis datos
-
                     </a>
 
                 {% elif boleto.estado == 'asignado' %}
 
-                    <a
-                        href="{{ url_for(
-                            'tarjeta_participacion',
-                            reserva_token=boleto.reserva_token
-                        ) }}"
-                        class="boton-continuar"
-                    >
-
-                        🎫 Ver mi tarjeta de participación
-
+                    <a href="{{ url_for('tarjeta_participacion', reserva_token=boleto.reserva_token) }}" class="boton-continuar">
+                        🎫 Ver mi comprobante de participación
                     </a>
 
                 {% endif %}
 
-
             {% endif %}
-
 
         </div>
 
@@ -518,36 +281,21 @@
         {% if boleto.estado == 'reservado' %}
 
             <div class="advertencia">
-
-                <strong>Importante:</strong>
-
-                Tu boleto está reservado exclusivamente
-                para esta participación.
-
-                No cierres esta página hasta completar
-                el proceso.
-
+                <strong>⏱️ Importante:</strong>
+                Tu boleto está reservado por <strong>1 hora</strong>.
+                Si no completas los 5 videos en ese tiempo, el boleto se liberará automáticamente.
             </div>
 
         {% endif %}
 
-
     </div>
 
 
-    <a
-        class="volver"
-        href="{{ url_for('rifas') }}"
-    >
-
-        ← Volver a las rifas
-
+    <a class="volver" href="{{ url_for('rifas') }}">
+        ← Volver a los sorteos
     </a>
-
 
 </div>
 
-
 </body>
-
 </html>
