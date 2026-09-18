@@ -334,6 +334,60 @@
     </div>
 
 </footer>
+<!-- ============================================
+     LIGHTBOX PARA IMÁGENES
+============================================= -->
 
+<div class="lightbox" id="lightbox" onclick="cerrarLightbox()">
+
+    <span class="lightbox-cerrar">&times;</span>
+
+    <img
+        class="lightbox-imagen"
+        id="lightboxImagen"
+        src=""
+        alt=""
+        onclick="event.stopPropagation()"
+    >
+
+</div>
+
+<script>
+
+    function abrirLightbox(src, alt) {
+
+        const lb = document.getElementById('lightbox');
+        const img = document.getElementById('lightboxImagen');
+
+        img.src = src;
+        img.alt = alt || '';
+
+        lb.classList.add('activo');
+
+        // Bloquear scroll del body
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarLightbox() {
+
+        const lb = document.getElementById('lightbox');
+
+        lb.classList.remove('activo');
+
+        // Restaurar scroll
+        document.body.style.overflow = '';
+
+    }
+
+    // Cerrar con la tecla ESC
+    document.addEventListener('keydown', function(e) {
+
+        if (e.key === 'Escape') {
+            cerrarLightbox();
+        }
+
+    });
+
+</script>
 </body>
 </html>
