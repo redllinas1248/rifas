@@ -534,7 +534,13 @@
                 <div class="rifa">
 
                     {% if rifa.imagen_url %}
-                        <img class="rifa-imagen" src="{{ rifa.imagen_url }}" alt="{{ rifa.titulo }}" loading="lazy">
+                        <img
+    class="rifa-imagen"
+    src="{{ rifa.imagen_url }}"
+    alt="{{ rifa.titulo }}"
+    loading="lazy"
+    onclick="abrirLightbox('{{ rifa.imagen_url }}', '{{ rifa.titulo }}')"
+>
                     {% else %}
                         <div class="rifa-placeholder">🎁</div>
                     {% endif %}
