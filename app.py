@@ -1177,6 +1177,13 @@ def terminos():
 def contacto():
     return render_template("contacto.html")
 
+# ============================================================
+# PREGUNTAS FRECUENTES
+# ============================================================
+
+@app.route("/faq")
+def faq():
+    return render_template("faq.html")
 
 # ============================================================
 # LOGIN DE ADMINISTRACIÓN
