@@ -1186,6 +1186,14 @@ def faq():
     return render_template("faq.html")
 
 # ============================================================
+# GANADORES ANTERIORES
+# ============================================================
+
+@app.route("/ganadores")
+def ganadores():
+    return render_template("ganadores.html")
+
+# ============================================================
 # LOGIN DE ADMINISTRACIÓN
 # ============================================================
 
@@ -1230,6 +1238,8 @@ def admin_login():
             )
 
     return render_template("admin_login.html")
+
+
 
 
 # ============================================================
