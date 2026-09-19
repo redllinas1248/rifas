@@ -21,7 +21,8 @@ from flask import (
     flash,
     session,
     abort,
-    jsonify
+    jsonify,
+    send_from_directory
 )
 
 from db import get_db
@@ -1184,6 +1185,20 @@ def contacto():
 @app.route("/faq")
 def faq():
     return render_template("faq.html")
+
+# ============================================================
+# ADS.TXT (para Google AdSense)
+# ============================================================
+
+from flask import send_from_directory
+
+@app.route("/ads.txt")
+def ads_txt():
+    return send_from_directory(
+        os.path.join(app.root_path, "static"),
+        "ads.txt",
+        mimetype="text/plain"
+    )
 
 # ============================================================
 # GANADORES ANTERIORES
