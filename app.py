@@ -82,6 +82,14 @@ RESERVA_TTL_HORAS = int(
     )
 )
 
+# Horas que un boleto puede estar "acreditado" sin completar
+# los datos del participante antes de liberarse.
+ACREDITADO_TTL_HORAS = int(
+    os.getenv(
+        "ACREDITADO_TTL_HORAS",
+        "24"
+    )
+)
 
 # ============================================================
 # CREDENCIALES DE ADMINISTRACIÓN
@@ -119,15 +127,15 @@ def admin_required(f):
     return decorated_function
 
 
-# ============================================================
-# HELPER: LIBERAR RESERVAS EXPIRADAS
-# ============================================================
-
 def liberar_reservas_expiradas(db):
 
     cursor = db.cursor()
 
-    cutoff = datetime.now() - timedelta(
+    # --------------------------------------------------------
+    # 1) Boletos RESERVADOS que expiraron (1 hora por defecto)
+    # --------------------------------------------------------
+
+    cutoff_reserva = datetime.now() - timedelta(
         hours=RESERVA_TTL_HORAS
     )
 
@@ -138,19 +146,51 @@ def liberar_reservas_expiradas(db):
             estado = 'reservado'
             AND reservado_en IS NOT NULL
             AND reservado_en < %s
-    """, (cutoff,))
+    """, (cutoff_reserva,))
 
-    filas = cursor.fetchall()
+    ids_reservados = [f["id"] for f in cursor.fetchall()]
 
-    if not filas:
+    # --------------------------------------------------------
+    # 2) Boletos ACREDITADOS que no completaron datos
+    #    (24 horas por defecto desde su última actualización)
+    # --------------------------------------------------------
+
+    cutoff_acreditado = datetime.now() - timedelta(
+        hours=ACREDITADO_TTL_HORAS
+    )
+
+    cursor.execute("""
+        SELECT id
+        FROM rt_boletos
+        WHERE
+            estado = 'acreditado'
+            AND actualizado_en IS NOT NULL
+            AND actualizado_en < %s
+    """, (cutoff_acreditado,))
+
+    ids_acreditados = [f["id"] for f in cursor.fetchall()]
+
+    # --------------------------------------------------------
+    # Unir ambos conjuntos
+    # --------------------------------------------------------
+
+    ids = ids_reservados + ids_acreditados
+
+    if not ids:
         return 0
 
-    ids = [fila["id"] for fila in filas]
+    # --------------------------------------------------------
+    # Borrar progreso de publicidad asociado
+    # --------------------------------------------------------
 
     cursor.execute("""
         DELETE FROM rt_progreso_publicidad
         WHERE boleto_id = ANY(%s)
     """, (ids,))
+
+    # --------------------------------------------------------
+    # Liberar los boletos
+    # --------------------------------------------------------
 
     cursor.execute("""
         UPDATE rt_boletos
@@ -158,13 +198,13 @@ def liberar_reservas_expiradas(db):
             estado = 'disponible',
             reserva_token = NULL,
             reservado_en = NULL,
+            asignado_en = NULL,
             actualizado_en = NOW()
         WHERE id = ANY(%s)
     """, (ids,))
 
     return len(ids)
-
-
+    
 # ============================================================
 # INICIO
 # ============================================================
@@ -1521,6 +1561,117 @@ def admin_participantes(rifa_id):
 
         db.close()
 
+
+# ============================================================
+# LIBERAR BOLETO MANUALMENTE (desde el admin)
+# ============================================================
+
+@app.route(
+    "/rifas/admin/liberar-boleto/<int:boleto_id>",
+    methods=["POST"]
+)
+@admin_required
+def admin_liberar_boleto(boleto_id):
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        # ----------------------------------------------------
+        # Verificar el boleto
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            SELECT id, numero, estado, rifa_id
+            FROM rt_boletos
+            WHERE id = %s
+            FOR UPDATE
+        """, (boleto_id,))
+
+        boleto = cursor.fetchone()
+
+        if not boleto:
+
+            db.rollback()
+
+            flash("El boleto no existe.", "error")
+
+            return redirect(url_for("admin_rifas"))
+
+        # ----------------------------------------------------
+        # Solo se pueden liberar boletos no asignados
+        # ----------------------------------------------------
+
+        if boleto["estado"] not in ("reservado", "acreditado"):
+
+            db.rollback()
+
+            flash(
+                f"El boleto #{boleto['numero']} no puede liberarse "
+                f"(estado actual: {boleto['estado']}).",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "admin_participantes",
+                    rifa_id=boleto["rifa_id"]
+                )
+            )
+
+        # ----------------------------------------------------
+        # Borrar progreso de publicidad
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            DELETE FROM rt_progreso_publicidad
+            WHERE boleto_id = %s
+        """, (boleto["id"],))
+
+        # ----------------------------------------------------
+        # Liberar boleto
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            UPDATE rt_boletos
+            SET
+                estado = 'disponible',
+                reserva_token = NULL,
+                reservado_en = NULL,
+                asignado_en = NULL,
+                actualizado_en = NOW()
+            WHERE id = %s
+        """, (boleto["id"],))
+
+        db.commit()
+
+        flash(
+            f"Boleto #{boleto['numero']} liberado correctamente.",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "admin_participantes",
+                rifa_id=boleto["rifa_id"]
+            )
+        )
+
+    except Exception as error:
+
+        db.rollback()
+
+        print("ERROR AL LIBERAR BOLETO:", error)
+
+        flash("Ocurrió un error al liberar el boleto.", "error")
+
+        return redirect(url_for("admin_rifas"))
+
+    finally:
+
+        db.close()
 
 # ============================================================
 # GENERAR TICKETS IMPRIMIBLES

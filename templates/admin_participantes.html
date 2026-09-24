@@ -612,27 +612,55 @@
 
                             <td class="fecha">
 
-{% if p.asignado_en %}
+    {% if p.asignado_en %}
 
-    {{ (p.asignado_en | mx).strftime(
-        '%d/%m/%Y %H:%M'
-    ) }}
+        {{ (p.asignado_en | mx).strftime('%d/%m/%Y %H:%M') }}
 
-{% elif p.reservado_en %}
+    {% elif p.reservado_en %}
 
-    Reservado:
+        Reservado:
+        {{ (p.reservado_en | mx).strftime('%d/%m/%Y %H:%M') }}
 
-    {{ (p.reservado_en | mx).strftime(
-        '%d/%m/%Y %H:%M'
-    ) }}
+    {% else %}
 
-{% else %}
+        —
 
-    —
+    {% endif %}
 
-{% endif %}
 
-                            </td>
+    {# Botón para liberar si no está asignado #}
+
+    {% if p.estado in ('reservado', 'acreditado') %}
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'admin_liberar_boleto',
+                boleto_id=p.id
+            ) }}"
+            onsubmit="return confirm('¿Liberar el boleto #{{ p.numero }}? El usuario perderá su progreso y el boleto volverá a estar disponible.');"
+            style="margin-top: 6px;"
+        >
+
+            <button
+                type="submit"
+                class="boton"
+                style="
+                    background: rgba(239, 68, 68, 0.15);
+                    color: #fca5a5;
+                    border: 1px solid rgba(239, 68, 68, 0.3);
+                    padding: 6px 10px;
+                    font-size: 12px;
+                "
+            >
+                🔓 Liberar
+            </button>
+
+        </form>
+
+    {% endif %}
+
+</td>
 
                         </tr>
 
