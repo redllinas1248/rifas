@@ -1,7 +1,7 @@
 import secrets
 import re
-from .functools import wraps
-from .flask import session, jsonify, request
+from functools import wraps
+from flask import session, jsonify, request
 from .db import get_db
 
 def get_current_user():
