@@ -1206,12 +1206,109 @@ def ads_txt():
     )
 
 # ============================================================
+# MANIFEST Y SERVICE WORKER (PWA)
+# ============================================================
+
+@app.route("/manifest.json")
+def manifest():
+    return send_from_directory(
+        os.path.join(app.root_path, "static"),
+        "manifest.json",
+        mimetype="application/manifest+json"
+    )
+
+
+@app.route("/service-worker.js")
+def service_worker():
+    return send_from_directory(
+        os.path.join(app.root_path, "static"),
+        "service-worker.js",
+        mimetype="application/javascript"
+    )
+
+# ============================================================
 # GANADORES ANTERIORES
 # ============================================================
 
 @app.route("/ganadores")
 def ganadores():
     return render_template("ganadores.html")
+
+
+# ============================================================
+# CONSULTAR MI PARTICIPACIÓN
+# ============================================================
+
+@app.route("/rifas/consultar", methods=["GET", "POST"])
+def consultar_participacion():
+
+    if request.method == "POST":
+
+        codigo = request.form.get("codigo", "").strip()
+
+        if not codigo:
+
+            flash("Ingresa tu código de participación.", "error")
+
+            return render_template("consultar.html")
+
+        db = get_db()
+
+        try:
+
+            cursor = db.cursor()
+
+            cursor.execute("""
+                SELECT id, estado
+                FROM rt_boletos
+                WHERE reserva_token = %s
+            """, (codigo,))
+
+            boleto = cursor.fetchone()
+
+            if not boleto:
+
+                flash(
+                    "No encontramos ninguna participación con ese código. "
+                    "Verifícalo e intenta de nuevo.",
+                    "error"
+                )
+
+                return render_template("consultar.html")
+
+            if boleto["estado"] == "asignado":
+
+                return redirect(
+                    url_for(
+                        "tarjeta_participacion",
+                        reserva_token=codigo
+                    )
+                )
+
+            elif boleto["estado"] in ("reservado", "acreditado"):
+
+                return redirect(
+                    url_for(
+                        "reserva",
+                        reserva_token=codigo
+                    )
+                )
+
+            else:
+
+                flash(
+                    "Esta participación ya no está activa.",
+                    "error"
+                )
+
+                return render_template("consultar.html")
+
+        finally:
+
+            db.close()
+
+    return render_template("consultar.html")
+
 
 # ============================================================
 # LOGIN DE ADMINISTRACIÓN
