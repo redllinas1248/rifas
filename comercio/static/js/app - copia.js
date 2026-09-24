@@ -244,7 +244,7 @@ async function publicar() {
   if (vid?.files.length) formData.append('videos', vid.files[0]);
 
   try {
-    await fetch('/api/publicaciones', { method: 'POST', body: formData, credentials: 'include' });
+    await fetch('/comercio/api/publicaciones', { method: 'POST', body: formData, credentials: 'include' });
     cerrarModal();
     toast('✅ Publicación creada');
     cargarPublicaciones();

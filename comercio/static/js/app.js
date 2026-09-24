@@ -17,7 +17,7 @@ let CSRF_TOKEN = null;
 
 async function getCsrfToken() {
   if (CSRF_TOKEN) return CSRF_TOKEN;
-  const res = await fetch('/api/auth/csrf', { credentials: 'include' });
+  const res = await fetch('/comercio/api/auth/csrf', { credentials: 'include' });
   const data = await res.json();
   if (!res.ok || !data.token) throw new Error('No se pudo obtener el token de seguridad');
   CSRF_TOKEN = data.token;
@@ -321,7 +321,7 @@ async function publicar() {
 
   try {
     const csrf = await getCsrfToken();
-    const res = await fetch('/api/publicaciones', {
+    const res = await fetch('/comercio/api/publicaciones', {
       method: 'POST',
       body: formData,
       credentials: 'include',
