@@ -157,6 +157,13 @@
 >
     👥 Ver participantes
 </a>
+<a
+    href="{{ url_for('admin_tickets', rifa_id=rifa.id) }}"
+    class="boton"
+    style="background:#10b981; color:white;"
+>
+    🎫 Tickets
+</a>
 
                                     <a href="{{ url_for('editar_rifa', rifa_id=rifa.id) }}" class="boton boton-editar">✏️ Editar</a>
 
