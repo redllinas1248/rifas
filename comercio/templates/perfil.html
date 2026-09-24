@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="perfil-wrap"></div>
+
+<script>
+async function cargarPerfil() {
+  const wrap = document.getElementById('perfil-wrap');
+  wrap.innerHTML = `<div class="spinner-feed"><span></span><span></span><span></span></div>`;
+  try {
+    const u = await api('/api/auth/yo');
+    const avatar = u.foto
+      ? `<img src="${imgUrl(u.foto)}" class="p-avatar" id="p-avatar-img" />`
+      : `<div class="p-avatar p-avatar-empty" id="p-avatar-img">👤</div>`;
+    wrap.innerHTML = `
+      <div class="p-card">
+        <div class="p-header">
+          <div class="p-avatar-wrap">
+            ${avatar}
+            <label class="p-avatar-edit" title="Cambiar foto">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              <input type="file" accept="image/*" style="display:none" onchange="subirFoto(this)" />
+            </label>
+          </div>
+          <div class="p-info">
+            <h2 class="p-nombre">${escapeHtml(u.nombre || u.usuario || u.telefono)}</h2>
+            <p class="p-telefono">📱 ${escapeHtml(u.telefono)}</p>
+            ${u.localidad ? `<p class="p-loc">📍 ${escapeHtml(u.localidad)}</p>` : ''}
+          </div>
+        </div>
+
+        <!-- Widget de puntos -->
+        <div class="p-section puntos-section">
+          <div class="puntos-wrap">
+            <div class="puntos-principal">
+              <div class="puntos-numero" id="p-puntos">—</div>
+              <div class="puntos-label">puntos</div>
+            </div>
+            <div class="puntos-info">
+              <div class="puntos-detalle" id="p-pubs-hoy">— / 2 publicaciones hoy</div>
+              <div class="puntos-barra-wrap">
+                <div class="puntos-barra" id="p-barra"></div>
+              </div>
+              <button class="puntos-ayuda" onclick="toggleAyudaPuntos()">
+                ¿Cómo funcionan los puntos? ℹ️
+              </button>
+            </div>
+          </div>
+          <div class="puntos-explicacion" id="puntos-exp" style="display:none">
+            <p>🌟 Ganas <strong>1 punto</strong> por cada <strong>2 publicaciones</strong> que hagas.</p>
+            <p>📅 Puedes publicar máximo <strong>2 veces al día</strong>.</p>
+            <p>💎 Los puntos tienen valor — próximamente podrás canjearlos por beneficios en el pueblo.</p>
+            <p>🏆 ¡Sigue publicando para acumular más!</p>
+          </div>
+          <div id="puntos-historial" style="margin-top:.75rem"></div>
+        </div>
+
+        <div class="p-section">
+          <h3 class="p-section-title">Editar perfil</h3>
+          <div class="p-form">
+            <div class="p-field">
+              <label>Nombre</label>
+              <input id="p-nombre" type="text" value="${escapeHtml(u.nombre || '')}" placeholder="Tu nombre" />
+            </div>
+            <div class="p-field">
+              <label>Apellido</label>
+              <input id="p-apellido" type="text" value="${escapeHtml(u.apellido || '')}" placeholder="Tu apellido" />
+            </div>
+            <div class="p-field">
+              <label>Localidad</label>
+              <input id="p-localidad" type="text" value="${escapeHtml(u.localidad || '')}" placeholder="Tu ciudad o municipio" />
+            </div>
+            <div class="p-field">
+              <label>Correo (opcional)</label>
+              <input id="p-correo" type="email" value="${escapeHtml(u.correo || '')}" placeholder="tu@correo.com" />
+            </div>
+            <button class="p-btn-save" id="btn-save" onclick="guardarPerfil()">
+              <span class="btn-text">Guardar cambios</span>
+              <div class="spinner-btn"></div>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-section">
+          <h3 class="p-section-title">Mis publicaciones</h3>
+          <div id="mis-pubs"></div>
+        </div>
+
+        <button class="p-btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
+      </div>`;
+
+    cargarMisPubs(u.telefono);
+    cargarPuntos();
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty"><p>${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+async function cargarPuntos() {
+  try {
+    const data = await api('/api/auth/puntos');
+    document.getElementById('p-puntos').textContent = data.puntos;
+    document.getElementById('p-pubs-hoy').textContent =
+      data.pubs_hoy + ' / 2 publicaciones hoy';
+    const pct = (data.pubs_hoy / 2) * 100;
+    document.getElementById('p-barra').style.width = pct + '%';
+
+    if (data.historial.length) {
+      document.getElementById('puntos-historial').innerHTML = `
+        <p class="p-section-title" style="margin-bottom:.5rem">Últimos puntos ganados</p>
+        ${data.historial.slice(0,5).map(h => `
+          <div class="puntos-hist-item">
+            <span>⭐ +${h.cantidad} — ${escapeHtml(h.motivo)}</span>
+            <span style="color:var(--muted);font-size:.72rem">${timeAgo(h.fecha)}</span>
+          </div>`).join('')}`;
+    }
+  } catch(e) { console.error(e); }
+}
+
+function toggleAyudaPuntos() {
+  const el = document.getElementById('puntos-exp');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+async function cargarMisPubs(telefono) {
+  const wrap = document.getElementById('mis-pubs');
+  try {
+    const pubs = await api(`/api/publicaciones?telefono=${encodeURIComponent(telefono)}&limite=10`);
+    if (!pubs.length) {
+      wrap.innerHTML = `<p style="color:var(--muted);font-size:.85rem">Aún no tienes publicaciones.</p>`;
+      return;
+    }
+    wrap.innerHTML = pubs.map(p => `
+      <div class="p-pub-item">
+        ${p.imagenes?.length ? `<img src="${imgUrl(p.imagenes[0])}" class="p-pub-thumb" />` : '<div class="p-pub-thumb p-pub-nopic">🏷</div>'}
+        <div class="p-pub-body">
+          <p class="p-pub-texto">${escapeHtml(p.contenido)}</p>
+          <p class="p-pub-meta">❤️ ${p.total_likes} · 💬 ${p.total_comentarios} · ${timeAgo(p.fecha)}</p>
+        </div>
+        <button class="p-pub-del" onclick="eliminarPub(${p.id}, this)" title="Eliminar">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
+            <path d="M9 6V4h6v2"/>
+          </svg>
+        </button>
+      </div>`).join('');
+  } catch(e) {
+    wrap.innerHTML = `<p style="color:var(--error);font-size:.82rem">${escapeHtml(e.message)}</p>`;
+  }
+}
+
+async function subirFoto(input) {
+  if (!input.files.length) return;
+  const fd = new FormData();
+  fd.append('foto', input.files[0]);
+  try {
+    const csrf = await getCsrfToken();
+      const res = await fetch('/api/auth/foto', {
+        method:'POST', body:fd, credentials:'include',
+        headers:{'X-CSRF-Token': csrf}
+      });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    toast('✅ Foto actualizada');
+    cargarPerfil();
+  } catch(e) { toast('Error: ' + e.message); }
+}
+
+async function guardarPerfil() {
+  const btn = document.getElementById('btn-save');
+  btn.classList.add('loading'); btn.disabled = true;
+  try {
+    await api('/api/auth/perfil', 'PUT', {
+      nombre:   document.getElementById('p-nombre').value.trim(),
+      apellido: document.getElementById('p-apellido').value.trim(),
+      localidad:document.getElementById('p-localidad').value.trim(),
+      correo:   document.getElementById('p-correo').value.trim(),
+    });
+    toast('✅ Perfil actualizado');
+    cargarPerfil();
+  } catch(e) { toast('Error: ' + e.message); }
+  finally { btn.classList.remove('loading'); btn.disabled = false; }
+}
+
+async function eliminarPub(id, btn) {
+  if (!confirm('¿Eliminar esta publicación?')) return;
+  try {
+    await api(`/api/publicaciones/${id}`, 'DELETE');
+    btn.closest('.p-pub-item').remove();
+    toast('🗑 Publicación eliminada');
+  } catch(e) { toast(e.message); }
+}
+
+async function cerrarSesion() {
+  await api('/api/auth/logout', 'POST');
+  location.href = '/login';
+}
+
+document.addEventListener('DOMContentLoaded', cargarPerfil);
+</script>
+{% endblock %}

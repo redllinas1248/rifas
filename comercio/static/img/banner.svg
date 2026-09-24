@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="50%" style="stop-color:#1a3a5c"/>
+      <stop offset="100%" style="stop-color:#0f172a"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="50%" style="stop-color:#fcd34d"/>
+      <stop offset="100%" style="stop-color:#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#38bdf8"/>
+      <stop offset="100%" style="stop-color:#0ea5e9"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Fondo -->
+  <rect width="800" height="160" fill="url(#bg)"/>
+
+  <!-- Puntos decorativos fondo -->
+  <circle cx="50" cy="30" r="1.5" fill="#38bdf8" opacity="0.3"/>
+  <circle cx="120" cy="80" r="1" fill="#38bdf8" opacity="0.2"/>
+  <circle cx="750" cy="40" r="1.5" fill="#f59e0b" opacity="0.3"/>
+  <circle cx="680" cy="120" r="1" fill="#38bdf8" opacity="0.2"/>
+  <circle cx="30" cy="130" r="1" fill="#f59e0b" opacity="0.2"/>
+  <circle cx="770" cy="130" r="1.5" fill="#38bdf8" opacity="0.3"/>
+
+  <!-- Línea decorativa superior -->
+  <rect x="0" y="0" width="800" height="3" fill="url(#gold)" opacity="0.8"/>
+
+  <!-- Línea decorativa inferior -->
+  <rect x="0" y="157" width="800" height="3" fill="url(#blue)" opacity="0.6"/>
+
+  <!-- Ícono de tienda izquierda -->
+  <g transform="translate(60, 45)" filter="url(#glow)">
+    <text font-size="52" text-anchor="middle" y="52">🏪</text>
+  </g>
+
+  <!-- Ícono derecha -->
+  <g transform="translate(720, 45)" filter="url(#glow)">
+    <text font-size="40" text-anchor="middle" y="42">🛒</text>
+  </g>
+
+  <!-- Texto principal -->
+  <text x="400" y="62"
+    font-family="Georgia, serif"
+    font-size="32"
+    font-weight="bold"
+    text-anchor="middle"
+    fill="url(#gold)"
+    filter="url(#glow)"
+    letter-spacing="1">Ventas Locales</text>
+
+  <!-- Texto secundario -->
+  <text x="400" y="100"
+    font-family="Georgia, serif"
+    font-size="26"
+    font-weight="bold"
+    text-anchor="middle"
+    fill="white"
+    letter-spacing="2">José Azueta</text>
+
+  <!-- Línea decorativa centro -->
+  <line x1="220" y1="113" x2="580" y2="113" stroke="url(#blue)" stroke-width="1" opacity="0.5"/>
+
+  <!-- Subtítulo -->
+  <text x="400" y="135"
+    font-family="Arial, sans-serif"
+    font-size="11"
+    text-anchor="middle"
+    fill="#94a3b8"
+    letter-spacing="3">COMPRA · VENDE · CONECTA</text>
+</svg>

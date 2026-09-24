@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="msg-wrap"></div>
+
+<!-- Panel de chat -->
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-header">
+    <button class="chat-back" onclick="cerrarChat()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+    <div class="chat-header-info">
+      <div class="chat-header-nombre" id="chat-nombre">—</div>
+      <div class="chat-header-tel" id="chat-tel"></div>
+    </div>
+    <button class="chat-del-btn" onclick="eliminarConversacion()" title="Borrar conversación">
+      <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14H6L5 6"/>
+        <path d="M10 11v6M14 11v6"/>
+        <path d="M9 6V4h6v2"/>
+      </svg>
+    </button>
+  </div>
+  <div class="chat-mensajes" id="chat-mensajes"></div>
+  <div class="chat-input-row">
+    <input id="chat-input" type="text" placeholder="Escribe un mensaje..."
+           onkeydown="if(event.key==='Enter') enviarMensaje()" />
+    <button class="chat-send" onclick="enviarMensaje()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+let chatActivo  = null;
+let miTelefono  = null;
+let chatInterval = null;
+
+async function cargarConversaciones() {
+  const wrap = document.getElementById('msg-wrap');
+  wrap.innerHTML = `<div class="spinner-feed"><span></span><span></span><span></span></div>`;
+  try {
+    const yo = await api('/api/auth/yo');
+    miTelefono = yo.telefono;
+    const convs = await api('/api/mensajes/conversaciones');
+
+    if (!convs.length) {
+      wrap.innerHTML = `<div class="empty">
+        <div class="empty-icon">💬</div>
+        <p>Sin conversaciones aún.</p>
+      </div>`;
+    } else {
+      wrap.innerHTML = `<div class="convs-list">${convs.map(c => `
+        <div class="conv-item" id="conv-${c.contacto}">
+          <div class="conv-avatar" onclick="abrirChat(decodeJsValue('${encodeURIComponent(c.contacto)}'))">👤</div>
+          <div class="conv-body" onclick="abrirChat(decodeJsValue('${encodeURIComponent(c.contacto)}'))">
+            <div class="conv-nombre">${escapeHtml(c.contacto)}</div>
+            <div class="conv-ultimo">${escapeHtml(c.ultimo_mensaje || '')}</div>
+          </div>
+          <div class="conv-fecha">${timeAgo(c.fecha)}</div>
+        </div>`).join('')}
+      </div>`;
+    }
+
+    const params = new URLSearchParams(location.search);
+    const conTel = params.get('con');
+    if (conTel) abrirChat(conTel);
+
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty"><p>${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+async function abrirChat(contacto) {
+  chatActivo = contacto;
+  document.getElementById('chat-nombre').textContent = contacto;
+  document.getElementById('chat-tel').textContent    = contacto;
+  document.getElementById('chat-panel').classList.add('open');
+  await cargarMensajes();
+  document.getElementById('chat-input').focus();
+  clearInterval(chatInterval);
+  chatInterval = setInterval(cargarMensajes, 4000);
+}
+
+function cerrarChat() {
+  document.getElementById('chat-panel').classList.remove('open');
+  clearInterval(chatInterval);
+  chatActivo = null;
+  history.replaceState(null, '', '/mensajes');
+  cargarConversaciones();
+}
+
+async function cargarMensajes() {
+  if (!chatActivo) return;
+  const wrap    = document.getElementById('chat-mensajes');
+  const atBottom = wrap.scrollHeight - wrap.scrollTop - wrap.clientHeight < 80;
+  try {
+    const msgs = await api(`/api/mensajes/${chatActivo}`);
+    wrap.innerHTML = msgs.length
+      ? msgs.map(m => {
+          const mio = m.emisor === miTelefono;
+          return `<div class="msg-burbuja ${mio ? 'mio' : 'suyo'}">
+            <p>${escapeHtml(m.mensaje)}</p>
+            <span>${timeAgo(m.fecha)}</span>
+          </div>`;
+        }).join('')
+      : `<p style="text-align:center;color:var(--muted);font-size:.82rem;padding:2rem">Di hola 👋</p>`;
+    if (atBottom || !wrap.dataset.loaded) {
+      wrap.scrollTop = wrap.scrollHeight;
+      wrap.dataset.loaded = '1';
+    }
+  } catch(e) { console.error(e); }
+}
+
+async function enviarMensaje() {
+  const input = document.getElementById('chat-input');
+  const texto = input.value.trim();
+  if (!texto || !chatActivo) return;
+  input.value = '';
+  try {
+    await api('/api/mensajes', 'POST', { receptor: chatActivo, mensaje: texto });
+    await cargarMensajes();
+  } catch(e) { toast(e.message); }
+}
+
+async function eliminarConversacion() {
+  if (!chatActivo) return;
+  if (!confirm(`¿Borrar toda la conversación con ${chatActivo}?`)) return;
+  try {
+    await api(`/api/mensajes/conversacion/${chatActivo}`, 'DELETE');
+    toast('🗑 Conversación eliminada');
+    cerrarChat();
+  } catch(e) { toast(e.message); }
+}
+
+document.addEventListener('DOMContentLoaded', cargarConversaciones);
+</script>
+{% endblock %}

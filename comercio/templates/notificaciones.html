@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="notif-header">
+  <h2 class="notif-title">Notificaciones</h2>
+  <div style="display:flex;gap:.5rem">
+    <button class="notif-clear" onclick="marcarLeidas()">✓ Leídas</button>
+    <button class="notif-clear" style="color:var(--error);border-color:rgba(248,113,113,.3)"
+            onclick="borrarTodas()">🗑 Borrar todas</button>
+  </div>
+</div>
+<div id="notif-wrap"></div>
+
+<script>
+async function cargarNotificaciones() {
+  const wrap = document.getElementById('notif-wrap');
+  wrap.innerHTML = `<div class="spinner-feed"><span></span><span></span><span></span></div>`;
+  try {
+    const notifs = await api('/api/notificaciones');
+    if (!notifs.length) {
+      wrap.innerHTML = `<div class="empty">
+        <div class="empty-icon">🔔</div>
+        <p>Sin notificaciones por ahora.</p>
+      </div>`;
+      return;
+    }
+    wrap.innerHTML = `<div class="notif-list">${notifs.map(n => `
+      <div class="notif-item ${n.leida ? '' : 'no-leida'}" 
+           id="notif-${n.id}" 
+           data-id="${n.id}"
+           data-mensaje="${escapeHtml(n.mensaje)}"
+           onclick="handleNotifClick('${escapeHtml(n.mensaje)}')">
+        <div class="notif-dot ${n.leida ? '' : 'activo'}"></div>
+        <div class="notif-body">
+          <p class="notif-msg">${formatNotif(n.mensaje)}</p>
+          <p class="notif-fecha">${timeAgo(n.fecha)}</p>
+        </div>
+        <button class="notif-del-btn" onclick="event.stopPropagation();eliminarNotif(${n.id})" title="Eliminar">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>`).join('')}
+    </div>`;
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty"><p>${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+// ===== MANEJAR CLICK EN NOTIFICACIÓN =====
+function handleNotifClick(mensaje) {
+  // Extraer ID de publicación si existe (formato: "...#123")
+  const pubMatch = mensaje.match(/#(\d+)/);
+  // Extraer nombre de usuario si es mensaje (formato: "Nuevo mensaje de nombre")
+  const userMatch = mensaje.match(/Nuevo mensaje de (.+)/);
+  
+  if (pubMatch) {
+    // Notificación de like o comentario → ir a publicación
+    location.href = `/publicacion/${pubMatch[1]}`;
+  } else if (userMatch) {
+    // Notificación de mensaje → ir a mensajes con ese usuario
+    // El nombre puede tener caracteres especiales, lo codificamos
+    const nombreUsuario = userMatch[1].trim();
+    location.href = `/mensajes?con=${encodeURIComponent(nombreUsuario)}`;
+  } else {
+    // Otras notificaciones (ej: "Bienvenido") → solo marcar como leída
+    toast('Notificación sin enlace específico');
+  }
+}
+
+// ===== FUNCIONES EXISTENTES =====
+async function eliminarNotif(id) {
+  try {
+    await api(`/api/notificaciones/${id}`, 'DELETE');
+    document.getElementById(`notif-${id}`)?.remove();
+    const lista = document.querySelector('.notif-list');
+    if (lista && !lista.children.length) cargarNotificaciones();
+  } catch(e) { toast(e.message); }
+}
+
+async function borrarTodas() {
+  if (!confirm('¿Borrar todas las notificaciones?')) return;
+  try {
+    await api('/api/notificaciones/borrar-todas', 'DELETE');
+    toast('🗑 Notificaciones eliminadas');
+    cargarNotificaciones();
+    const badge = document.getElementById('notif-count');
+    if (badge) badge.style.display = 'none';
+  } catch(e) { toast(e.message); }
+}
+
+async function marcarLeidas() {
+  try {
+    await api('/api/notificaciones/marcar-leidas', 'POST');
+    toast('✅ Todas marcadas como leídas');
+    cargarNotificaciones();
+    const badge = document.getElementById('notif-count');
+    if (badge) badge.style.display = 'none';
+  } catch(e) { toast(e.message); }
+}
+
+function formatNotif(msg) {
+  if (!msg) return '';
+  msg = escapeHtml(msg);
+  if (msg.includes('mensaje')) return '💬 ' + msg;
+  if (msg.includes('like') || msg.includes('dieron')) return '❤️ ' + msg;
+  if (msg.includes('Comentaron') || msg.includes('comentario')) return '💬 ' + msg;
+  if (msg.includes('publicaci')) return '📢 ' + msg;
+  return '🔔 ' + msg;
+}
+
+document.addEventListener('DOMContentLoaded', cargarNotificaciones);
+</script>
+{% endblock %}

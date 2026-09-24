@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="detalle-wrap"></div>
+
+<script>
+const PUB_ID = {{ pub_id }};
+
+async function cargarDetalle() {
+  const wrap = document.getElementById('detalle-wrap');
+  wrap.innerHTML = `<div class="spinner-feed"><span></span><span></span><span></span></div>`;
+  try {
+    const [pub, coms, likesData] = await Promise.all([
+      api(`/api/publicaciones/${PUB_ID}`),
+      api(`/api/comentarios/${PUB_ID}`),
+      api(`/api/likes/${PUB_ID}`)
+    ]);
+
+    const totalLikes = likesData.reduce((s, l) => s + l.total, 0);
+    const imgs = pub.imagenes || [];
+    const vids = pub.videos   || [];
+    const pubUrl = location.origin + '/publicacion/' + PUB_ID;
+
+    // Video o imágenes
+    let mediaHtml = '';
+    if (vids.length) {
+      mediaHtml = `<div class="card-video-wrap det-video-wrap">
+        <video src="${imgUrl(vids[0])}" controls playsinline preload="metadata"
+               class="card-video det-video"></video>
+      </div>`;
+    } else if (imgs.length) {
+      const cls = `n${Math.min(imgs.length, 3)}`;
+      mediaHtml = `<div class="card-imagenes ${cls}">
+        ${imgs.map(img =>
+          `<img src="${imgUrl(img)}" loading="lazy" class="img-lightbox"
+               data-src="${imgUrl(img)}" style="cursor:zoom-in" />`
+        ).join('')}
+      </div>`;
+    }
+
+    // ===== META TAGS ELIMINADAS (el backend ya las genera) =====
+    // Ya no se llama a actualizarMeta()
+
+    wrap.innerHTML = `
+      <button class="btn-back" onclick="history.back()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg> Volver
+      </button>
+
+      <div class="card det-card">
+        <div class="card-header" style="cursor:pointer"
+             onclick="location.href='/usuario/' + encodeJsValue(pub.telefono)">
+          ${pub.autor_foto
+            ? `<img src="${imgUrl(pub.autor_foto)}" class="avatar" />`
+            : `<div class="avatar">👤</div>`}
+          <div class="card-meta">
+            <div class="card-autor">${escapeHtml(pub.autor || pub.telefono)}</div>
+            <div class="card-fecha">
+              ${pub.comunidad ? `<span class="card-comunidad">📍 ${escapeHtml(pub.comunidad)}</span> · ` : ''}${timeAgo(pub.fecha)}
+            </div>
+          </div>
+          <span class="card-badge">🏷 Venta</span>
+        </div>
+
+        <div class="card-contenido det-contenido">${escapeHtml(pub.contenido)}</div>
+        ${pub.precio ? `<div class="det-precio">$${escapeHtml(String(pub.precio))}</div>` : ''}
+        ${mediaHtml}
+
+        <div class="card-acciones">
+          <button class="btn-accion" id="like-btn-${pub.id}" onclick="reaccionar(${pub.id})">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+            </svg>
+            <span id="likes-${pub.id}">${totalLikes}</span>
+          </button>
+          <button class="btn-accion" onclick="location.href='/usuario/' + encodeJsValue(pub.telefono)">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
+            Vendedor
+          </button>
+        </div>
+      </div>
+
+      <!-- Botón WhatsApp -->
+      <button class="btn-wa-grande" onclick="contactarWAEncoded(encodeJsValue(pub.tel_autor || pub.telefono), encodeJsValue((pub.contenido || '').slice(0,60)), ${pub.id})">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.847L.057 23.882l6.198-1.448A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.878 9.878 0 01-5.031-1.378l-.361-.214-3.681.861.878-3.596-.235-.369A9.865 9.865 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.421 0 9.894 4.474 9.894 9.894 0 5.421-4.473 9.894-9.894 9.894z"/>
+        </svg>
+        Contactar al vendedor por WhatsApp
+      </button>
+
+      <!-- Botones compartir en redes -->
+      <div class="share-section">
+        <p class="share-title">Compartir esta publicación</p>
+        <div class="share-btns">
+
+          <!-- Facebook -->
+          <button class="share-btn share-fb" onclick="compartirFacebook('${pubUrl}')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+            </svg>
+            Facebook
+          </button>
+
+          <!-- Copiar link -->
+          <button class="share-btn share-copy" onclick="copiarLink('${pubUrl}')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+            </svg>
+            Copiar link
+          </button>
+
+          <!-- WhatsApp compartir -->
+          <button class="share-btn share-wacopy" onclick="compartirWhatsApp('${pubUrl}', pub.contenido.slice(0,60))">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.847L.057 23.882l6.198-1.448A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.878 9.878 0 01-5.031-1.378l-.361-.214-3.681.861.878-3.596-.235-.369A9.865 9.865 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.421 0 9.894 4.474 9.894 9.894 0 5.421-4.473 9.894-9.894 9.894z"/>
+            </svg>
+            WhatsApp
+          </button>
+
+        </div>
+        <p class="share-hint">📸 Para Instagram y TikTok: copia el link y pégalo en tu bio o historia</p>
+      </div>
+
+      <div class="det-coms-title">💬 Comentarios (${coms.length})</div>
+
+      <div class="det-coms" id="det-coms">
+        ${coms.length
+          ? coms.map(c => `
+              <div class="comentario-item">
+                <div class="com-avatar" style="cursor:pointer"
+                     onclick="location.href='/usuario/' + encodeJsValue(c.telefono)">👤</div>
+                <div class="com-body">
+                  <div class="com-autor" style="cursor:pointer"
+                       onclick="location.href='/usuario/' + encodeJsValue(c.telefono)">
+                    ${escapeHtml(c.autor || c.telefono)}
+                  </div>
+                  <div class="com-texto">${escapeHtml(c.comentario)}</div>
+                  <div class="com-fecha">${timeAgo(c.fecha)}</div>
+                </div>
+              </div>`).join('')
+          : `<p style="color:var(--muted);font-size:.85rem;padding:.25rem 0">
+               Sin comentarios aún. ¡Sé el primero!</p>`}
+      </div>
+
+      <div class="det-com-input">
+        <input id="det-com" type="text" placeholder="Escribe un comentario..."
+               onkeydown="if(event.key==='Enter') enviarComDet()" />
+        <button class="com-send" onclick="enviarComDet()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>`;
+
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty"><p>${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+/* ===== Funciones compartir ===== */
+function compartirFacebook(url) {
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank', 'width=600,height=400');
+}
+
+function compartirWhatsApp(url, texto) {
+  const msg = encodeURIComponent(`🏪 ${texto}\n\nVe la publicación completa en Ventas Locales José Azueta:\n${url}`);
+  window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
+
+function copiarLink(url) {
+  navigator.clipboard.writeText(url)
+    .then(() => toast('🔗 Link copiado — pégalo en Instagram o TikTok'))
+    .catch(() => {
+      const inp = document.createElement('input');
+      inp.value = url;
+      document.body.appendChild(inp);
+      inp.select();
+      document.execCommand('copy');
+      inp.remove();
+      toast('🔗 Link copiado');
+    });
+}
+
+/* ===== Lightbox ===== */
+function abrirLightbox(src) {
+  const lb = document.createElement('div');
+  lb.className = 'lightbox';
+  lb.innerHTML = `
+    <img src="${src}" />
+    <button onclick="this.parentElement.remove()"
+      style="position:absolute;top:1rem;right:1rem;background:rgba(0,0,0,.6);
+             border:none;border-radius:50%;color:#fff;width:36px;height:36px;
+             font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>`;
+  lb.onclick = e => { if (e.target === lb) lb.remove(); };
+  document.body.appendChild(lb);
+}
+
+async function enviarComDet() {
+  const input = document.getElementById('det-com');
+  const texto = input.value.trim();
+  if (!texto) return;
+  input.disabled = true;
+  try {
+    await api('/api/comentarios', 'POST', { publicacion_id: PUB_ID, comentario: texto });
+    input.value = '';
+    cargarDetalle();
+  } catch(e) {
+    toast(e.message);
+  } finally {
+    input.disabled = false;
+    input.focus();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', cargarDetalle);
+</script>
+{% endblock %}

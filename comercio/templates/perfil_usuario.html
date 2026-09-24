@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="pu-wrap"></div>
+
+<script>
+const TELEFONO = {{ telefono|tojson }};
+
+async function cargarPerfilUsuario() {
+  const wrap = document.getElementById('pu-wrap');
+  wrap.innerHTML = `<div class="spinner-feed"><span></span><span></span><span></span></div>`;
+  try {
+    const [u, pubs] = await Promise.all([
+      api(`/api/auth/usuario/${encodeURIComponent(TELEFONO)}`),
+      api(`/api/publicaciones?telefono=${encodeURIComponent(TELEFONO)}&limite=20`)
+    ]);
+
+    const avatar = u.foto
+      ? `<img src="/static/${u.foto}" class="pu-avatar" />`
+      : `<div class="pu-avatar pu-avatar-empty">👤</div>`;
+
+    wrap.innerHTML = `
+      <button class="btn-back" onclick="history.back()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg> Volver
+      </button>
+
+      <div class="pu-card">
+        <div class="pu-header">
+          ${avatar}
+          <div class="pu-info">
+            <h2 class="pu-nombre">${escapeHtml(u.nombre || u.telefono)}</h2>
+            ${u.apellido ? `<p class="pu-sub">${escapeHtml(u.apellido)}</p>` : ''}
+            ${u.localidad ? `<p class="pu-sub">📍 ${escapeHtml(u.localidad)}</p>` : ''}
+            <p class="pu-sub">🏷 ${u.total_pubs} publicacion${u.total_pubs !== 1 ? 'es' : ''}</p>
+          </div>
+        </div>
+        <div class="pu-actions">
+          <button class="pu-btn-msg" onclick="iniciarChat('${encodeJsValue(u.telefono)}')">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+            Enviar mensaje
+          </button>
+        </div>
+      </div>
+
+      <div class="det-coms-title">🏷 Publicaciones de ${escapeHtml(u.nombre || u.telefono)}</div>
+      <div class="feed" id="pu-feed">
+        ${pubs.length
+          ? pubs.map(p => renderPub(p)).join('')
+          : `<div class="empty"><div class="empty-icon">📦</div><p>Sin publicaciones aún.</p></div>`}
+      </div>`;
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty"><p>${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+// ===== FUNCIÓN PARA INICIAR CHAT (corregida) =====
+function iniciarChat(encodedTelefono) {
+  // Decodificar por si viene encoded
+  const telefono = decodeJsValue(encodedTelefono);
+  if (!telefono) {
+    toast('⚠️ No se pudo obtener el contacto');
+    return;
+  }
+  // Redirigir a mensajes con el parámetro 'con'
+  location.href = `/mensajes?con=${encodeURIComponent(telefono)}`;
+}
+
+// ===== INICIO =====
+document.addEventListener('DOMContentLoaded', cargarPerfilUsuario);
+</script>
+{% endblock %}

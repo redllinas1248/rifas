@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="search-wrap">
+  <div class="search-bar">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input id="search-input" type="text" placeholder="Buscar publicaciones o usuarios..."
+           oninput="debounceBuscar(this.value)" autofocus />
+    <button class="search-clear" id="search-clear" onclick="limpiarBusqueda()" style="display:none">✕</button>
+  </div>
+  <div id="search-results"></div>
+</div>
+
+<script>
+let searchTimeout = null;
+
+function debounceBuscar(q) {
+  document.getElementById('search-clear').style.display = q ? 'flex' : 'none';
+  clearTimeout(searchTimeout);
+  if (!q.trim()) {
+    document.getElementById('search-results').innerHTML = '';
+    return;
+  }
+  searchTimeout = setTimeout(() => buscar(q), 350);
+}
+
+async function buscar(q) {
+  const wrap = document.getElementById('search-results');
+  wrap.innerHTML = `<div class="spinner-feed"><span></span><span></span><span></span></div>`;
+  try {
+    const data = await api(`/api/publicaciones/buscar?q=${encodeURIComponent(q)}`);
+    const { usuarios, publicaciones } = data;
+
+    if (!usuarios.length && !publicaciones.length) {
+      wrap.innerHTML = `<div class="empty">
+        <div class="empty-icon">🔍</div>
+        <p>Sin resultados para "<strong>${escapeHtml(q)}</strong>"</p>
+      </div>`;
+      return;
+    }
+
+    let html = '';
+
+    // ===== SECCIÓN: USUARIOS ENCONTRADOS =====
+    if (usuarios.length) {
+      html += `<div class="search-section">
+        <div class="search-section-title">👤 Usuarios encontrados (${usuarios.length})</div>
+        <div class="search-users-grid">
+          ${usuarios.map(u => `
+            <div class="search-user-card" onclick="location.href='/usuario/${encodeJsValue(u.telefono)}'">
+              ${u.foto
+                ? `<img src="${imgUrl(u.foto)}" class="search-user-avatar" />`
+                : `<div class="search-user-avatar search-user-avatar-empty">👤</div>`}
+              <div class="search-user-info">
+                <div class="search-user-nombre">${escapeHtml(u.nombre)}</div>
+                <div class="search-user-tel">📱 ${escapeHtml(u.telefono)}</div>
+                ${u.localidad ? `<div class="search-user-loc">📍 ${escapeHtml(u.localidad)}</div>` : ''}
+                <div class="search-user-pubs">📝 ${u.total_pubs} publicacion${u.total_pubs !== 1 ? 'es' : ''}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+
+    // ===== SECCIÓN: PUBLICACIONES =====
+    if (publicaciones.length) {
+      html += `<div class="search-section">
+        <div class="search-section-title">📝 Publicaciones encontradas (${publicaciones.length})</div>
+        <div class="search-pubs-list">
+          ${publicaciones.map(p => `
+            <div class="card search-card" onclick="location.href='/publicacion/${p.id}'">
+              <div class="card-header">
+                ${p.autor_foto
+                  ? `<img src="${imgUrl(p.autor_foto)}" class="avatar" />`
+                  : `<div class="avatar">👤</div>`}
+                <div class="card-meta">
+                  <div class="card-autor" onclick="event.stopPropagation();location.href='/usuario/${encodeJsValue(p.telefono)}'">${escapeHtml(p.autor || p.telefono)}</div>
+                  <div class="card-fecha">${timeAgo(p.fecha)}</div>
+                </div>
+                <span class="card-badge">🏷 Venta</span>
+              </div>
+              <div class="card-contenido">${escapeHtml(p.contenido)}</div>
+              ${p.imagenes?.length ? `
+                <div class="card-imagenes n1">
+                  <img src="${imgUrl(p.imagenes[0])}" loading="lazy" />
+                </div>` : ''}
+              <div class="search-meta">
+                <span>❤️ ${p.total_likes}</span>
+                <span>💬 ${p.total_comentarios}</span>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    }
+
+    wrap.innerHTML = html;
+
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty"><p>${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+function limpiarBusqueda() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-clear').style.display = 'none';
+  document.getElementById('search-results').innerHTML = '';
+  document.getElementById('search-input').focus();
+}
+</script>
+{% endblock %}

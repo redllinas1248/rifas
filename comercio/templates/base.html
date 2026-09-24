@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#0f172a"/>
+  
+  <!-- Meta tags dinámicas -->
+  <meta name="description" content="{{ meta_description or 'Ventas Locales José Azueta - Compra, vende y conecta en tu comunidad' }}"/>
+  <title>{{ meta_title or 'Ventas Locales — José Azueta' }}</title>
+
+  <!-- Open Graph (para compartir en redes sociales) -->
+  <meta property="og:title" content="{{ meta_title or 'Ventas Locales José Azueta' }}"/>
+  <meta property="og:description" content="{{ meta_description or 'Compra, vende y conecta en tu comunidad de José Azueta' }}"/>
+  <meta property="og:url" content="{{ meta_url or request.url }}"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="Ventas Locales José Azueta"/>
+  {% if meta_image %}
+    <meta property="og:image" content="{{ meta_image }}"/>
+  {% else %}
+    <meta property="og:image" content="{{ default_og_image or logo_url or '/static/img/icon-512.png' }}"/>
+  {% endif %}
+
+  <!-- ============================================================ -->
+  <!-- GOOGLE ANALYTICS (si está configurado)                       -->
+  <!-- ============================================================ -->
+  {% if config.GOOGLE_ANALYTICS_ID %}
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.GOOGLE_ANALYTICS_ID }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '{{ config.GOOGLE_ANALYTICS_ID }}');
+  </script>
+  {% endif %}
+
+  <link rel="manifest" href="/static/manifest.json"/>
+  <link rel="apple-touch-icon" href="/static/img/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/app.css"/>
+
+  <style>
+    .ad-container {
+      text-align: center;
+      margin: 1rem 0;
+      min-height: 90px;
+      background: var(--bg2);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      padding: 0.5rem;
+    }
+    .ad-container iframe,
+    .ad-container img {
+      max-width: 100%;
+      border: 0;
+    }
+    .ad-label {
+      font-size: 0.6rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+    .ad-container > * {
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Banner -->
+  <div class="site-banner">
+    <img src="{{ logo_url }}" alt="Ventas Locales José Azueta" class="banner-img"/>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/" class="brand">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/>
+      </svg>
+      <span>Inicio</span>
+    </a>
+    <div class="nav-links">
+      <button id="install-btn" class="nav-link nav-install" style="display:none" onclick="instalarApp()" title="Instalar app">
+        <svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Instalar</span>
+      </button>
+      <a href="/transmisiones" class="nav-link nav-transmisiones" title="Transmisiones en vivo">
+        <svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <polygon points="23 7 16 12 23 17 23 7"/>
+          <rect x="1" y="5" width="15" height="14" rx="2"/>
+        </svg>
+        <span class="live-dot"></span>
+      </a>
+      <a href="/buscar" class="nav-link" title="Buscar">
+        <svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </a>
+      <a href="/mensajes" class="nav-link nav-auth" style="display:none" title="Mensajes">
+        <svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+      </a>
+      <a href="/notificaciones" class="nav-link nav-auth nav-notif" style="display:none" id="badge-notif" title="Notificaciones">
+        <svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+        <span class="notif-badge" id="notif-count" style="display:none"></span>
+      </a>
+      <a href="/perfil" class="nav-link nav-auth" style="display:none" title="Perfil">
+        <svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </a>
+      <a href="/login" class="nav-link nav-guest nav-login-btn" title="Iniciar sesión">
+        <svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/>
+          <polyline points="10 17 15 12 10 7"/>
+          <line x1="15" y1="12" x2="3" y2="12"/>
+        </svg>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ===== BANNER 728x90 (debajo del navbar) ===== -->
+  <div class="container" style="max-width:640px; margin:0 auto; padding:0 1rem;">
+    <div class="ad-container" id="ad-top" style="min-height:100px; text-align:center; background:var(--bg2); border-radius:var(--radius); border:1px solid var(--border); padding:0.5rem; margin:0.5rem 0;">
+      <div class="ad-label" style="font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem;">Anuncio</div>
+      <!-- BANNER 728x90 -->
+      <script>
+        atOptions = {
+          'key' : 'c8faf59902984dd8cbd09b2dbce9b59a',
+          'format' : 'iframe',
+          'height' : 90,
+          'width' : 728,
+          'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/c8faf59902984dd8cbd09b2dbce9b59a/invoke.js"></script>
+    </div>
+  </div>
+
+  <main id="app" class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- ===== SOCIAL BAR (flotante) ===== -->
+  <div id="social-bar-container">
+    <script src="https://pl30899863.effectivecpmnetwork.com/b9/00/d4/b900d4c236d22691cfa4d444601c48dd.js"></script>
+  </div>
+
+  <!-- ===== POPUNDER (DESACTIVADO TEMPORALMENTE) ===== -->
+  <!--
+  <script src="https://pl30899859.effectivecpmnetwork.com/6a/8c/31/6a8c3191b0f79bf85b894e5db8313e9a.js" async></script>
+  -->
+
+  <!-- ===== SCRIPT PRINCIPAL DE LA APP ===== -->
+  <script src="/static/js/app.js"></script>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/static/sw.js')
+        .then(() => console.log('SW registrado'))
+        .catch(err => console.error('Error SW:', err));
+    }
+  </script>
+
+</body>
+</html>

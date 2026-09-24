@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#0f172a"/>
+  <title>Comercio Local — Entrar</title>
+  <link rel="manifest" href="/static/manifest.json"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f172a;
+      --bg2:       #1e293b;
+      --bg3:       #263348;
+      --border:    rgba(255,255,255,.08);
+      --border2:   rgba(255,255,255,.16);
+      --text:      #f1f5f9;
+      --muted:     #94a3b8;
+      --accent:    #38bdf8;
+      --accent2:   #0ea5e9;
+      --success:   #34d399;
+      --error:     #f87171;
+      --radius:    14px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .bg-dots {
+      position: fixed; inset: 0; z-index: 0;
+      background-image: radial-gradient(circle, rgba(56,189,248,.12) 1px, transparent 1px);
+      background-size: 28px 28px;
+      animation: drift 20s linear infinite;
+    }
+    .bg-glow {
+      position: fixed; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(56,189,248,.08) 0%, transparent 70%);
+    }
+    @keyframes drift { to { background-position: 28px 28px; } }
+
+    .card {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 420px;
+      margin: 1rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 24px 64px rgba(0,0,0,.5);
+      animation: slideUp .45s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform: translateY(24px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .brand-icon {
+      font-size: 2.4rem;
+      line-height: 1;
+      margin-bottom: .5rem;
+      display: block;
+      animation: pop .5s cubic-bezier(.34,1.56,.64,1) .2s both;
+    }
+    @keyframes pop {
+      from { opacity:0; transform: scale(.6); }
+      to   { opacity:1; transform: scale(1); }
+    }
+    .brand h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--text);
+      letter-spacing: -.01em;
+    }
+    .brand p {
+      font-size: .85rem;
+      color: var(--muted);
+      margin-top: .25rem;
+    }
+
+    .tabs {
+      display: flex;
+      background: var(--bg3);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 1.75rem;
+      gap: 3px;
+    }
+    .tab {
+      flex: 1;
+      padding: .55rem;
+      border: none;
+      background: none;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .tab.active {
+      background: var(--bg2);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,.3);
+    }
+
+    .form { display: none; flex-direction: column; gap: 1rem; }
+    .form.visible { display: flex; animation: fadeIn .25s ease both; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+    .field { display: flex; flex-direction: column; gap: .35rem; }
+    .field label {
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-wrap .ico {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem; pointer-events: none;
+      opacity: .5;
+    }
+    .input-wrap input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+      padding: .75rem .75rem .75rem 2.4rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      -webkit-appearance: none;
+    }
+    .input-wrap input::placeholder { color: var(--muted); opacity: .6; }
+    .input-wrap input:focus {
+      border-color: var(--accent2);
+      box-shadow: 0 0 0 3px rgba(14,165,233,.15);
+    }
+    .input-wrap input.error { border-color: var(--error); }
+
+    /* Botón mostrar/ocultar PIN */
+    .toggle-pin {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.6;
+      transition: opacity .2s;
+    }
+    .toggle-pin:hover { opacity: 1; }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent2);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: .85rem;
+      cursor: pointer;
+      transition: background .2s, transform .1s, opacity .2s;
+      margin-top: .25rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-submit:hover { background: var(--accent); }
+    .btn-submit:active { transform: scale(.98); }
+    .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-submit .spinner-btn {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      margin: 0 auto;
+    }
+    .btn-submit.loading .spinner-btn { display: block; }
+    .btn-submit.loading .btn-text { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .msg {
+      font-size: .83rem;
+      padding: .65rem .85rem;
+      border-radius: 8px;
+      text-align: center;
+      display: none;
+    }
+    .msg.show { display: block; animation: fadeIn .2s ease; }
+    .msg.error { background: rgba(248,113,113,.1); color: var(--error); border: 1px solid rgba(248,113,113,.2); }
+    .msg.ok    { background: rgba(52,211,153,.1); color: var(--success); border: 1px solid rgba(52,211,153,.2); }
+
+    .hint {
+      text-align: center;
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: 1.25rem;
+    }
+    .hint span { color: var(--accent); cursor: pointer; }
+    .hint span:hover { text-decoration: underline; }
+  
+    .select-field {
+      width: 100%;
+      background: var(--bg3);
+      border: none;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+      padding: .75rem .75rem .75rem 2.4rem;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .select-field option { background: var(--bg2); }
+  </style>
+</head>
+<body>
+  <div class="bg-dots"></div>
+  <div class="bg-glow"></div>
+
+  <div class="card">
+    <div class="brand">
+      <span class="brand-icon">🏪</span>
+      <h1>Comercio Local</h1>
+      <p>Compra, vende y conecta en tu comunidad</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="setTab('login')">Entrar</button>
+      <button class="tab" onclick="setTab('registro')">Registrarse</button>
+    </div>
+
+    <!-- ===== FORM LOGIN ===== -->
+    <div id="form-login" class="form visible">
+      <div class="field">
+        <label>Teléfono</label>
+        <div class="input-wrap">
+          <span class="ico">📱</span>
+          <input id="l-tel" type="tel" placeholder="10 dígitos" maxlength="15"
+                 inputmode="numeric" autocomplete="tel"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>PIN de acceso</label>
+        <div class="input-wrap">
+          <span class="ico">🔑</span>
+          <input id="l-pin" type="password" placeholder="4 dígitos" maxlength="4"
+                 inputmode="numeric" autocomplete="current-password"/>
+          <button type="button" class="toggle-pin" onclick="togglePinVisibility('l-pin', this)" title="Mostrar/ocultar PIN">
+            👁️
+          </button>
+        </div>
+      </div>
+
+      <div class="msg" id="msg-login"></div>
+
+      <button class="btn-submit" id="btn-login" onclick="doLogin()">
+        <span class="btn-text">Entrar</span>
+        <div class="spinner-btn"></div>
+      </button>
+    </div>
+
+    <!-- ===== FORM REGISTRO ===== -->
+    <div id="form-registro" class="form">
+      <div class="field">
+        <label>Nombre completo</label>
+        <div class="input-wrap">
+          <span class="ico">👤</span>
+          <input id="r-nombre" type="text" placeholder="Tu nombre" autocomplete="name"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Teléfono</label>
+        <div class="input-wrap">
+          <span class="ico">📱</span>
+          <input id="r-tel" type="tel" placeholder="10 dígitos" maxlength="15"
+                 inputmode="numeric" autocomplete="tel"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Comunidad</label>
+        <div class="input-wrap">
+          <span class="ico">📍</span>
+          <select id="r-comunidad" class="select-field">
+            <option value="">Selecciona tu comunidad...</option>
+            <option>José Azueta</option>
+            <option>San Antonio</option>
+            <option>La Gloria</option>
+            <option>Las Cadenas</option>
+            <option>San Luis</option>
+            <option>La Esperanza</option>
+            <option>El Café</option>
+            <option>San Jerónimo</option>
+            <option>Curazao</option>
+            <option>Paso de la V</option>
+            <option>Juan Mularo</option>
+            <option>El Aguacate</option>
+            <option>Cujuliapan</option>
+            <option>Juan García</option>
+            <option>Tenejapan</option>
+            <option>Pueblo Nuevo</option>
+            <option>Agua Fría</option>
+            <option>Buena Vista</option>
+            <option>Tierra y Libertad</option>
+            <option>La Florida</option>
+            <option>Otro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Crea tu PIN (4 dígitos)</label>
+        <div class="input-wrap">
+          <span class="ico">🔑</span>
+          <input id="r-pin" type="password" placeholder="4 dígitos" maxlength="4"
+                 inputmode="numeric" autocomplete="new-password"/>
+          <button type="button" class="toggle-pin" onclick="togglePinVisibility('r-pin', this)" title="Mostrar/ocultar PIN">
+            👁️
+          </button>
+        </div>
+      </div>
+
+      <div class="msg" id="msg-registro"></div>
+
+      <button class="btn-submit" id="btn-registro" onclick="doRegistro()">
+        <span class="btn-text">Crear cuenta</span>
+        <div class="spinner-btn"></div>
+      </button>
+    </div>
+
+    <p class="hint" id="hint-text">
+      ¿No tienes cuenta? <span onclick="setTab('registro')">Regístrate gratis</span>
+    </p>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+  <script>
+    // ===== Tabs =====
+    function setTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('form-login').classList.toggle('visible', isLogin);
+      document.getElementById('form-registro').classList.toggle('visible', !isLogin);
+      document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', isLogin ? i===0 : i===1));
+      document.getElementById('hint-text').innerHTML = isLogin
+        ? '¿No tienes cuenta? <span onclick="setTab(\'registro\')">Regístrate gratis</span>'
+        : '¿Ya tienes cuenta? <span onclick="setTab(\'login\')">Entra aquí</span>';
+      clearMsg('login'); clearMsg('registro');
+    }
+
+    // ===== Toggle PIN visibility =====
+    function togglePinVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+        btn.title = 'Ocultar PIN';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+        btn.title = 'Mostrar PIN';
+      }
+      input.focus();
+    }
+
+    // ===== Mensajes =====
+    function showMsg(id, txt, tipo) {
+      const el = document.getElementById('msg-' + id);
+      el.textContent = txt;
+      el.className = 'msg show ' + tipo;
+    }
+    function clearMsg(id) {
+      const el = document.getElementById('msg-' + id);
+      if (el) el.className = 'msg';
+    }
+
+    // ===== Loading state =====
+    function setLoading(btnId, on) {
+      const btn = document.getElementById(btnId);
+      btn.classList.toggle('loading', on);
+      btn.disabled = on;
+    }
+
+    // ===== Login =====
+    async function doLogin() {
+      clearMsg('login');
+      const telefono = document.getElementById('l-tel').value.trim();
+      const pin = document.getElementById('l-pin').value.trim();
+
+      if (!telefono) { showMsg('login', 'Ingresa tu teléfono', 'error'); return; }
+      if (pin.length < 4) { showMsg('login', 'Ingresa tu PIN de 4 dígitos', 'error'); return; }
+
+      setLoading('btn-login', true);
+      try {
+        const csrf = await getCsrfToken();
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },
+          credentials: 'include',
+          body: JSON.stringify({ telefono, pin })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión');
+        localStorage.setItem('usr_tel', telefono);
+        localStorage.setItem('usr_nombre', data.usuario?.nombre || '');
+        localStorage.setItem('usr_rol', data.usuario?.rol || 'usuario');
+        showMsg('login', '¡Bienvenido! Entrando...', 'ok');
+        setTimeout(() => location.href = '/', 900);
+      } catch(e) {
+        showMsg('login', e.message, 'error');
+        document.getElementById('l-pin').value = '';
+        document.getElementById('l-pin').classList.add('error');
+        setTimeout(() => {
+          document.getElementById('l-pin').classList.remove('error');
+        }, 800);
+      } finally {
+        setLoading('btn-login', false);
+      }
+    }
+
+    // ===== Registro =====
+    async function doRegistro() {
+      clearMsg('registro');
+      const nombre   = document.getElementById('r-nombre').value.trim();
+      const telefono = document.getElementById('r-tel').value.trim();
+      const pin      = document.getElementById('r-pin').value.trim();
+
+      if (!nombre)            { showMsg('registro', 'Ingresa tu nombre', 'error'); return; }
+      if (!telefono)          { showMsg('registro', 'Ingresa tu teléfono', 'error'); return; }
+      if (!/^\d{10}$/.test(telefono)) { showMsg('registro', 'El teléfono debe tener 10 dígitos', 'error'); return; }
+      const comunidad = document.getElementById('r-comunidad').value;
+      if (!comunidad)          { showMsg('registro', 'Selecciona tu comunidad', 'error'); return; }
+      if (pin.length < 4)     { showMsg('registro', 'Crea un PIN de 4 dígitos', 'error'); return; }
+
+      setLoading('btn-registro', true);
+      try {
+        const csrf = await getCsrfToken();
+        const res = await fetch('/api/auth/registro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },
+          credentials: 'include',
+          body: JSON.stringify({ nombre, telefono, pin, usuario: telefono, localidad: comunidad })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error al registrar');
+        localStorage.setItem('usr_tel', telefono);
+        localStorage.setItem('usr_nombre', nombre);
+        localStorage.setItem('usr_rol', 'usuario');
+        showMsg('registro', '✓ Cuenta creada. Entrando...', 'ok');
+        setTimeout(() => location.href = '/', 900);
+      } catch(e) {
+        showMsg('registro', e.message, 'error');
+        document.getElementById('r-pin').value = '';
+        document.getElementById('r-pin').classList.add('error');
+        setTimeout(() => {
+          document.getElementById('r-pin').classList.remove('error');
+        }, 800);
+      } finally {
+        setLoading('btn-registro', false);
+      }
+    }
+
+    // ===== Enter key =====
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        if (document.getElementById('form-login').classList.contains('visible')) doLogin();
+        else doRegistro();
+      }
+    });
+
+    // ===== Init =====
+    // Si ya hay sesión, redirigir
+    fetch('/api/auth/yo', { credentials: 'include' })
+      .then(r => { if (r.ok) location.href = '/'; })
+      .catch(() => {});
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+static/img/posts/*
+static/img/perfiles/*
+static/videos/posts/*
+!static/img/posts/.gitkeep
+!static/img/perfiles/.gitkeep
+!static/videos/posts/.gitkeep

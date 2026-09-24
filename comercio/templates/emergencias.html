@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="dir-header">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+    <button class="btn-back" onclick="history.back()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg> Volver
+    </button>
+    <div style="display:flex; gap:0.5rem;">
+      <button class="share-btn share-fb" onclick="compartirFacebook()" style="padding:0.4rem 0.8rem; font-size:0.8rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+        </svg>
+        Compartir
+      </button>
+      <button class="share-btn share-wacopy" onclick="compartirWhatsApp()" style="padding:0.4rem 0.8rem; font-size:0.8rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.847L.057 23.882l6.198-1.448A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.878 9.878 0 01-5.031-1.378l-.361-.214-3.681.861.878-3.596-.235-.369A9.865 9.865 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.421 0 9.894 4.474 9.894 9.894 0 5.421-4.473 9.894-9.894 9.894z"/>
+        </svg>
+        WhatsApp
+      </button>
+    </div>
+  </div>
+  <h2 class="dir-title">🚨 Emergencias</h2>
+  <p class="dir-sub">Información esencial para emergencias en José Azueta</p>
+</div>
+
+<div id="emergencias-wrap"></div>
+
+<script>
+function compartirFacebook() {
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
+}
+
+function compartirWhatsApp() {
+  const url = encodeURIComponent(window.location.href);
+  const msg = encodeURIComponent('🚨 ¡Información de emergencias en José Azueta!');
+  window.open(`https://wa.me/?text=${msg}%20${url}`, '_blank');
+}
+
+const TIPO = 'emergencias';
+
+async function cargarEmergencias() {
+  const wrap = document.getElementById('emergencias-wrap');
+  wrap.innerHTML = `<div class="spinner-feed"><span></span><span></span><span></span></div>`;
+  try {
+    const grupos = await api(`/api/directorio?tipo=${TIPO}`);
+    const cats = Object.keys(grupos);
+
+    if (!cats.length) {
+      wrap.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p>No hay información de emergencias disponible.<br>El administrador la agregará pronto.</p></div>`;
+      return;
+    }
+
+    let html = '';
+    for (const cat of cats) {
+      html += `<div class="dir-grupo"><div class="dir-grupo-titulo">${escapeHtml(cat)}</div><div class="dir-grid">`;
+      for (const item of grupos[cat]) {
+        const promedio = item.promedio || 0;
+        const totalEstrellas = item.total_calificaciones || 0;
+        const estrellasHtml = generarEstrellas(promedio);
+        const fotoHtml = item.foto ? `<img src="${item.foto}" class="dir-card-foto" />` : `<div class="dir-card-foto dir-card-nofoto">${item.icono || '📍'}</div>`;
+        html += `
+          <div class="dir-card" data-id="${item.id}">
+            ${fotoHtml}
+            <div class="dir-card-body">
+              <div class="dir-card-nombre">${escapeHtml(item.nombre)}</div>
+              ${item.descripcion_corta ? `<div class="dir-card-desc">${escapeHtml(item.descripcion_corta)}</div>` : ''}
+              <div class="dir-card-estrellas">${estrellasHtml} <span class="dir-card-total">(${totalEstrellas})</span></div>
+              ${item.horario ? `<div class="dir-card-dato">🕐 ${escapeHtml(item.horario)}</div>` : ''}
+              ${item.direccion ? `<div class="dir-card-dato">📍 ${escapeHtml(item.direccion)}</div>` : ''}
+              ${item.telefono ? `
+                <div class="dir-card-actions">
+                  <a href="tel:${escapeHtml(item.telefono)}" class="dir-tel-btn">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.69a16 16 0 006.29 6.29l1.21-1.21a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+                    </svg>
+                    ${escapeHtml(item.telefono)}
+                  </a>
+                  <!-- BOTÓN VER EN MAPA (solo si hay dirección) -->
+                  ${item.direccion ? `
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.direccion)}" target="_blank" class="dir-mapa-btn" style="display:inline-flex; align-items:center; gap:0.3rem; background:rgba(56,189,248,.1); color:var(--accent); border:1px solid rgba(56,189,248,.2); border-radius:8px; font-size:0.75rem; font-weight:600; padding:0.35rem 0.75rem; text-decoration:none; transition:background 0.15s;">
+                      📍 Ver en mapa
+                    </a>
+                  ` : ''}
+                  <button class="dir-calificar-btn" onclick="calificar(${item.id})" title="Calificar">⭐ Calificar</button>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }
+      html += `</div></div>`;
+    }
+    wrap.innerHTML = html;
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty"><p>${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+function generarEstrellas(promedio) {
+  const total = 5;
+  const llenas = Math.round(promedio);
+  let html = '';
+  for (let i = 1; i <= total; i++) {
+    html += i <= llenas ? '⭐' : '☆';
+  }
+  return html;
+}
+
+async function calificar(id) {
+  const usuario = await api('/api/auth/yo').catch(() => null);
+  if (!usuario) {
+    toast('⚠️ Inicia sesión para calificar');
+    return;
+  }
+  const calificacion = prompt('Califica este servicio (1-5 estrellas):', '5');
+  if (calificacion === null) return;
+  const num = parseInt(calificacion);
+  if (isNaN(num) || num < 1 || num > 5) {
+    toast('❌ Ingresa un número entre 1 y 5');
+    return;
+  }
+  try {
+    const data = await api(`/api/directorio/${id}/calificar`, 'POST', { calificacion: num });
+    toast(`✅ Calificación de ${num} estrellas guardada`);
+    cargarEmergencias();
+  } catch(e) {
+    toast('Error: ' + e.message);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', cargarEmergencias);
+</script>
+
+<style>
+  .dir-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-top: 0.5rem; }
+  .dir-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: transform 0.15s, border-color 0.15s; }
+  .dir-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+  .dir-card-foto { width: 100%; height: 140px; object-fit: cover; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--muted); }
+  .dir-card-nofoto { font-size: 3rem; color: var(--muted); }
+  .dir-card-body { padding: 0.75rem 1rem 1rem; }
+  .dir-card-nombre { font-weight: 600; font-size: 1rem; color: var(--text); margin-bottom: 0.25rem; }
+  .dir-card-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.5rem; line-height: 1.4; }
+  .dir-card-estrellas { font-size: 1rem; letter-spacing: 1px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.3rem; }
+  .dir-card-total { font-size: 0.7rem; color: var(--muted); }
+  .dir-card-dato { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.25rem; }
+  .dir-card-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; align-items: center; }
+  .dir-tel-btn { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(37,211,102,.1); color: #25d366; border: 1px solid rgba(37,211,102,.2); border-radius: 8px; font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.75rem; text-decoration: none; transition: background 0.15s; }
+  .dir-tel-btn:hover { background: rgba(37,211,102,.2); }
+  .dir-mapa-btn { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(56,189,248,.1); color: var(--accent); border: 1px solid rgba(56,189,248,.2); border-radius: 8px; font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.75rem; text-decoration: none; transition: background 0.15s; }
+  .dir-mapa-btn:hover { background: rgba(56,189,248,.2); }
+  .dir-calificar-btn { background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.75rem; cursor: pointer; transition: background 0.15s, color 0.15s; }
+  .dir-calificar-btn:hover { background: var(--bg3); color: var(--text); }
+  .share-btn { display: inline-flex; align-items: center; gap: 0.4rem; border: none; border-radius: 8px; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.8rem; cursor: pointer; color: #fff; transition: opacity 0.2s; }
+  .share-btn:hover { opacity: 0.85; }
+  .share-fb { background: #1877f2; }
+  .share-wacopy { background: #25d366; }
+  @media (max-width: 500px) { .dir-grid { grid-template-columns: 1fr 1fr; } .dir-card-foto { height: 100px; } }
+  @media (max-width: 380px) { .dir-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}

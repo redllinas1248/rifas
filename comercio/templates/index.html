@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Botón flotante -->
+<div id="fab-wrap">
+  <button class="fab" id="fab-pub" style="display:none" onclick="abrirModal()" title="Nueva publicación">
+    <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  </button>
+  <a href="/login" class="fab fab-login" id="fab-login" style="display:none" title="Iniciar sesión">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+      <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/>
+      <polyline points="10 17 15 12 10 7"/>
+      <line x1="15" y1="12" x2="3" y2="12"/>
+    </svg>
+  </a>
+</div>
+
+<!-- Banner visitante -->
+<div class="visitor-banner" id="visitor-banner" style="display:none">
+  <div class="visitor-banner-txt">
+    👋 Estás viendo en modo invitado.
+    <a href="/login" class="visitor-link">Inicia sesión</a> o
+    <a href="/login" class="visitor-link">regístrate</a> para interactuar.
+  </div>
+</div>
+
+<!-- ===== CARRUSEL DE DESTACADAS ===== -->
+<div id="destacadas-wrap" style="margin-bottom:1rem;">
+  <div class="destacadas-header">
+    <span class="destacadas-icon">⭐</span>
+    <span class="destacadas-titulo">Publicaciones destacadas</span>
+  </div>
+  <div class="destacadas-slider" id="destacadas-slider">
+    <!-- El JS llenará esto -->
+  </div>
+</div>
+
+<!-- ===== CONTADORES DE ESTADÍSTICAS ===== -->
+<div class="stats-bar" id="stats-bar" style="display: none;">
+  <div class="stat-item">
+    <span class="stat-icon">👥</span>
+    <span class="stat-number" id="stat-usuarios">—</span>
+    <span class="stat-label">Usuarios</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-icon">📝</span>
+    <span class="stat-number" id="stat-pubs-hoy">—</span>
+    <span class="stat-label">Publicaciones hoy</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-icon">👁️</span>
+    <span class="stat-number" id="stat-visitas">—</span>
+    <span class="stat-label">Visitas totales</span>
+  </div>
+</div>
+
+<!-- ===== WIDGET DE PUNTOS ===== -->
+<div id="puntos-widget" style="display:none; margin-bottom:1rem;">
+  <div class="puntos-section" style="border-radius:var(--radius);padding:1rem;background:var(--bg2);border:1px solid var(--border);">
+    <div class="puntos-wrap">
+      <div class="puntos-principal">
+        <div class="puntos-numero" id="pw-puntos">—</div>
+        <div class="puntos-label">puntos</div>
+      </div>
+      <div class="puntos-info">
+        <div class="puntos-detalle" id="pw-pubs-hoy">— / 2 publicaciones hoy</div>
+        <div class="puntos-barra-wrap">
+          <div class="puntos-barra" id="pw-barra" style="width:0%"></div>
+        </div>
+        <button class="puntos-ayuda" onclick="toggleAyudaPuntosWidget()">
+          ¿Cómo funcionan los puntos? ℹ️
+        </button>
+      </div>
+    </div>
+    <div class="puntos-explicacion" id="pw-exp" style="display:none;margin-top:.75rem;background:var(--bg3);padding:.85rem;border-radius:10px;">
+      <p>🌟 Ganas <strong>1 punto</strong> por cada <strong>2 publicaciones</strong> que hagas.</p>
+      <p>📅 Puedes publicar máximo <strong>2 veces al día</strong>.</p>
+      <p>💎 Los puntos tienen valor — próximamente podrás canjearlos por beneficios en el pueblo.</p>
+      <p>🏆 ¡Sigue publicando para acumular más!</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BOTONES DE SECCIONES ===== -->
+<div class="secciones-btns">
+  <a href="/servicios" class="seccion-btn seccion-servicios">
+    <span class="seccion-ico">🔧</span>
+    <div class="seccion-info">
+      <span class="seccion-titulo">Servicios</span>
+      <span class="seccion-sub">Plomero, electricista y más</span>
+    </div>
+    <svg class="seccion-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>
+  </a>
+  <a href="/emergencias" class="seccion-btn seccion-emergencias">
+    <span class="seccion-ico">🚨</span>
+    <div class="seccion-info">
+      <span class="seccion-titulo">Emergencias y Comercios</span>
+      <span class="seccion-sub">Info esencial del pueblo</span>
+    </div>
+    <svg class="seccion-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>
+  </a>
+</div>
+<!-- ===== BOTONES PERSONALIZADOS ===== -->
+<div class="secciones-btns">
+  <!-- Botón Entretenimiento (dinámico) -->
+  {% if btn_entretenimiento.activo %}
+  <a href="{{ btn_entretenimiento.enlace }}" class="seccion-btn seccion-entretenimiento">
+    <span class="seccion-ico">{{ btn_entretenimiento.icono }}</span>
+    <div class="seccion-info">
+      <span class="seccion-titulo">{{ btn_entretenimiento.titulo }}</span>
+      <span class="seccion-sub">{{ btn_entretenimiento.sub }}</span>
+    </div>
+    <svg class="seccion-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>
+  </a>
+  {% endif %}
+
+  <!-- Botón Educación (dinámico) -->
+  {% if btn_educacion.activo %}
+  <a href="{{ btn_educacion.enlace }}" class="seccion-btn seccion-educacion">
+    <span class="seccion-ico">{{ btn_educacion.icono }}</span>
+    <div class="seccion-info">
+      <span class="seccion-titulo">{{ btn_educacion.titulo }}</span>
+      <span class="seccion-sub">{{ btn_educacion.sub }}</span>
+    </div>
+    <svg class="seccion-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>
+  </a>
+  {% endif %}
+</div>
+
+<!-- ===== FEED DE PUBLICACIONES ===== -->
+<div id="feed" class="feed"></div>
+
+<!-- ===== BANNER 300x250 (dentro del feed, se inserta desde JS) ===== -->
+<!-- El script de app.js insertará este banner automáticamente -->
+
+<!-- ===== NATIVE BANNER (al final del feed) ===== -->
+<div class="ad-container" id="ad-bottom" style="margin-top:1.5rem; min-height:280px; background:var(--bg2); border-radius:var(--radius); border:1px solid var(--border); padding:0.5rem; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+  <div class="ad-label">Anuncio</div>
+  <div id="container-2381fde58e67195cb918ab6a1548b1e4" style="width:100%; min-height:250px;"></div>
+</div>
+
+<!-- ===== SCRIPT DEL NATIVE BANNER (justo después del contenedor) ===== -->
+<script async="async" data-cfasync="false" src="https://pl30899860.effectivecpmnetwork.com/2381fde58e67195cb918ab6a1548b1e4/invoke.js"></script>
+
+<!-- ===== SMARTLINK (footer) ===== -->
+<div style="text-align:center; margin-top:1.5rem; padding:1rem 0; border-top:1px solid var(--border);">
+  <a href="https://www.effectivecpmnetwork.com/p78n4512?key=7aae79a74874dcc277ccad3bb98d4cd5" target="_blank" style="color:var(--muted); font-size:0.7rem; text-decoration:none; opacity:0.5;">
+    Anuncio
+  </a>
+</div>
+
+<!-- ===== MODALES ===== -->
+<div class="modal-overlay" id="modal-login-req" onclick="cerrarModalLogin(event)">
+  <div class="modal modal-login-req-inner">
+    <div class="modal-login-ico">🔐</div>
+    <h3 class="modal-login-titulo">Inicia sesión para continuar</h3>
+    <p class="modal-login-desc">Únete a Ventas Locales José Azueta para publicar, dar likes, comentar y chatear con vendedores.</p>
+    <a href="/login" class="modal-login-btn-reg">Registrarse gratis</a>
+    <a href="/login" class="modal-login-btn-login">Ya tengo cuenta — Entrar</a>
+    <button class="modal-login-cancelar" onclick="cerrarModalLogin()">Seguir viendo</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="cerrarModal(event)">
+  <div class="modal" id="modal-pub">
+    <div class="modal-header">
+      <h3>Nueva publicación</h3>
+      <button class="modal-close" onclick="cerrarModal()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-limit" id="modal-limit-ind"></div>
+    <textarea id="nuevo-contenido" placeholder="¿Qué estás vendiendo? Describe tu producto..."></textarea>
+    <div class="precio-input-wrap">
+      <span class="precio-simbolo">$</span>
+      <input id="nuevo-precio" type="number" min="0" step="0.01" placeholder="Precio (opcional)" />
+    </div>
+    <div class="modal-imgs" id="preview-imgs"></div>
+    <div class="modal-footer">
+      <div style="display:flex;gap:.5rem">
+        <label class="btn-icon" title="Agregar fotos">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <input type="file" id="nuevo-imgs" accept="image/*" multiple style="display:none"
+                 onchange="previewMedia(this, 'imagen')"/>
+        </label>
+        <label class="btn-icon" title="Agregar video">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+          </svg>
+          <input type="file" id="nuevo-vid" accept="video/mp4,video/mov,video/webm,video/*" style="display:none"
+                 onchange="previewMedia(this, 'video')"/>
+        </label>
+      </div>
+      <button class="btn-pub" id="btn-pub" onclick="publicar()">
+        <span class="btn-text">Publicar</span>
+        <div class="spinner-btn"></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Función para alternar ayuda de puntos en el widget
+function toggleAyudaPuntosWidget() {
+  const el = document.getElementById('pw-exp');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// ===== Cargar destacadas (con manejo de errores) =====
+async function cargarDestacadas() {
+  const slider = document.getElementById('destacadas-slider');
+  if (!slider) return;
+  try {
+    const pubs = await api('/api/publicaciones/destacadas');
+    if (!pubs.length) {
+      slider.innerHTML = `<p style="color:var(--muted);font-size:.85rem;padding:.5rem 0;text-align:center;">Sin publicaciones destacadas aún.</p>`;
+      return;
+    }
+    let html = `<div class="slider-track">`;
+    pubs.forEach(p => {
+      const img = p.imagenes && p.imagenes.length ? `<img src="${imgUrl(p.imagenes[0])}" />` : '';
+      html += `
+        <div class="slider-slide" onclick="location.href='/publicacion/${p.id}'">
+          ${img}
+          <div class="slider-caption">
+            <div class="slider-title">${escapeHtml(p.contenido).slice(0,80)}${p.contenido.length > 80 ? '…' : ''}</div>
+            <div class="slider-autor">${escapeHtml(p.autor || p.telefono)}</div>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div><div class="slider-dots"></div>`;
+    slider.innerHTML = html;
+
+    const track = slider.querySelector('.slider-track');
+    const slides = track.querySelectorAll('.slider-slide');
+    const dotsContainer = slider.querySelector('.slider-dots');
+    let current = 0;
+
+    slides.forEach((_, i) => {
+      const dot = document.createElement('span');
+      dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+      dot.dataset.index = i;
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
+    });
+
+    function goTo(index) {
+      if (index < 0) index = slides.length - 1;
+      if (index >= slides.length) index = 0;
+      current = index;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dotsContainer.querySelectorAll('.slider-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+    }
+
+    let autoInterval = setInterval(() => goTo(current + 1), 4000);
+    slider.addEventListener('mouseenter', () => clearInterval(autoInterval));
+    slider.addEventListener('mouseleave', () => {
+      autoInterval = setInterval(() => goTo(current + 1), 4000);
+    });
+    let startX = 0;
+    slider.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+    slider.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) {
+        if (diff > 0) goTo(current + 1);
+        else goTo(current - 1);
+      }
+    });
+    window._sliderGoTo = goTo;
+  } catch(e) {
+    console.error('Error cargando destacadas:', e);
+    slider.innerHTML = `<p style="color:var(--error);font-size:.82rem;">Error al cargar destacadas</p>`;
+  }
+}
+
+// ===== Cargar estadísticas =====
+async function cargarEstadisticas() {
+  try {
+    const data = await api('/api/estadisticas');
+    document.getElementById('stat-usuarios').textContent = data.total_usuarios;
+    document.getElementById('stat-pubs-hoy').textContent = data.pubs_hoy;
+    document.getElementById('stat-visitas').textContent = data.visitas_totales.toLocaleString();
+  } catch(e) {
+    console.error('Error cargando estadísticas:', e);
+    document.getElementById('stat-usuarios').textContent = '—';
+    document.getElementById('stat-pubs-hoy').textContent = '—';
+    document.getElementById('stat-visitas').textContent = '—';
+  }
+}
+
+// ===== Cargar widget de puntos =====
+async function cargarPuntosWidget() {
+  const widget = document.getElementById('puntos-widget');
+  if (!widget) return;
+  try {
+    const data = await api('/api/auth/puntos');
+    widget.style.display = 'block';
+    document.getElementById('pw-puntos').textContent = data.puntos;
+    document.getElementById('pw-pubs-hoy').textContent = data.pubs_hoy + ' / 2 publicaciones hoy';
+    const pct = Math.min((data.pubs_hoy / 2) * 100, 100);
+    document.getElementById('pw-barra').style.width = pct + '%';
+  } catch(e) {
+    widget.style.display = 'none';
+  }
+}
+
+// ===== Inicialización =====
+document.addEventListener('DOMContentLoaded', async function() {
+  await verificarSesion();
+
+  // Asegurar que se carguen las estadísticas y destacadas después de un pequeño delay
+  // para dar tiempo a que los scripts de Adsterra terminen de cargar
+  setTimeout(async () => {
+    await cargarEstadisticas();
+    await cargarDestacadas();
+    if (SESION_ACTIVA) {
+      await cargarPuntosWidget();
+    } else {
+      const widget = document.getElementById('puntos-widget');
+      if (widget) widget.style.display = 'none';
+    }
+  }, 100);
+
+  // Cargar feed (no depende de Adsterra)
+  cargarPublicaciones();
+});
+</script>
+{% endblock %}

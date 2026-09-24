@@ -1,0 +1,898 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  /* ===== ADMIN: ESTADÍSTICAS ===== */
+  .stats-dashboard {
+    padding: 0.5rem 0;
+  }
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .stat-card-icon {
+    font-size: 2rem;
+    opacity: 0.7;
+  }
+  .stat-card-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .stat-card-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .stat-card-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .stats-charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .chart-container {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    height: 250px;
+  }
+  .chart-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .chart-container canvas {
+    width: 100% !important;
+    height: calc(100% - 1.5rem) !important;
+  }
+  @media (max-width: 700px) {
+    .stats-charts {
+      grid-template-columns: 1fr;
+    }
+    .chart-container {
+      height: 200px;
+    }
+  }
+</style>
+
+<div class="admin-wrap">
+  <div class="admin-header">
+    <h2 class="admin-title">⚙️ Panel Admin</h2>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="setAdminTab('pubs', this)">Publicaciones</button>
+    <button class="admin-tab" onclick="setAdminTab('users', this)">Usuarios</button>
+    <button class="admin-tab" onclick="setAdminTab('directorio', this)">Directorio</button>
+    <button class="admin-tab" onclick="setAdminTab('transmisiones', this)">Transmisiones</button>
+    <button class="admin-tab" onclick="setAdminTab('estadisticas', this)">📊 Estadísticas</button>
+    <button class="admin-tab" onclick="setAdminTab('config', this)">Configuración</button>
+  </div>
+
+  <!-- PUBLICACIONES -->
+  <div id="admin-pubs">
+    <div id="pubs-wrap"></div>
+  </div>
+
+  <!-- USUARIOS -->
+  <div id="admin-users" style="display:none">
+    <div id="users-wrap"></div>
+  </div>
+
+  <!-- ===== DIRECTORIO ===== -->
+  <div id="admin-directorio" style="display:none">
+    <div class="dir-admin-form" id="dir-form">
+      <h3 class="p-section-title" style="margin-bottom:.75rem">Agregar entrada</h3>
+      <form id="dir-form-elements" enctype="multipart/form-data">
+        <div class="dir-form-grid">
+          <div class="p-field">
+            <label>Ícono</label>
+            <input id="df-icono" type="text" value="📍" placeholder="Emoji" maxlength="4" style="width:70px"/>
+          </div>
+          <div class="p-field" style="grid-column:span 1">
+            <label>Tipo</label>
+            <select id="df-tipo" class="select-field" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:.65rem .85rem;outline:none;">
+              <option value="servicios">🔧 Servicios</option>
+              <option value="emergencias">🚨 Emergencias</option>
+              <option value="general">📌 General</option>
+            </select>
+          </div>
+          <div class="p-field" style="grid-column:span 3">
+            <label>Nombre</label>
+            <input id="df-nombre" type="text" placeholder="Ej: Farmacia Similar"/>
+          </div>
+          <div class="p-field" style="grid-column:span 2">
+            <label>Teléfono</label>
+            <input id="df-tel" type="tel" placeholder="Ej: 322 123 4567"/>
+          </div>
+          <div class="p-field" style="grid-column:span 2">
+            <label>Horario</label>
+            <input id="df-horario" type="text" placeholder="Ej: 8:00am - 10:00pm"/>
+          </div>
+          <div class="p-field" style="grid-column:span 4">
+            <label>Dirección (opcional)</label>
+            <input id="df-dir" type="text" placeholder="Ej: Calle Hidalgo 45"/>
+          </div>
+          <!-- Foto -->
+          <div class="p-field" style="grid-column:span 2">
+            <label>Foto</label>
+            <input id="df-foto" type="file" accept="image/*" />
+            <small style="color:var(--muted);font-size:.7rem;">Sube una imagen desde tu PC</small>
+          </div>
+          <!-- Descripción corta -->
+          <div class="p-field" style="grid-column:span 2">
+            <label>Descripción corta</label>
+            <textarea id="df-descripcion" rows="2" placeholder="Breve descripción del servicio..." style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.65rem .85rem;outline:none;width:100%;resize:vertical;"></textarea>
+          </div>
+        </div>
+        <button type="button" class="p-btn-save" style="margin-top:.75rem" onclick="guardarDir()">
+          <span class="btn-text" id="df-btn-txt">➕ Agregar</span>
+          <div class="spinner-btn"></div>
+        </button>
+        <input type="hidden" id="df-edit-id" value=""/>
+      </form>
+    </div>
+    <div id="dir-admin-wrap" style="margin-top:1rem"></div>
+  </div>
+
+  <!-- TRANSMISIONES -->
+  <div id="admin-transmisiones" style="display:none">
+    <div class="trans-admin-form" id="trans-form">
+      <h3 class="p-section-title" style="margin-bottom:.75rem">Agregar transmisión</h3>
+      <div class="trans-form-grid">
+        <div class="p-field" style="grid-column:span 3">
+          <label>Título *</label>
+          <input id="tf-titulo" type="text" placeholder="Ej: Milenio Noticias"/>
+        </div>
+        <div class="p-field" style="grid-column:span 1">
+          <label>Categoría</label>
+          <select id="tf-categoria" class="select-field" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:.65rem .85rem;outline:none;">
+            <option value="noticias">📰 Noticias</option>
+            <option value="deportes">⚽ Deportes</option>
+            <option value="eventos">🎥 Eventos</option>
+          </select>
+        </div>
+        <div class="p-field" style="grid-column:span 4">
+          <label>URL o ID de YouTube *</label>
+          <input id="tf-url" type="text" placeholder="ID de video (ej: oPy8a-TCjzA) o URL completa"/>
+          <small style="color:var(--muted);font-size:.7rem;">Ej: oPy8a-TCjzA o https://www.youtube.com/@CanalOnceIPN/live</small>
+        </div>
+        <div class="p-field" style="grid-column:span 3">
+          <label>Descripción (opcional)</label>
+          <input id="tf-descripcion" type="text" placeholder="Breve descripción de la transmisión"/>
+        </div>
+        <div class="p-field" style="grid-column:span 1">
+          <label>Orden</label>
+          <input id="tf-orden" type="number" value="0" min="0" style="width:100%;"/>
+        </div>
+        <div class="p-field" style="grid-column:span 2">
+          <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+            <input id="tf-destacada" type="checkbox" /> Destacada
+          </label>
+        </div>
+        <div class="p-field" style="grid-column:span 2">
+          <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+            <input id="tf-activo" type="checkbox" checked /> Activa
+          </label>
+        </div>
+      </div>
+      <button class="p-btn-save" style="margin-top:.75rem" onclick="guardarTrans()">
+        <span class="btn-text" id="tf-btn-txt">➕ Agregar</span>
+        <div class="spinner-btn"></div>
+      </button>
+      <input type="hidden" id="tf-edit-id" value=""/>
+    </div>
+    <div id="trans-admin-wrap" style="margin-top:1rem"></div>
+  </div>
+
+  <!-- ===== ESTADÍSTICAS (NUEVO) ===== -->
+  <div id="admin-estadisticas" style="display:none">
+    <div class="stats-dashboard">
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-card-icon">👥</div>
+          <div class="stat-card-info">
+            <span class="stat-card-number" id="stat-total-usuarios">0</span>
+            <span class="stat-card-label">Usuarios</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">📝</div>
+          <div class="stat-card-info">
+            <span class="stat-card-number" id="stat-total-publicaciones">0</span>
+            <span class="stat-card-label">Publicaciones</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">👁️</div>
+          <div class="stat-card-info">
+            <span class="stat-card-number" id="stat-total-visitas">0</span>
+            <span class="stat-card-label">Visitas</span>
+          </div>
+        </div>
+      </div>
+      <div class="stats-charts">
+        <div class="chart-container">
+          <h4 class="chart-title">Visitas diarias (últimos 30 días)</h4>
+          <canvas id="chart-visitas"></canvas>
+        </div>
+        <div class="chart-container">
+          <h4 class="chart-title">Publicaciones por día</h4>
+          <canvas id="chart-publicaciones"></canvas>
+        </div>
+        <div class="chart-container">
+          <h4 class="chart-title">Nuevos usuarios por día</h4>
+          <canvas id="chart-usuarios"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIGURACIÓN -->
+  <div id="admin-config" style="display:none">
+    <div class="admin-config-card">
+      <p class="admin-config-help">Sube un logo personalizado para el banner superior de tu sitio.</p>
+      <div class="logo-config-preview" id="logo-preview-container">
+        <img src="{{ logo_url }}" alt="Logo actual" id="logo-preview-img" />
+      </div>
+      <form id="logo-form" class="logo-upload-form" enctype="multipart/form-data">
+        <label class="logo-file-label p-btn-save" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);cursor:pointer;padding:.6rem 1rem;border-radius:10px;display:inline-flex;align-items:center;gap:.5rem;">
+          📁 Seleccionar imagen
+          <input type="file" name="logo" accept="image/*" style="display:none" onchange="mostrarNombreArchivo(this)" />
+        </label>
+        <span class="logo-file-name" id="logo-file-name">Ningún archivo seleccionado</span>
+        <button type="button" class="p-btn-save" id="btn-subir-logo" onclick="subirLogo()">
+          <span class="btn-text">Actualizar Logo</span>
+          <div class="spinner-btn"></div>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONFIGURACIÓN DE BOTONES PERSONALIZADOS ===== -->
+<div class="admin-config-card" style="margin-top:1.5rem;">
+  <h3 class="p-section-title" style="margin-bottom:0.75rem;">🎯 Botones personalizados</h3>
+  <p class="admin-config-help">Configura los botones que aparecerán en la página principal.</p>
+  
+  <form id="botones-form" onsubmit="event.preventDefault(); guardarBotones();">
+    <!-- Botón: Entretenimiento -->
+    <div class="botones-group">
+      <h4 style="color:var(--text);font-size:0.9rem;margin-bottom:0.5rem;">🎬 Entretenimiento</h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div class="p-field">
+          <label>Título</label>
+          <input id="btn-entretenimiento-titulo" type="text" placeholder="Ej: 🎬 Entretenimiento"/>
+        </div>
+        <div class="p-field">
+          <label>Subtítulo</label>
+          <input id="btn-entretenimiento-sub" type="text" placeholder="Ej: Videos, juegos y más"/>
+        </div>
+        <div class="p-field">
+          <label>Ícono (emoji)</label>
+          <input id="btn-entretenimiento-icono" type="text" placeholder="🎬" maxlength="4" style="width:70px;"/>
+        </div>
+        <div class="p-field">
+          <label>Enlace</label>
+          <input id="btn-entretenimiento-enlace" type="text" placeholder="/entretenimiento"/>
+        </div>
+        <div class="p-field" style="grid-column:span 2;">
+          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+            <input id="btn-entretenimiento-activo" type="checkbox" /> Activo
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <hr style="border-color:var(--border);margin:1rem 0;"/>
+
+    <!-- Botón: Educación -->
+    <div class="botones-group">
+      <h4 style="color:var(--text);font-size:0.9rem;margin-bottom:0.5rem;">📚 Educación</h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div class="p-field">
+          <label>Título</label>
+          <input id="btn-educacion-titulo" type="text" placeholder="Ej: 📚 Educación"/>
+        </div>
+        <div class="p-field">
+          <label>Subtítulo</label>
+          <input id="btn-educacion-sub" type="text" placeholder="Ej: Cursos, tutoriales y más"/>
+        </div>
+        <div class="p-field">
+          <label>Ícono (emoji)</label>
+          <input id="btn-educacion-icono" type="text" placeholder="📚" maxlength="4" style="width:70px;"/>
+        </div>
+        <div class="p-field">
+          <label>Enlace</label>
+          <input id="btn-educacion-enlace" type="text" placeholder="/educacion"/>
+        </div>
+        <div class="p-field" style="grid-column:span 2;">
+          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+            <input id="btn-educacion-activo" type="checkbox" /> Activo
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="p-btn-save" style="margin-top:1rem;">
+      <span class="btn-text">Guardar botones</span>
+      <div class="spinner-btn"></div>
+    </button>
+  </form>
+</div>
+
+<script>
+// ===== FUNCIONES ADMIN =====
+function setAdminTab(tab, el) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('admin-pubs').style.display        = tab === 'pubs'         ? 'block' : 'none';
+  document.getElementById('admin-users').style.display       = tab === 'users'        ? 'block' : 'none';
+  document.getElementById('admin-directorio').style.display  = tab === 'directorio'   ? 'block' : 'none';
+  document.getElementById('admin-transmisiones').style.display = tab === 'transmisiones' ? 'block' : 'none';
+  document.getElementById('admin-estadisticas').style.display = tab === 'estadisticas' ? 'block' : 'none';
+  document.getElementById('admin-config').style.display      = tab === 'config'       ? 'block' : 'none';
+  
+  if (tab === 'pubs')         cargarAdminPubs();
+  if (tab === 'users')        cargarAdminUsers();
+  if (tab === 'directorio')   cargarAdminDir();
+  if (tab === 'transmisiones') cargarAdminTrans();
+  if (tab === 'estadisticas') cargarEstadisticas();
+  if (tab === 'config') {
+  cargarBotones();
+}
+}
+
+// ===== PUBLICACIONES =====
+async function cargarAdminPubs() {
+  const wrap = document.getElementById('pubs-wrap');
+  wrap.innerHTML = `<div class="spinner-feed"><span></span><span></span><span></span></div>`;
+  try {
+    const pubs = await api('/api/publicaciones/admin/lista');
+    wrap.innerHTML = `
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>⭐</th><th>#</th><th>Autor</th><th>Contenido</th><th>❤️</th><th>💬</th><th>Fecha</th><th></th></tr></thead>
+          <tbody>
+            ${pubs.map(p => `
+              <tr id="row-pub-${p.id}">
+                <td><span id="dest-star-${p.id}" style="opacity:${p.likes >= 0 ? '0.3' : '1'}">⭐</span></td>
+                <td>${p.id}</td>
+                <td>
+                  <a href="/usuario/${encodeJsValue(p.telefono)}" class="admin-link">${escapeHtml(p.autor || p.telefono)}</a>
+                </td>
+                <td class="admin-td-content">
+                  <a href="/publicacion/${p.id}" class="admin-link">${escapeHtml(p.contenido)}</a>
+                </td>
+                <td>${p.likes}</td>
+                <td>${p.comentarios}</td>
+                <td>${timeAgo(p.fecha)}</td>
+                <td>
+                  <button class="admin-btn-dest ${p.likes > 0 ? '' : ''}"
+                    id="dest-btn-${p.id}"
+                    onclick="toggleDestacada(${p.id})"
+                    title="Destacar publicación">⭐</button>
+                  <button class="admin-btn-del" onclick="eliminarPubAdmin(${p.id})" title="Eliminar">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+                      <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
+                    </svg>
+                  </button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty"><p>${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+async function toggleDestacada(id) {
+  const star = document.getElementById(`dest-star-${id}`);
+  const activa = star && star.style.opacity === '1';
+  try {
+    await api(`/api/publicaciones/${id}/destacar`, 'POST', { destacada: !activa });
+    document.querySelectorAll('[id^="dest-star-"]').forEach(s => {
+      s.style.opacity = '0.3';
+      s.title = '';
+    });
+    if (!activa) {
+      star.style.opacity = '1';
+      star.title = 'Destacada';
+    }
+    toast(activa ? '⭐ Destacado quitado' : '⭐ ¡Publicación destacada!');
+  } catch(e) { toast(e.message); }
+}
+
+async function eliminarPubAdmin(id) {
+  if (!confirm('¿Eliminar esta publicación?')) return;
+  try {
+    await api(`/api/publicaciones/${id}`, 'DELETE');
+    document.getElementById(`row-pub-${id}`)?.remove();
+    toast('🗑 Publicación eliminada');
+  } catch(e) { toast(e.message); }
+}
+
+// ===== USUARIOS =====
+async function cargarAdminUsers() {
+  const wrap = document.getElementById('users-wrap');
+  wrap.innerHTML = `<div class="spinner-feed"><span></span><span></span><span></span></div>`;
+  try {
+    const users = await api('/api/auth/admin/usuarios');
+    wrap.innerHTML = `
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>#</th><th>Teléfono</th><th>Nombre</th><th>Localidad</th><th>Pubs</th><th>Rol</th><th>Acciones</th></tr></thead>
+          <tbody>
+            ${users.map(u => `
+              <tr id="row-user-${u.id}">
+                <td>${u.id}</td>
+                <td><a href="/usuario/${encodeJsValue(u.telefono)}" class="admin-link">${escapeHtml(u.telefono)}</a></td>
+                <td>${escapeHtml(u.nombre || '—')}</td>
+                <td>${escapeHtml(u.localidad || '—')}</td>
+                <td>${u.total_pubs}</td>
+                <td>
+                  <span class="admin-rol-badge ${u.rol === 'admin' ? 'admin' : ''}">${escapeHtml(u.rol || 'usuario')}</span>
+                </td>
+                <td class="admin-actions-cell">
+                  <button class="admin-btn-rol" onclick="toggleRol(${JSON.stringify(String(u.telefono))}, ${JSON.stringify(String(u.rol || 'usuario'))})"
+                    title="${u.rol === 'admin' ? 'Quitar admin' : 'Hacer admin'}">
+                    ${u.rol === 'admin' ? '👑 Quitar' : '👑 Admin'}
+                  </button>
+                  <button class="admin-btn-del" onclick="banearUser('${u.telefono}')" title="Banear">🚫</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty"><p>${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+async function toggleRol(telefono, rolActual) {
+  const nuevo = rolActual === 'admin' ? 'usuario' : 'admin';
+  if (!confirm(`¿Cambiar rol a ${nuevo}?`)) return;
+  try {
+    await api('/api/auth/admin/rol', 'POST', { telefono, rol: nuevo });
+    toast(`✅ Rol cambiado a ${nuevo}`);
+    cargarAdminUsers();
+  } catch(e) { toast(e.message); }
+}
+
+async function banearUser(telefono) {
+  if (!confirm(`¿Banear al usuario ${telefono}?`)) return;
+  try {
+    await api('/api/auth/admin/banear', 'POST', { telefono, baneado: true });
+    toast('🚫 Usuario baneado');
+    cargarAdminUsers();
+  } catch(e) { toast(e.message); }
+}
+
+// ===== DIRECTORIO =====
+let dirItems = [];
+
+async function cargarAdminDir() {
+  const wrap = document.getElementById('dir-admin-wrap');
+  wrap.innerHTML = `<div class="spinner-feed"><span></span><span></span><span></span></div>`;
+  try {
+    const grupos = await api('/api/directorio');
+    dirItems = Object.values(grupos).flat();
+    if (!dirItems.length) {
+      wrap.innerHTML = `<p style="color:var(--muted);font-size:.85rem;padding:.5rem 0">Sin entradas aún.</p>`;
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Ico</th>
+              <th>Categoría</th>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Horario</th>
+              <th>Tipo</th>
+              <th>⭐</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${dirItems.map(item => `
+              <tr id="dir-row-${item.id}">
+                <td>${escapeHtml(item.icono || '📍')}</td>
+                <td>${escapeHtml(item.categoria)}</td>
+                <td>${escapeHtml(item.nombre)}</td>
+                <td>${escapeHtml(item.telefono || '—')}</td>
+                <td>${escapeHtml(item.horario  || '—')}</td>
+                <td>${escapeHtml(item.tipo || 'general')}</td>
+                <td>${item.total_calificaciones || 0} ⭐</td>
+                <td class="admin-actions-cell">
+                  <button class="admin-btn-rol" onclick="editarDir(${item.id})">✏️</button>
+                  <button class="admin-btn-del" onclick="eliminarDir(${item.id})">🗑</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch(e) {
+    wrap.innerHTML = `<p style="color:var(--error)">${escapeHtml(e.message)}</p>`;
+  }
+}
+
+async function guardarDir() {
+  const editId = document.getElementById('df-edit-id').value;
+  const formData = new FormData();
+  
+  const icono = document.getElementById('df-icono').value.trim() || '📍';
+  const nombre = document.getElementById('df-nombre').value.trim();
+  const telefono = document.getElementById('df-tel').value.trim();
+  const horario = document.getElementById('df-horario').value.trim();
+  const direccion = document.getElementById('df-dir').value.trim();
+  const descripcion = document.getElementById('df-descripcion').value.trim();
+  const tipo = document.getElementById('df-tipo').value;
+  const fotoFile = document.getElementById('df-foto').files[0];
+
+  if (!nombre) { toast('⚠️ El nombre es obligatorio'); return; }
+
+  formData.append('icono', icono);
+  formData.append('nombre', nombre);
+  formData.append('telefono', telefono);
+  formData.append('horario', horario);
+  formData.append('direccion', direccion);
+  formData.append('descripcion_corta', descripcion);
+  formData.append('tipo', tipo);
+  if (fotoFile) {
+    formData.append('foto', fotoFile);
+  }
+
+  try {
+    const csrf = await getCsrfToken();
+    let url = '/api/directorio';
+    let method = 'POST';
+    if (editId) {
+      url += '/' + editId;
+      method = 'PUT';
+    }
+    const res = await fetch(url, {
+      method: method,
+      body: formData,
+      credentials: 'include',
+      headers: { 'X-CSRF-Token': csrf }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error al guardar');
+    toast(editId ? '✅ Actualizado' : '✅ Agregado');
+    limpiarFormDir();
+    cargarAdminDir();
+  } catch(e) { toast('Error: ' + e.message); }
+}
+
+function editarDir(id) {
+  const item = dirItems.find(i => i.id === id);
+  if (!item) return;
+  document.getElementById('df-icono').value   = item.icono    || '📍';
+  document.getElementById('df-nombre').value  = item.nombre;
+  document.getElementById('df-tel').value     = item.telefono || '';
+  document.getElementById('df-horario').value = item.horario  || '';
+  document.getElementById('df-dir').value     = item.direccion|| '';
+  document.getElementById('df-descripcion').value = item.descripcion_corta || '';
+  document.getElementById('df-tipo').value    = item.tipo     || 'general';
+  document.getElementById('df-edit-id').value = id;
+  document.getElementById('df-btn-txt').textContent = '💾 Guardar cambios';
+  document.getElementById('df-foto').value = '';
+  document.getElementById('dir-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+function limpiarFormDir() {
+  ['df-icono','df-nombre','df-tel','df-horario','df-dir','df-descripcion'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = id === 'df-icono' ? '📍' : '';
+  });
+  document.getElementById('df-foto').value = '';
+  document.getElementById('df-tipo').value = 'general';
+  document.getElementById('df-edit-id').value = '';
+  document.getElementById('df-btn-txt').textContent = '➕ Agregar';
+}
+
+async function eliminarDir(id) {
+  if (!confirm('¿Eliminar esta entrada?')) return;
+  try {
+    await api(`/api/directorio/${id}`, 'DELETE');
+    document.getElementById(`dir-row-${id}`)?.remove();
+    dirItems = dirItems.filter(i => i.id !== id);
+    toast('🗑 Eliminado');
+  } catch(e) { toast(e.message); }
+}
+
+// ===== TRANSMISIONES =====
+let transItems = [];
+
+async function cargarAdminTrans() {
+  const wrap = document.getElementById('trans-admin-wrap');
+  wrap.innerHTML = `<div class="spinner-feed"><span></span><span></span><span></span></div>`;
+  try {
+    const data = await api('/api/transmisiones');
+    transItems = data;
+    if (!transItems.length) {
+      wrap.innerHTML = `<p style="color:var(--muted);font-size:.85rem;padding:.5rem 0">Sin transmisiones aún.</p>`;
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>#</th><th>Título</th><th>Categoría</th><th>Destacada</th><th>Activo</th><th>Orden</th><th>Fecha</th><th></th></tr></thead>
+          <tbody>
+            ${transItems.map(item => `
+              <tr id="trans-row-${item.id}">
+                <td>${item.id}</td>
+                <td>${escapeHtml(item.titulo)}</td>
+                <td>${escapeHtml(item.categoria)}</td>
+                <td>${item.destacada ? '⭐' : '—'}</td>
+                <td>${item.activo ? '✅' : '❌'}</td>
+                <td>${item.orden}</td>
+                <td>${timeAgo(item.fecha_creacion)}</td>
+                <td class="admin-actions-cell">
+                  <button class="admin-btn-rol" onclick="editarTrans(${item.id})">✏️</button>
+                  <button class="admin-btn-del" onclick="eliminarTrans(${item.id})">🗑</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch(e) {
+    wrap.innerHTML = `<p style="color:var(--error)">${escapeHtml(e.message)}</p>`;
+  }
+}
+
+async function guardarTrans() {
+  const editId = document.getElementById('tf-edit-id').value;
+  const payload = {
+    titulo:      document.getElementById('tf-titulo').value.trim(),
+    descripcion: document.getElementById('tf-descripcion').value.trim(),
+    url:         document.getElementById('tf-url').value.trim(),
+    categoria:   document.getElementById('tf-categoria').value,
+    destacada:   document.getElementById('tf-destacada').checked,
+    activo:      document.getElementById('tf-activo').checked,
+    orden:       parseInt(document.getElementById('tf-orden').value) || 0
+  };
+  if (!payload.titulo || !payload.url) { toast('⚠️ Título y URL son obligatorios'); return; }
+  try {
+    if (editId) {
+      await api(`/api/transmisiones/${editId}`, 'PUT', payload);
+      toast('✅ Actualizado');
+    } else {
+      await api('/api/transmisiones', 'POST', payload);
+      toast('✅ Agregado');
+    }
+    limpiarFormTrans();
+    cargarAdminTrans();
+  } catch(e) { toast(e.message); }
+}
+
+function editarTrans(id) {
+  const item = transItems.find(i => i.id === id);
+  if (!item) return;
+  document.getElementById('tf-titulo').value      = item.titulo;
+  document.getElementById('tf-descripcion').value = item.descripcion || '';
+  document.getElementById('tf-url').value         = item.url;
+  document.getElementById('tf-categoria').value   = item.categoria;
+  document.getElementById('tf-destacada').checked = !!item.destacada;
+  document.getElementById('tf-activo').checked    = !!item.activo;
+  document.getElementById('tf-orden').value       = item.orden || 0;
+  document.getElementById('tf-edit-id').value     = id;
+  document.getElementById('tf-btn-txt').textContent = '💾 Guardar cambios';
+  document.getElementById('trans-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+function limpiarFormTrans() {
+  document.getElementById('tf-titulo').value = '';
+  document.getElementById('tf-descripcion').value = '';
+  document.getElementById('tf-url').value = '';
+  document.getElementById('tf-categoria').value = 'noticias';
+  document.getElementById('tf-destacada').checked = false;
+  document.getElementById('tf-activo').checked = true;
+  document.getElementById('tf-orden').value = '0';
+  document.getElementById('tf-edit-id').value = '';
+  document.getElementById('tf-btn-txt').textContent = '➕ Agregar';
+}
+
+async function eliminarTrans(id) {
+  if (!confirm('¿Eliminar esta transmisión?')) return;
+  try {
+    await api(`/api/transmisiones/${id}`, 'DELETE');
+    document.getElementById(`trans-row-${id}`)?.remove();
+    transItems = transItems.filter(i => i.id !== id);
+    toast('🗑 Eliminado');
+  } catch(e) { toast(e.message); }
+}
+
+// ===== CONFIGURACIÓN LOGO =====
+function mostrarNombreArchivo(input) {
+  const fileName = input.files[0]?.name || 'Ningún archivo seleccionado';
+  document.getElementById('logo-file-name').textContent = fileName;
+}
+
+async function subirLogo() {
+  const input = document.querySelector('input[name="logo"]');
+  if (!input.files || !input.files[0]) {
+    toast('⚠️ Selecciona una imagen primero');
+    return;
+  }
+  const btn = document.getElementById('btn-subir-logo');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  const formData = new FormData();
+  formData.append('logo', input.files[0]);
+  try {
+    const csrf = await getCsrfToken();
+    const res = await fetch('/admin/logo', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+      headers: { 'X-CSRF-Token': csrf }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error al subir el logo');
+    const preview = document.getElementById('logo-preview-img');
+    if (data.logo_url) {
+      preview.src = data.logo_url;
+      toast('✅ Logo actualizado');
+    } else {
+      toast('✅ Logo actualizado. Recargando...');
+      setTimeout(() => location.reload(), 800);
+    }
+    input.value = '';
+    document.getElementById('logo-file-name').textContent = 'Ningún archivo seleccionado';
+  } catch(e) {
+    toast('Error: ' + e.message);
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+// ============================================================
+// ===== ADMIN: ESTADÍSTICAS (NUEVO) =====
+// ============================================================
+async function cargarEstadisticas() {
+  try {
+    const data = await api('/api/admin/estadisticas');
+    // Totales
+    document.getElementById('stat-total-usuarios').textContent = data.totales.usuarios;
+    document.getElementById('stat-total-publicaciones').textContent = data.totales.publicaciones;
+    document.getElementById('stat-total-visitas').textContent = data.totales.visitas;
+
+    // Gráficas (requiere Chart.js)
+    if (typeof Chart !== 'undefined') {
+      // Destruir gráficos existentes para evitar duplicados
+      if (window.chartInstances) {
+        window.chartInstances.forEach(c => c.destroy());
+      }
+      window.chartInstances = [];
+
+      function crearGrafico(id, etiqueta, datos, color) {
+        const ctx = document.getElementById(id).getContext('2d');
+        const fechas = datos.map(d => d.fecha);
+        const valores = datos.map(d => d.total);
+        const chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: fechas,
+            datasets: [{
+              label: etiqueta,
+              data: valores,
+              backgroundColor: color + '33',
+              borderColor: color,
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        });
+        window.chartInstances.push(chart);
+      }
+
+      crearGrafico('chart-visitas', 'Visitas', data.visitas_diarias, '#38bdf8');
+      crearGrafico('chart-publicaciones', 'Publicaciones', data.pubs_diarias, '#34d399');
+      crearGrafico('chart-usuarios', 'Usuarios', data.usuarios_diarios, '#fbbf24');
+    } else {
+      // Si Chart.js no está cargado, cargarlo dinámicamente
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+      script.onload = () => cargarEstadisticas(); // Recargar después de cargar
+      document.head.appendChild(script);
+    }
+  } catch(e) {
+    console.error('Error cargando estadísticas:', e);
+    toast('Error al cargar estadísticas');
+  }
+}
+
+// ===== INICIO =====
+document.addEventListener('DOMContentLoaded', function() {
+  cargarAdminPubs();
+});
+
+
+// ===== CONFIGURACIÓN DE BOTONES PERSONALIZADOS =====
+async function cargarBotones() {
+  try {
+    const data = await api('/api/admin/botones');
+    // Entretenimiento
+    document.getElementById('btn-entretenimiento-titulo').value = data.entretenimiento.titulo || '';
+    document.getElementById('btn-entretenimiento-sub').value = data.entretenimiento.sub || '';
+    document.getElementById('btn-entretenimiento-icono').value = data.entretenimiento.icono || '🎬';
+    document.getElementById('btn-entretenimiento-enlace').value = data.entretenimiento.enlace || '/entretenimiento';
+    document.getElementById('btn-entretenimiento-activo').checked = data.entretenimiento.activo;
+    // Educación
+    document.getElementById('btn-educacion-titulo').value = data.educacion.titulo || '';
+    document.getElementById('btn-educacion-sub').value = data.educacion.sub || '';
+    document.getElementById('btn-educacion-icono').value = data.educacion.icono || '📚';
+    document.getElementById('btn-educacion-enlace').value = data.educacion.enlace || '/educacion';
+    document.getElementById('btn-educacion-activo').checked = data.educacion.activo;
+  } catch(e) {
+    console.error('Error cargando botones:', e);
+  }
+}
+
+async function guardarBotones() {
+  const btn = document.querySelector('#botones-form .p-btn-save');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  
+  const data = {
+    'btn_entretenimiento_titulo': document.getElementById('btn-entretenimiento-titulo').value.trim(),
+    'btn_entretenimiento_sub': document.getElementById('btn-entretenimiento-sub').value.trim(),
+    'btn_entretenimiento_icono': document.getElementById('btn-entretenimiento-icono').value.trim() || '🎬',
+    'btn_entretenimiento_enlace': document.getElementById('btn-entretenimiento-enlace').value.trim() || '/entretenimiento',
+    'btn_entretenimiento_activo': document.getElementById('btn-entretenimiento-activo').checked ? '1' : '0',
+    'btn_educacion_titulo': document.getElementById('btn-educacion-titulo').value.trim(),
+    'btn_educacion_sub': document.getElementById('btn-educacion-sub').value.trim(),
+    'btn_educacion_icono': document.getElementById('btn-educacion-icono').value.trim() || '📚',
+    'btn_educacion_enlace': document.getElementById('btn-educacion-enlace').value.trim() || '/educacion',
+    'btn_educacion_activo': document.getElementById('btn-educacion-activo').checked ? '1' : '0'
+  };
+  
+  try {
+    await api('/api/admin/botones', 'POST', data);
+    toast('✅ Configuración guardada');
+    cargarBotones();
+  } catch(e) {
+    toast('Error: ' + e.message);
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+</script>
+{% endblock %}
