@@ -2328,3 +2328,10 @@ except Exception as e:
 if __name__ == "__main__":
 
     app.run(debug=True)
+
+    from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from comercio.app import app as comercio_app
+
+app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+    "/comercio": comercio_app
+})
