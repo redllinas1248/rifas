@@ -343,21 +343,25 @@
 
         <h1>👥 Participantes</h1>
 
+        
+
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
 
-            <a
-                href="{{ url_for('admin_rifas') }}"
-                class="boton boton-volver"
-            >
-                ← Volver al panel
-            </a>
+    <a href="{{ url_for('admin_tickets', rifa_id=rifa.id) }}"
+       class="boton"
+       style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+        🎫 Imprimir tickets
+    </a>
 
-            <a
-                href="{{ url_for('admin_logout') }}"
-                class="boton boton-cerrar"
-            >
-                Cerrar Sesión
-            </a>
+    <a href="{{ url_for('admin_rifas') }}" class="boton boton-volver">
+        ← Volver al panel
+    </a>
+
+    <a href="{{ url_for('admin_logout') }}" class="boton boton-cerrar">
+        Cerrar Sesión
+    </a>
+
+</div>
 
         </div>
 

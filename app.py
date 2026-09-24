@@ -1523,6 +1523,76 @@ def admin_participantes(rifa_id):
 
 
 # ============================================================
+# GENERAR TICKETS IMPRIMIBLES
+#
+# Genera una página con los boletos asignados (con participante)
+# para imprimir, recortar y usar en la tómbola física.
+# ============================================================
+
+@app.route("/rifas/admin/tickets/<int:rifa_id>")
+@admin_required
+def admin_tickets(rifa_id):
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        # ----------------------------------------------------
+        # Datos del sorteo
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            SELECT
+                id,
+                titulo,
+                descripcion,
+                cantidad_boletos,
+                fecha_sorteo,
+                estado
+            FROM rt_rifas
+            WHERE id = %s
+        """, (rifa_id,))
+
+        rifa = cursor.fetchone()
+
+        if not rifa:
+
+            flash("El sorteo no existe.", "error")
+
+            return redirect(url_for("admin_rifas"))
+
+        # ----------------------------------------------------
+        # Solo boletos con participante (asignados)
+        # ----------------------------------------------------
+
+        cursor.execute("""
+            SELECT
+                numero,
+                nombre,
+                numero_especial,
+                asignado_en
+            FROM rt_boletos
+            WHERE rifa_id = %s
+              AND estado = 'asignado'
+            ORDER BY numero ASC
+        """, (rifa_id,))
+
+        boletos = cursor.fetchall()
+
+        return render_template(
+            "admin_tickets.html",
+            rifa=rifa,
+            boletos=boletos
+        )
+
+    finally:
+
+        db.close()
+
+
+# ============================================================
 # NUEVA RIFA
 # ============================================================
 
