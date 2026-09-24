@@ -2298,3 +2298,12 @@ def cancelar_rifa(rifa_id):
 if __name__ == "__main__":
 
     app.run(debug=True)
+
+
+    # Al final de app.py de rifas
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from comercio.app import app as comercio_app
+
+app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+    "/comercio": comercio_app
+})
