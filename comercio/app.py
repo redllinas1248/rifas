@@ -8,8 +8,7 @@ from .db import init_db, get_db
 
 app = Flask(
     __name__,
-    static_folder='static',
-    static_url_path='/comercio/static'
+    static_folder='static'
 )
 app.config.from_object(Config)
 
