@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify, request
-from db import get_db
-from security import get_current_user
+from ..flask import Blueprint, jsonify, request
+from ..db import get_db
+from ..security import get_current_user
 
 notif_bp = Blueprint('notificaciones', __name__, url_prefix='/api/notificaciones')
 

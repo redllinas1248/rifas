@@ -1,6 +1,6 @@
-from flask import Blueprint, request, jsonify
-from db import get_db
-from security import get_current_user
+from ..flask import Blueprint, request, jsonify
+from ..db import get_db
+from ..security import get_current_user
 
 likes_bp = Blueprint('likes', __name__, url_prefix='/api/likes')
 

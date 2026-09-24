@@ -1,5 +1,5 @@
 import psycopg2
-from flask import current_app, g
+from .flask import current_app, g
 
 def get_db():
     """Obtiene una conexión a la base de datos PostgreSQL."""

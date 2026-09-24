@@ -1,6 +1,6 @@
-from flask import Blueprint, request, jsonify, current_app
-from db import get_db
-from security import require_api_admin, get_current_user
+from ..flask import Blueprint, request, jsonify, current_app
+from ..db import get_db
+from ..security import require_api_admin, get_current_user
 import html
 import cloudinary.uploader
 import os

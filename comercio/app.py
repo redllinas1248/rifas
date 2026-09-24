@@ -1,10 +1,10 @@
 import os
 import logging
-from flask import Flask, request, jsonify, g
-from apscheduler.schedulers.background import BackgroundScheduler
-from security import validate_csrf
-from config import Config, init_cloudinary
-from db import init_db, get_db
+from .flask import Flask, request, jsonify, g
+from .apscheduler.schedulers.background import BackgroundScheduler
+from .security import validate_csrf
+from .config import Config, init_cloudinary
+from .db import init_db, get_db
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -88,16 +88,15 @@ def security_headers(response):
 init_db(app)
 init_cloudinary(app)
 
-# Registrar Blueprints
-from routes.auth import auth_bp
-from routes.publicaciones import pub_bp
-from routes.comentarios import com_bp
-from routes.likes import likes_bp
-from routes.mensajes import msg_bp
-from routes.notificaciones import notif_bp
-from routes.directorio import dir_bp
-from routes.views import views_bp
-from routes.transmisiones import transmisiones_bp
+from .routes.auth import auth_bp
+from .routes.publicaciones import pub_bp
+from .routes.comentarios import com_bp
+from .routes.likes import likes_bp
+from .routes.mensajes import msg_bp
+from .routes.notificaciones import notif_bp
+from .routes.directorio import dir_bp
+from .routes.views import views_bp
+from .routes.transmisiones import transmisiones_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(pub_bp)

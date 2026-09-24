@@ -1,7 +1,7 @@
-from flask import Blueprint, request, jsonify
-from db import get_db
+from ..flask import Blueprint, request, jsonify
+from ..db import get_db
 import html
-from security import get_current_user, valid_phone
+from ..security import get_current_user, valid_phone
 
 msg_bp = Blueprint('mensajes', __name__, url_prefix='/api/mensajes')
 

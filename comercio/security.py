@@ -1,8 +1,8 @@
 import secrets
 import re
-from functools import wraps
-from flask import session, jsonify, request
-from db import get_db
+from .functools import wraps
+from .flask import session, jsonify, request
+from .db import get_db
 
 def get_current_user():
     user_id = session.get('usuario_id')

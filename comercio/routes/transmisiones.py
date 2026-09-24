@@ -1,8 +1,8 @@
-from flask import Blueprint, request, jsonify, current_app
-from db import get_db
-from security import require_api_admin
+from ..flask import Blueprint, request, jsonify, current_app
+from ..db import get_db
+from ..security import require_api_admin
 import html
-from routes.push import enviar_notificacion_a_todos
+from ..routes.push import enviar_notificacion_a_todos
 import re
 
 transmisiones_bp = Blueprint('transmisiones', __name__, url_prefix='/api/transmisiones')

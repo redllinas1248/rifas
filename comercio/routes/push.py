@@ -1,6 +1,6 @@
-from flask import current_app
-from db import get_db
-from pywebpush import webpush, WebPushException
+from ..flask import current_app
+from ..db import get_db
+from ..pywebpush import webpush, WebPushException
 import json
 import os
 
