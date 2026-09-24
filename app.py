@@ -323,6 +323,11 @@ def participar(rifa_id):
         db.close()
 
 
+@app.route('/health')
+def health():
+    return "OK"
+
+
 # ============================================================
 # RESERVAR BOLETO
 # ============================================================
