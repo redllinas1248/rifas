@@ -1,4 +1,4 @@
-from ..flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify
 from ..db import get_db
 from ..security import get_current_user
 import html

@@ -1,7 +1,7 @@
 import os
 import logging
-from ..flask import Blueprint, request, jsonify, current_app
-from ..werkzeug.utils import secure_filename
+from flask import Blueprint, request, jsonify, current_app
+from werkzeug.utils import secure_filename
 from ..db import get_db
 from ..security import require_api_admin, get_current_user
 import cloudinary.uploader

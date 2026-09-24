@@ -1,9 +1,9 @@
-from ..flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, session
 from ..db import get_db
 import bcrypt
 import re
 import time
-from ..threading import Lock
+from threading import Lock
 from ..security import require_api_admin, get_current_user, csrf_token, valid_phone
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
