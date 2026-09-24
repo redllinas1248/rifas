@@ -2292,18 +2292,39 @@ def cancelar_rifa(rifa_id):
 
 
 # ============================================================
+# INTEGRACIÓN CON COMERCIO (appazueta.lat/comercio)
+#
+# Monta el proyecto comercio como sub-aplicación en /comercio.
+# Rifas sigue intacto en /*, el comercio en /comercio/*.
+# ============================================================
+
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.exceptions import NotFound
+
+try:
+
+    from comercio.app import app as comercio_app
+
+    # Handler por si alguien va a una ruta desconocida
+    # que no empiece con /comercio (devuelve el 404 normal de rifas)
+
+    app.wsgi_app = DispatcherMiddleware(
+        app.wsgi_app,
+        {
+            "/comercio": comercio_app
+        }
+    )
+
+    print("✅ Comercio montado en /comercio")
+
+except Exception as e:
+
+    print("⚠️ No se pudo montar /comercio:", e)
+
+# ============================================================
 # EJECUCIÓN LOCAL
 # ============================================================
 
 if __name__ == "__main__":
 
     app.run(debug=True)
-
-
-    # Al final de app.py de rifas
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from comercio.app import app as comercio_app
-
-app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
-    "/comercio": comercio_app
-})
