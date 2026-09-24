@@ -176,7 +176,7 @@
   <!-- Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/static/sw.js')
+      navigator.serviceWorker.register('/comercio/static/sw.js')
         .then(() => console.log('SW registrado'))
         .catch(err => console.error('Error SW:', err));
     }
