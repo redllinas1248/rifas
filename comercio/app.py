@@ -1,7 +1,7 @@
 import os
 import logging
 from flask import Flask, request, jsonify, g
-from .apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 from .security import validate_csrf
 from .config import Config, init_cloudinary
 from .db import init_db, get_db
