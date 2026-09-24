@@ -6,7 +6,11 @@ from .security import validate_csrf
 from .config import Config, init_cloudinary
 from .db import init_db, get_db
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_folder='static',
+    static_url_path='/comercio/static'
+)
 app.config.from_object(Config)
 
 # Configurar logging
