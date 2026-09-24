@@ -2,7 +2,9 @@ import os
 import cloudinary
 import urllib.parse
 
+
 class Config:
+
     # PostgreSQL via DATABASE_URL (Render)
     DATABASE_URL = os.environ.get('DATABASE_URL')
     if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
@@ -10,16 +12,16 @@ class Config:
 
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
-SESSION_COOKIE_SECURE   = True
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Lax'
-PERMANENT_SESSION_LIFETIME = 60 * 60 * 24 * 30
+    SESSION_COOKIE_SECURE   = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    PERMANENT_SESSION_LIFETIME = 60 * 60 * 24 * 30
 
-# ⚠️ Clave para convivir con la app de rifas:
-# - Nombre diferente para no pisar la cookie de rifas
-# - Path restringido a /comercio para no viajar en cada request
-SESSION_COOKIE_NAME = 'comercio_session'
-SESSION_COOKIE_PATH = '/comercio'
+    # Clave para convivir con la app de rifas (mismo dominio):
+    # - Nombre diferente para no pisar la cookie de rifas
+    # - Path restringido a /comercio para no viajar en cada request
+    SESSION_COOKIE_NAME = 'comercio_session'
+    SESSION_COOKIE_PATH = '/comercio'
 
     MAX_CONTENT_LENGTH = 20 * 1024 * 1024  # 20 MB
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -33,7 +35,7 @@ SESSION_COOKIE_PATH = '/comercio'
     VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
     VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 
-    # Google Analytics (ID de medición)
+    # Google Analytics (ID de medicion)
     GOOGLE_ANALYTICS_ID = os.environ.get('GOOGLE_ANALYTICS_ID', '')
 
 
