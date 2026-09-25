@@ -529,8 +529,9 @@ function insertarAnunciosEnFeed() {
   // Insertar AdSense in-feed después de la 4ta publicación
   if (cards.length >= 4) {
     const adContainer = document.createElement('div');
-    adContainer.className = 'ad-container ad-container--feed';
-    adContainer.style.margin = '0.75rem 0';
+  adContainer.className = 'ad-container ad-container--feed';
+adContainer.style.width = '100%';
+adContainer.style.margin = '0.75rem 0';
     adContainer.innerHTML = `
       <div class="ad-label" style="font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem; text-align:center;">Anuncio</div>
       <ins class="adsbygoogle"
@@ -552,6 +553,7 @@ function insertarAnunciosEnFeed() {
   if (cards.length >= 9) {
     const adContainer2 = document.createElement('div');
     adContainer2.className = 'ad-container ad-container--feed';
+    adContainer2.style.width = '100%';
     adContainer2.style.margin = '0.75rem 0';
     adContainer2.innerHTML = `
       <div class="ad-label" style="font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem; text-align:center;">Anuncio</div>
