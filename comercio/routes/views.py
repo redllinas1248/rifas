@@ -115,7 +115,7 @@ def index():
     )
 
 
-@views_bp.route('/login')
+@views_bp.route('/comercio/login')
 def login():
     if get_current_user():
         return redirect(url_for('views.index'))
@@ -367,7 +367,7 @@ def sitemap():
         {'loc': '/emergencias', 'priority': '0.9'},
         {'loc': '/transmisiones', 'priority': '0.8'},
         {'loc': '/buscar', 'priority': '0.6'},
-        {'loc': '/login', 'priority': '0.5'},
+        {'loc': '/comercio/login', 'priority': '0.5'},
     ]
     
     # Publicaciones (más recientes)
