@@ -140,23 +140,19 @@
 <!-- ===== FEED DE PUBLICACIONES ===== -->
 <div id="feed" class="feed"></div>
 
-<!-- ===== BANNER 300x250 (dentro del feed, se inserta desde JS) ===== -->
-<!-- El script de app.js insertará este banner automáticamente -->
-
-<!-- ===== NATIVE BANNER (al final del feed) ===== -->
+<!-- ===== ADSENSE IN-ARTICLE (al final del feed) ===== -->
 <div class="ad-container" id="ad-bottom" style="margin-top:1.5rem; min-height:280px; background:var(--bg2); border-radius:var(--radius); border:1px solid var(--border); padding:0.5rem; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-  <div class="ad-label">Anuncio</div>
-  <div id="container-2381fde58e67195cb918ab6a1548b1e4" style="width:100%; min-height:250px;"></div>
-</div>
-
-<!-- ===== SCRIPT DEL NATIVE BANNER (justo después del contenedor) ===== -->
-<script async="async" data-cfasync="false" src="https://pl30899860.effectivecpmnetwork.com/2381fde58e67195cb918ab6a1548b1e4/invoke.js"></script>
-
-<!-- ===== SMARTLINK (footer) ===== -->
-<div style="text-align:center; margin-top:1.5rem; padding:1rem 0; border-top:1px solid var(--border);">
-  <a href="https://www.effectivecpmnetwork.com/p78n4512?key=7aae79a74874dcc277ccad3bb98d4cd5" target="_blank" style="color:var(--muted); font-size:0.7rem; text-decoration:none; opacity:0.5;">
-    Anuncio
-  </a>
+  <div class="ad-label" style="font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem;">Anuncio</div>
+  <!-- AdSense - In-article -->
+  <ins class="adsbygoogle"
+       style="display:block; text-align:center;"
+       data-ad-layout="in-article"
+       data-ad-format="fluid"
+       data-ad-client="ca-pub-2084405192549609"
+       data-ad-slot="1575958007"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
 </div>
 
 <!-- ===== MODALES ===== -->
@@ -235,7 +231,7 @@ async function cargarDestacadas() {
     pubs.forEach(p => {
       const img = p.imagenes && p.imagenes.length ? `<img src="${imgUrl(p.imagenes[0])}" />` : '';
       html += `
-        <div class="slider-slide" onclick="location.href='/publicacion/${p.id}'">
+        <div class="slider-slide" onclick="location.href='/comercio/publicacion/${p.id}'">
           ${img}
           <div class="slider-caption">
             <div class="slider-title">${escapeHtml(p.contenido).slice(0,80)}${p.contenido.length > 80 ? '…' : ''}</div>
@@ -326,8 +322,7 @@ async function cargarPuntosWidget() {
 document.addEventListener('DOMContentLoaded', async function() {
   await verificarSesion();
 
-  // Asegurar que se carguen las estadísticas y destacadas después de un pequeño delay
-  // para dar tiempo a que los scripts de Adsterra terminen de cargar
+  // Cargar estadísticas, destacadas y puntos
   setTimeout(async () => {
     await cargarEstadisticas();
     await cargarDestacadas();
@@ -339,7 +334,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   }, 100);
 
-  // Cargar feed (no depende de Adsterra)
+  // Cargar feed
   cargarPublicaciones();
 });
 </script>

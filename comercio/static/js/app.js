@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   cargarPublicaciones();
 });
 
-// ===== Insertar anuncios en el feed =====
+// ===== Insertar anuncios en el feed (AdSense) =====
 const _cargarPublicacionesOriginal = cargarPublicaciones;
 cargarPublicaciones = async function() {
   await _cargarPublicacionesOriginal();
@@ -526,45 +526,47 @@ function insertarAnunciosEnFeed() {
   // Eliminar anuncios existentes para no duplicar
   feed.querySelectorAll('.ad-container--feed').forEach(el => el.remove());
 
-  // Insertar banner 300x250 después de la 4ta publicación
+  // Insertar AdSense in-feed después de la 4ta publicación
   if (cards.length >= 4) {
     const adContainer = document.createElement('div');
     adContainer.className = 'ad-container ad-container--feed';
     adContainer.style.margin = '0.75rem 0';
     adContainer.innerHTML = `
-      <div class="ad-label">Anuncio</div>
-      <script>
-        atOptions = {
-          'key' : '3c28692570519f7a1f14c0a8fd20aa78',
-          'format' : 'iframe',
-          'height' : 250,
-          'width' : 300,
-          'params' : {}
-        };
-      <\/script>
-      <script src="https://www.highperformanceformat.com/3c28692570519f7a1f14c0a8fd20aa78/invoke.js"><\/script>
+      <div class="ad-label" style="font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem; text-align:center;">Anuncio</div>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-format="fluid"
+           data-ad-layout-key="-6t+ed+2i-1n-4w"
+           data-ad-client="ca-pub-2084405192549609"
+           data-ad-slot="4202121345"></ins>
     `;
     cards[3].after(adContainer);
+    try {
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      console.warn('AdSense no disponible aún:', e);
+    }
   }
 
-  // Insertar otro banner 300x250 después de la 8va publicación (si existe)
+  // Insertar otro AdSense in-feed después de la 8va publicación (si existe)
   if (cards.length >= 9) {
     const adContainer2 = document.createElement('div');
     adContainer2.className = 'ad-container ad-container--feed';
     adContainer2.style.margin = '0.75rem 0';
     adContainer2.innerHTML = `
-      <div class="ad-label">Anuncio</div>
-      <script>
-        atOptions = {
-          'key' : '3c28692570519f7a1f14c0a8fd20aa78',
-          'format' : 'iframe',
-          'height' : 250,
-          'width' : 300,
-          'params' : {}
-        };
-      <\/script>
-      <script src="https://www.highperformanceformat.com/3c28692570519f7a1f14c0a8fd20aa78/invoke.js"><\/script>
+      <div class="ad-label" style="font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem; text-align:center;">Anuncio</div>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-format="fluid"
+           data-ad-layout-key="-6t+ed+2i-1n-4w"
+           data-ad-client="ca-pub-2084405192549609"
+           data-ad-slot="4202121345"></ins>
     `;
     cards[8].after(adContainer2);
+    try {
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      console.warn('AdSense no disponible aún:', e);
+    }
   }
 }

@@ -33,7 +33,7 @@
   </div>
 </div>
 
-<!-- ===== BOTONES DE COMPARTIR (FUERA del contenedor) ===== -->
+<!-- ===== BOTONES DE COMPARTIR ===== -->
 <div class="share-section" style="padding: 0.75rem 1rem; text-align: center; background: var(--bg2); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 1rem;">
   <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem;">📤 Comparte esta transmisión</p>
   <div class="share-btns" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
@@ -53,7 +53,7 @@
   </div>
 </div>
 
-<!-- ===== BOTÓN DE NOTIFICACIONES (sigue donde estaba) ===== -->
+<!-- ===== BOTÓN DE NOTIFICACIONES ===== -->
 <div style="margin-bottom:1rem; text-align:center;">
   <button id="push-subscribe-btn" class="p-btn-save" style="background:var(--accent2); padding:0.6rem 1.5rem; border-radius:99px; border:none; cursor:pointer;">
     🔔 Activar notificaciones
@@ -61,12 +61,19 @@
   <span id="push-status" style="margin-left:0.5rem; font-size:0.8rem; color:var(--muted);"></span>
 </div>
 
-<!-- ===== ANUNCIO ROTATORIO ===== -->
-<div id="ad-rotator" class="ad-container" style="margin: 1rem 0; min-height: 120px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-  <div class="ad-label">Anuncio</div>
-  <div id="ad-content">
-    <p style="color:var(--muted); font-size:0.8rem;">Cargando anuncio...</p>
-  </div>
+<!-- ===== ADSENSE BANNER ===== -->
+<div class="ad-container" id="ad-rotator" style="margin: 1rem 0; min-height: 120px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+  <div class="ad-label" style="font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem;">Anuncio</div>
+  <!-- AdSense - Banner horizontal -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-2084405192549609"
+       data-ad-slot="5434563537"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
 </div>
 
 <!-- ===== LISTA DE TRANSMISIONES ===== -->
@@ -246,55 +253,6 @@ async function verificarSuscripcion() {
   btn.style.display = 'inline-block';
   status.textContent = '';
 }
-
-// ============================================================
-// ===== ANUNCIOS ROTATORIOS (cada 3 minutos) =================
-// ============================================================
-
-// IDs de tus anuncios de Adsterra (reemplaza con los tuyos)
-const adUnitIds = [
-    'c8faf59902984dd8cbd09b2dbce9b59a',  // Banner 728x90
-    '3c28692570519f7a1f14c0a8fd20aa78'   // Banner 300x250
-];
-let currentAdIndex = 0;
-
-function rotateAd() {
-    const adContainer = document.getElementById('ad-content');
-    if (!adContainer) return;
-
-    const adId = adUnitIds[currentAdIndex];
-    currentAdIndex = (currentAdIndex + 1) % adUnitIds.length;
-
-    adContainer.innerHTML = `
-        <script>
-            atOptions = {
-                'key' : '${adId}',
-                'format' : 'iframe',
-                'height' : 250,
-                'width' : 300,
-                'params' : {}
-            };
-        <\/script>
-        <script src="https://www.highperformanceformat.com/${adId}/invoke.js"><\/script>
-    `;
-
-    const scripts = adContainer.querySelectorAll('script');
-    scripts.forEach(oldScript => {
-        const newScript = document.createElement('script');
-        Array.from(oldScript.attributes).forEach(attr => {
-            newScript.setAttribute(attr.name, attr.value);
-        });
-        newScript.textContent = oldScript.textContent;
-        oldScript.parentNode.replaceChild(newScript, newScript);
-    });
-}
-
-setTimeout(() => {
-    rotateAd();
-    setInterval(rotateAd, 180000);
-}, 1500);
-
-// ============================================================
 
 // ===== INICIO =====
 document.addEventListener('DOMContentLoaded', async function() {
