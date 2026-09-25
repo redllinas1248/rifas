@@ -12,6 +12,10 @@ app = Flask(
 )
 app.config.from_object(Config)
 
+# ⚠️ Necesario para que url_for() y las rutas funcionen
+# correctamente cuando la app está montada en /comercio
+app.config['APPLICATION_ROOT'] = '/comercio'
+
 # Configurar logging
 if not app.debug:
     app.logger.setLevel(logging.ERROR)
