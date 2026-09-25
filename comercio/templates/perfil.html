@@ -195,7 +195,7 @@ async function eliminarPub(id, btn) {
 
 async function cerrarSesion() {
   await api('/api/auth/logout', 'POST');
-  location.href = '/login';
+  location.href = '/comercio/login';
 }
 
 document.addEventListener('DOMContentLoaded', cargarPerfil);
