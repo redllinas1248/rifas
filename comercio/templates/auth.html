@@ -435,7 +435,7 @@
       setLoading('btn-login', true);
       try {
         const csrf = await getCsrfToken();
-        const res = await fetch('/api/auth/login', {
+        const res = await fetch('/comercio/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },
           credentials: 'include',
@@ -477,7 +477,7 @@
       setLoading('btn-registro', true);
       try {
         const csrf = await getCsrfToken();
-        const res = await fetch('/api/auth/registro', {
+        const res = await fetch('/comercio/api/auth/registro', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },
           credentials: 'include',
@@ -512,7 +512,7 @@
 
     // ===== Init =====
     // Si ya hay sesión, redirigir
-    fetch('/api/auth/yo', { credentials: 'include' })
+    fetch('/comercio/api/auth/yo', { credentials: 'include' })
       .then(r => { if (r.ok) location.href = '/'; })
       .catch(() => {});
   </script>
