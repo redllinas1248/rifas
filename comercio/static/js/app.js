@@ -25,6 +25,10 @@ async function getCsrfToken() {
 }
 
 async function api(url, method = 'GET', body = null) {
+  // Auto-prefijar /comercio para rutas de API
+  if (url.startsWith('/api/')) {
+    url = '/comercio' + url;
+  }
   const opts = { method, headers: { 'Content-Type': 'application/json' }, credentials: 'include' };
   if (!['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase())) {
     opts.headers['X-CSRF-Token'] = await getCsrfToken();
@@ -37,9 +41,8 @@ async function api(url, method = 'GET', body = null) {
 }
 
 function imgUrl(ruta) {
-  // Si es URL completa (Cloudinary) la usa directo, si no agrega /static/
   if (!ruta) return '';
-  return ruta.startsWith('http') ? ruta : '/static/' + ruta;
+  return ruta.startsWith('http') ? ruta : '/comercio/static/' + ruta;
 }
 
 function escapeHtml(str) {
@@ -201,7 +204,7 @@ function renderPub(p) {
             </svg>
           </button>` : ''}
       </div>
-      <div class="card-contenido" style="cursor:pointer" onclick="location.href='/publicacion/${pid}'">${escapeHtml(p.contenido)}</div>
+      <div class="card-contenido" style="cursor:pointer" onclick="location.href='/comercio/publicacion/${pid}'">${escapeHtml(p.contenido)}</div>
       ${p.precio ? `<div class="card-precio">$${escapeHtml(String(p.precio))}</div>` : ''}
       ${imgsHtml}
 <div class="card-acciones">
@@ -225,7 +228,7 @@ function renderPub(p) {
     Contactar
   </button>
   ${SESION_ACTIVA && p.tel_autor !== _miTel ? `
-    <button class="btn-accion btn-msg" onclick="location.href='/mensajes?con=${encodeJsValue(p.tel_autor)}'" title="Enviar mensaje">
+    <button class="btn-accion btn-msg" onclick="location.href='/comercio/mensajes?con=${encodeJsValue(p.tel_autor)}'" title="Enviar mensaje">
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
       </svg>
@@ -441,14 +444,14 @@ function contactarWA(telefono, pubId, descripcion) {
   let tel = telefono.replace(/[\s\-\(\)]/g, '');
   if (tel.startsWith('0')) tel = '52' + tel.slice(1);
   else if (!tel.startsWith('52') && tel.length === 10) tel = '52' + tel;
-  const url = location.origin + '/publicacion/' + pubId;
+  const url = location.origin + '/comercio/publicacion/' + pubId;
   const msg = encodeURIComponent(`Hola! Vi tu publicación en Ventas Locales José Azueta:\n*${descripcion}*\n${url}\n\n¿Sigue disponible?`);
   window.open(`https://wa.me/${tel}?text=${msg}`, '_blank');
 }
 
 /* ===== Compartir ===== */
 function compartir(pubId) {
-  const url = `${location.origin}/publicacion/${pubId}`;
+  const url = `${location.origin}/comercio/publicacion/${pubId}`;
   if (navigator.share) {
     navigator.share({ title: 'Ventas Locales José Azueta', url });
   } else {
