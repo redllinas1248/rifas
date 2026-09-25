@@ -7,7 +7,8 @@ const URLS_A_CACHEAR = [
   '/comercio/static/img/icon-512.png'
 ];
 
-// Instalar — versión resiliente: si un archivo falla, los demás igual se cachean
+// ===== INSTALAR =====
+// Cachea archivo por archivo. Si uno falla, los demás siguen.
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
@@ -22,7 +23,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activar — borrar cachés viejos
+// ===== ACTIVAR =====
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -33,11 +34,10 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch
+// ===== FETCH =====
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Solo manejar requests GET del mismo origen
   if (event.request.method !== 'GET' || url.origin !== location.origin) {
     return;
   }
@@ -45,7 +45,6 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(cached => {
       const fetchPromise = fetch(event.request).then(response => {
-        // Solo cachear estáticos
         if (response.ok && event.request.url.includes('/comercio/static/')) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
@@ -57,6 +56,54 @@ self.addEventListener('fetch', event => {
         }
       });
       return cached || fetchPromise;
+    })
+  );
+});
+
+// ===== NOTIFICACIONES PUSH =====
+self.addEventListener('push', function(event) {
+  let data = {
+    title: 'Nueva transmisión en vivo',
+    body: '¡Estamos en vivo!',
+    icon: '/comercio/static/img/icon-192.png',
+    url: '/comercio/transmisiones'
+  };
+
+  try {
+    if (event.data) {
+      const parsed = event.data.json();
+      data = { ...data, ...parsed };
+    }
+  } catch (e) {}
+
+  const options = {
+    body: data.body,
+    icon: data.icon,
+    badge: '/comercio/static/img/icon-192.png',
+    data: {
+      url: data.url
+    }
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  const url = event.notification.data.url || '/comercio/transmisiones';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then(windowClients => {
+      for (let client of windowClients) {
+        if (client.url === url && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
     })
   );
 });
