@@ -115,7 +115,7 @@ def index():
     )
 
 
-@views_bp.route('/comercio/login')
+@views_bp.route('/login')
 def login():
     if get_current_user():
         return redirect(url_for('views.index'))
