@@ -447,7 +447,7 @@
         localStorage.setItem('usr_nombre', data.usuario?.nombre || '');
         localStorage.setItem('usr_rol', data.usuario?.rol || 'usuario');
         showMsg('login', '¡Bienvenido! Entrando...', 'ok');
-        setTimeout(() => location.href = '/', 900);
+        setTimeout(() => location.href = '/comercio/', 900);
       } catch(e) {
         showMsg('login', e.message, 'error');
         document.getElementById('l-pin').value = '';
@@ -489,7 +489,7 @@
         localStorage.setItem('usr_nombre', nombre);
         localStorage.setItem('usr_rol', 'usuario');
         showMsg('registro', '✓ Cuenta creada. Entrando...', 'ok');
-        setTimeout(() => location.href = '/', 900);
+        setTimeout(() => location.href = '/comercio/', 900);
       } catch(e) {
         showMsg('registro', e.message, 'error');
         document.getElementById('r-pin').value = '';
@@ -513,7 +513,7 @@
     // ===== Init =====
     // Si ya hay sesión, redirigir
     fetch('/comercio/api/auth/yo', { credentials: 'include' })
-      .then(r => { if (r.ok) location.href = '/'; })
+      .then(r => { if (r.ok) location.href = '/comercio/'; })
       .catch(() => {});
   </script>
 </body>
