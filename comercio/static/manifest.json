@@ -2,13 +2,13 @@
   "name": "Ventas Locales José Azueta",
   "short_name": "Comercio Local",
   "description": "Compra, vende y conecta en tu comunidad",
-  "start_url": "/",
+  "start_url": "/comercio/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
   "orientation": "portrait",
-  "scope": "/",
+  "scope": "/comercio/",
   "icons": [
     {
       "src": "/comercio/static/img/icon-192.png",
