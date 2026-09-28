@@ -572,3 +572,64 @@ adContainer.style.margin = '0.75rem 0';
     }
   }
 }
+// ============================================================
+// PWA: INSTALAR APP
+// ============================================================
+
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    const btn = document.getElementById('install-btn');
+    if (btn) {
+        btn.style.display = 'flex';
+        console.log('✅ Botón de instalar PWA disponible');
+    }
+});
+
+async function instalarApp() {
+    const btn = document.getElementById('install-btn');
+
+    if (!deferredPrompt) {
+        // Si el navegador no disparó beforeinstallprompt,
+        // mostrar instrucciones según plataforma
+        const ua = navigator.userAgent.toLowerCase();
+        let msg = 'Para instalar la app, usa el menú del navegador.';
+
+        if (ua.includes('iphone') || ua.includes('ipad')) {
+            msg = 'Para instalar:\n1. Toca el botón Compartir (⬆️)\n2. Elige "Añadir a pantalla de inicio"';
+        } else if (ua.includes('android')) {
+            msg = 'Para instalar:\n1. Toca el menú (⋮)\n2. Elige "Instalar app" o "Añadir a pantalla de inicio"';
+        }
+
+        alert(msg);
+        return;
+    }
+
+    // Mostrar el prompt nativo
+    deferredPrompt.prompt();
+
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log('Elección del usuario:', outcome);
+
+    if (outcome === 'accepted') {
+        if (btn) btn.style.display = 'none';
+    }
+
+    deferredPrompt = null;
+}
+
+window.addEventListener('appinstalled', function() {
+    console.log('✅ PWA instalada');
+    const btn = document.getElementById('install-btn');
+    if (btn) btn.style.display = 'none';
+    deferredPrompt = null;
+});
+
+// Ocultar botón si ya está corriendo en modo app
+if (window.matchMedia('(display-mode: standalone)').matches) {
+    const btn = document.getElementById('install-btn');
+    if (btn) btn.style.display = 'none';
+}
