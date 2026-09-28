@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Noticias</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #0a0d18; color: #e8ecf4; }
+        header { background: #141827; border-bottom: 1px solid #232942; padding: 20px; }
+        header .contenedor { max-width: 1200px; margin: auto; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
+        header h1 { margin: 0; font-size: 22px; }
+        main { max-width: 1200px; margin: 30px auto; padding: 20px; }
+        .boton { display: inline-block; padding: 11px 16px; border: none; border-radius: 9px; text-decoration: none; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s; color: white; font-family: inherit; }
+        .boton-nuevo { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+        .boton-nuevo:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4); }
+        .boton-volver { background: #1e293b; border: 1px solid #232942; }
+        .boton-volver:hover { background: #232942; }
+        .boton-cerrar { background: #4b5563; }
+        .boton-editar { background: #1e293b; border: 1px solid #232942; }
+        .boton-publicar { background: #10b981; }
+        .boton-eliminar { background: #dc2626; }
+        .acciones { display: flex; flex-wrap: wrap; gap: 7px; }
+        .acciones form { margin: 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: #141827; border: 1px solid #232942; border-radius: 12px; padding: 18px; text-align: center; }
+        .stat-card h3 { margin: 0 0 8px; font-size: 12px; color: #8a93ab; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card .numero { font-size: 28px; font-weight: bold; color: #e8ecf4; }
+        .stat-card .numero.verde { color: #34d399; }
+        .stat-card .numero.amarillo { color: #fbbf24; }
+        .stat-card .numero.azul { color: #60a5fa; }
+        .tabla-contenedor { background: #141827; border: 1px solid #232942; border-radius: 15px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #232942; vertical-align: middle; }
+        th { background: #0a0d18; font-size: 12px; color: #8a93ab; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { font-size: 14px; color: #e8ecf4; }
+        .titulo { font-weight: bold; color: #e8ecf4; }
+        .descripcion { color: #8a93ab; max-width: 280px; margin-top: 4px; font-size: 13px; }
+        .estado { display: inline-block; padding: 5px 11px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .estado.publicada { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .estado.borrador { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        .categoria { display: inline-block; background: rgba(139, 92, 246, 0.15); color: #a78bfa; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .fecha { white-space: nowrap; color: #8a93ab; font-size: 13px; }
+        .flash { padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-weight: bold; }
+        .flash.success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .flash.error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .vacio { text-align: center; padding: 60px 20px; color: #8a93ab; }
+        .vacio h2 { color: #e8ecf4; }
+        .destacada-star { color: #fbbf24; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="contenedor">
+        <h1>📰 Admin Noticias</h1>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="/rifas/admin" class="boton boton-volver">← Panel rifas</a>
+            <a href="/rifas/admin/logout" class="boton boton-cerrar">Cerrar Sesión</a>
+        </div>
+    </div>
+</header>
+
+<main>
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% if mensajes %}
+            {% for categoria, mensaje in mensajes %}
+                <div class="flash {{ categoria }}">{{ mensaje }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- ESTADÍSTICAS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Publicadas</h3>
+            <div class="numero verde">{{ stats.publicadas }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Borradores</h3>
+            <div class="numero amarillo">{{ stats.borradores }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total</h3>
+            <div class="numero">{{ stats.total }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Vistas totales</h3>
+            <div class="numero azul">{{ stats.vistas_totales }}</div>
+        </div>
+    </div>
+
+    <!-- HEADER CON BOTÓN NUEVA -->
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 25px; flex-wrap: wrap;">
+        <h2 style="margin: 0;">Todas las noticias</h2>
+        <a href="/rifas/admin/noticias/nueva" class="boton boton-nuevo">+ Nueva noticia</a>
+    </div>
+
+    {% if noticias %}
+        <div class="tabla-contenedor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Noticia</th>
+                        <th>Categoría</th>
+                        <th>Estado</th>
+                        <th>Vistas</th>
+                        <th>Publicada</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for n in noticias %}
+                        <tr>
+                            <td>#{{ n.id }}</td>
+                            <td>
+                                <div class="titulo">
+                                    {% if n.destacada %}<span class="destacada-star">⭐</span>{% endif %}
+                                    {{ n.titulo }}
+                                </div>
+                                <div class="descripcion">/{{ n.slug }}</div>
+                            </td>
+                            <td>
+                                {% if n.categoria_nombre %}
+                                    <span class="categoria">{{ n.categoria_icono }} {{ n.categoria_nombre }}</span>
+                                {% else %}
+                                    <span style="color:#4b5563;">—</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="estado {{ n.estado }}">{{ n.estado }}</span></td>
+                            <td>{{ n.vistas }}</td>
+                            <td class="fecha">
+                                {% if n.publicado_en %}
+                                    {{ (n.publicado_en | mx).strftime('%d/%m/%Y') }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="acciones">
+                                    <a href="/noticias/{{ n.slug }}" target="_blank" class="boton boton-volver">👁️ Ver</a>
+                                    <a href="/rifas/admin/noticias/editar/{{ n.id }}" class="boton boton-editar">✏️ Editar</a>
+                                    <form method="POST" action="/rifas/admin/noticias/eliminar/{{ n.id }}" onsubmit="return confirm('¿Eliminar esta noticia?');">
+                                        <button type="submit" class="boton boton-eliminar">🗑️</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="tabla-contenedor">
+            <div class="vacio">
+                <h2>📰 No hay noticias todavía</h2>
+                <p>Crea tu primera noticia para empezar.</p>
+                <br>
+                <a href="/rifas/admin/noticias/nueva" class="boton boton-nuevo">+ Crear primera noticia</a>
+            </div>
+        </div>
+    {% endif %}
+
+</main>
+
+</body>
+</html>

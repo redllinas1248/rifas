@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administración de Sorteos</title>
+    <title>Administracion</title>
     <style>
         /* ... (tu CSS existente del admin, adaptado a dark mode) ... */
         body { margin: 0; font-family: Arial, sans-serif; background: #0a0d18; color: #e8ecf4; }
@@ -61,7 +61,10 @@
 <header>
     <div class="contenedor">
         <h1>🎁 Administración de Sorteos</h1>
-        <a href="{{ url_for('admin_logout') }}" class="boton boton-salir">Cerrar Sesión</a>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <a href="/rifas/admin/noticias" class="boton" style="background:#8b5cf6; color:white;">📰 Noticias</a>
+    <a href="{{ url_for('admin_logout') }}" class="boton boton-salir">Cerrar Sesión</a>
+</div>
     </div>
 </header>
 

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if modo_edicion %}Editar{% else %}Nueva{% endif %} noticia</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #0a0d18; color: #e8ecf4; }
+        header { background: #141827; border-bottom: 1px solid #232942; padding: 20px; }
+        header .contenedor { max-width: 900px; margin: auto; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
+        header h1 { margin: 0; font-size: 22px; }
+        main { max-width: 900px; margin: 30px auto; padding: 20px; }
+        .formulario { background: #141827; border: 1px solid #232942; border-radius: 16px; padding: 30px; }
+        .campo { margin-bottom: 22px; }
+        .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; color: #e8ecf4; }
+        input, textarea, select { width: 100%; padding: 12px; background: #0a0d18; border: 1px solid #232942; border-radius: 10px; font-size: 15px; font-family: inherit; color: #e8ecf4; transition: 0.2s; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        textarea { min-height: 120px; resize: vertical; }
+        textarea.contenido { min-height: 400px; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6; }
+        .ayuda { display: block; color: #8a93ab; font-size: 13px; margin-top: 6px; }
+        .checkbox-wrap { display: flex; align-items: center; gap: 10px; }
+        .checkbox-wrap input { width: auto; }
+        .acciones { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
+        .boton { border: none; padding: 13px 22px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; text-decoration: none; display: inline-flex; justify-content: center; align-items: center; font-family: inherit; transition: 0.2s; color: white; }
+        .guardar { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+        .guardar:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4); }
+        .cancelar { background: #1e293b; border: 1px solid #232942; }
+        .cancelar:hover { background: #232942; }
+        .flash { padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-weight: bold; }
+        .flash.error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+        @media (max-width: 700px) { .fila { grid-template-columns: 1fr; gap: 0; } .formulario { padding: 20px; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="contenedor">
+        <h1>{% if modo_edicion %}✏️ Editar noticia{% else %}📰 Nueva noticia{% endif %}</h1>
+        <a href="/rifas/admin/noticias" class="boton cancelar">← Volver al listado</a>
+    </div>
+</header>
+
+<main>
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% if mensajes %}
+            {% for categoria, mensaje in mensajes %}
+                <div class="flash {{ categoria }}">{{ mensaje }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="formulario">
+
+        <form method="POST" action="{% if modo_edicion %}/rifas/admin/noticias/editar/{{ noticia.id }}{% else %}/rifas/admin/noticias/nueva{% endif %}">
+
+            <div class="campo">
+                <label for="titulo">Título *</label>
+                <input type="text" id="titulo" name="titulo" maxlength="200" required
+                       placeholder="Ej: José Azueta celebra su tradicional Carnaval"
+                       value="{{ noticia.titulo if modo_edicion else '' }}">
+            </div>
+
+            <div class="fila">
+                <div class="campo">
+                    <label for="categoria_id">Categoría</label>
+                    <select id="categoria_id" name="categoria_id">
+                        <option value="">— Sin categoría —</option>
+                        {% for cat in categorias %}
+                            <option value="{{ cat.id }}"
+                                {% if modo_edicion and noticia.categoria_id == cat.id %}selected{% endif %}>
+                                {{ cat.icono }} {{ cat.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="autor">Autor</label>
+                    <input type="text" id="autor" name="autor" maxlength="120"
+                           placeholder="Redacción"
+                           value="{{ noticia.autor if modo_edicion else 'Redacción' }}">
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="resumen">Resumen *</label>
+                <textarea id="resumen" name="resumen" maxlength="500" required
+                          placeholder="Un párrafo corto que resuma la noticia (aparece en las tarjetas)">{{ noticia.resumen if modo_edicion else '' }}</textarea>
+                <span class="ayuda">Máximo 500 caracteres. Es lo primero que verá el lector.</span>
+            </div>
+
+            <div class="campo">
+                <label for="contenido">Contenido completo *</label>
+                <textarea id="contenido" name="contenido" class="contenido" required
+                          placeholder="Escribe aquí el contenido completo de la noticia.&#10;&#10;Separa los párrafos con doble salto de línea.&#10;&#10;Puedes escribir todo lo que necesites.">{{ noticia.contenido if modo_edicion else '' }}</textarea>
+                <span class="ayuda">Separa los párrafos con doble salto de línea. Mínimo recomendado: 500 palabras.</span>
+            </div>
+
+            <div class="campo">
+                <label for="imagen_url">URL de la imagen destacada</label>
+                <input type="url" id="imagen_url" name="imagen_url"
+                       placeholder="https://..."
+                       value="{{ noticia.imagen_url if modo_edicion else '' }}">
+                <span class="ayuda">URL de una imagen de Unsplash, Cloudinary o similar. Debe empezar con https://</span>
+            </div>
+
+            <div class="fila">
+                <div class="campo">
+                    <label for="estado">Estado</label>
+                    <select id="estado" name="estado">
+                        <option value="borrador" {% if modo_edicion and noticia.estado == 'borrador' %}selected{% endif %}>
+                            📝 Borrador (no visible al público)
+                        </option>
+                        <option value="publicada" {% if modo_edicion and noticia.estado == 'publicada' %}selected{% endif %}>
+                            ✅ Publicada (visible al público)
+                        </option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label>Destacar</label>
+                    <div class="checkbox-wrap">
+                        <input type="checkbox" id="destacada" name="destacada"
+                               {% if modo_edicion and noticia.destacada %}checked{% endif %}>
+                        <label for="destacada" style="font-weight: normal; margin: 0; cursor: pointer;">
+                            ⭐ Marcar como destacada
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acciones">
+                <button type="submit" class="boton guardar">
+                    {% if modo_edicion %}💾 Guardar cambios{% else %}📰 Crear noticia{% endif %}
+                </button>
+                <a href="/rifas/admin/noticias" class="boton cancelar">Cancelar</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
+</body>
+</html>
