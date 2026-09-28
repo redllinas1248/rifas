@@ -205,48 +205,6 @@ def liberar_reservas_expiradas(db):
 
     return len(ids)
     
-# ============================================================
-# INICIO
-# ============================================================
-
-@app.route("/")
-def inicio():
-
-    db = get_db()
-
-    try:
-
-        liberadas = liberar_reservas_expiradas(db)
-
-        if liberadas > 0:
-            db.commit()
-
-        cursor = db.cursor()
-
-        cursor.execute("""
-            SELECT
-                id,
-                titulo,
-                descripcion,
-                imagen_url,
-                cantidad_boletos,
-                precio_boleto
-            FROM rt_rifas
-            WHERE estado = 'activa'
-            ORDER BY creado_en DESC
-            LIMIT 3
-        """)
-
-        rifas_destacadas = cursor.fetchall()
-
-        return render_template(
-            "index.html",
-            rifas_destacadas=rifas_destacadas
-        )
-
-    finally:
-
-        db.close()
 
 
 # ============================================================
@@ -2320,6 +2278,24 @@ try:
 except Exception as e:
 
     print("⚠️ No se pudo montar /comercio:", e)
+
+
+# ============================================================
+# INTEGRACIÓN CON EL PORTAL DE NOTICIAS (appazueta.lat/)
+# ============================================================
+
+try:
+
+    from noticias.rutas import noticias_bp
+
+    app.register_blueprint(noticias_bp)
+
+    print("✅ Portal de noticias montado en /")
+
+except Exception as e:
+
+    print("⚠️ No se pudo montar el portal de noticias:", e)
+
 
 # ============================================================
 # EJECUCIÓN LOCAL

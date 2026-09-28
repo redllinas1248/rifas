@@ -1,0 +1,81 @@
+{% extends "noticias_base.html" %}
+
+{% block titulo %}Noticias del Día Azver | Portal informativo{% endblock %}
+
+{% block contenido %}
+
+<section class="hero">
+
+    <h1>Noticias del Día Azver</h1>
+
+    <p>
+        Información, eventos y cultura de nuestra comunidad.
+    </p>
+
+</section>
+
+
+<section class="contenedor">
+
+    {% if ultimas %}
+
+        <div class="seccion-titulo">
+            <h2>📰 Últimas noticias</h2>
+        </div>
+
+        <div class="grid-noticias">
+
+            {% for n in ultimas %}
+
+                <article class="card-noticia">
+
+                    {% if n.imagen_url %}
+                        <img src="{{ n.imagen_url }}" alt="{{ n.titulo }}" class="card-imagen" loading="lazy">
+                    {% else %}
+                        <div class="card-imagen-placeholder">📰</div>
+                    {% endif %}
+
+                    <div class="card-body">
+
+                        {% if n.categoria_nombre %}
+                            <span class="card-categoria">
+                                {{ n.categoria_icono }} {{ n.categoria_nombre }}
+                            </span>
+                        {% endif %}
+
+                        <h3 class="card-titulo">{{ n.titulo }}</h3>
+
+                        {% if n.resumen %}
+                            <p class="card-resumen">{{ n.resumen }}</p>
+                        {% endif %}
+
+                        <a href="/noticias/{{ n.slug }}" class="card-link">
+                            Leer más →
+                        </a>
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="aviso">
+
+            <strong>🚧 Portal en construcción</strong>
+
+            <p>
+                Estamos preparando contenido de valor. Pronto encontrarás
+                noticias, eventos y guías locales.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

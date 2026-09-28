@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block titulo %}Noticias del Día Azver{% endblock %}</title>
+
+    <meta name="description" content="{% block descripcion %}Noticias, eventos y cultura de José Azueta, Veracruz.{% endblock %}">
+
+    <meta name="theme-color" content="#0a0d18">
+    <meta name="color-scheme" content="dark">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('noticias.static', filename='css/noticias.css') }}">
+
+    {% block extra_head %}{% endblock %}
+
+</head>
+
+<body>
+
+<!-- ============================================
+     NAVBAR
+============================================= -->
+
+<nav class="navbar">
+
+    <div class="navbar-inner">
+
+        <a href="/" class="navbar-brand">
+
+            <span class="brand-icon">📰</span>
+
+            <span class="brand-text">Noticias del Día Azver</span>
+
+        </a>
+
+        <div class="navbar-links">
+
+            <a href="/">Inicio</a>
+            <a href="/noticias">Noticias</a>
+            <a href="/rifas">Sorteos</a>
+            <a href="/comercio">Comercio</a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- ============================================
+     CONTENIDO
+============================================= -->
+
+<main>
+
+    {% block contenido %}{% endblock %}
+
+</main>
+
+
+<!-- ============================================
+     FOOTER
+============================================= -->
+
+<footer class="footer">
+
+    <div class="footer-inner">
+
+        <div class="footer-links">
+
+            <a href="/">Inicio</a>
+            <a href="/noticias">Noticias</a>
+            <a href="/rifas">Sorteos</a>
+            <a href="/comercio">Comercio</a>
+            <a href="/contacto">Contacto</a>
+            <a href="/privacidad">Privacidad</a>
+            <a href="/terminos">Términos</a>
+
+        </div>
+
+        <div class="footer-copy">
+
+            © 2026 Noticias del Día Azver · Todos los derechos reservados
+
+        </div>
+
+    </div>
+
+</footer>
+
+</body>
+
+</html>
