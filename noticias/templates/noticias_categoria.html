@@ -1,0 +1,76 @@
+{% extends "noticias_base.html" %}
+
+{% block titulo %}{{ categoria.nombre }} | Noticias del Día Azver{% endblock %}
+
+{% block descripcion %}{{ categoria.descripcion or 'Noticias de ' + categoria.nombre }}{% endblock %}
+
+{% block contenido %}
+
+<section class="hero-listado">
+
+    <h1>{{ categoria.icono }} {{ categoria.nombre }}</h1>
+
+    {% if categoria.descripcion %}
+        <p>{{ categoria.descripcion }}</p>
+    {% endif %}
+
+</section>
+
+
+<section class="contenedor">
+
+    {% if noticias %}
+
+        <div class="grid-noticias">
+
+            {% for n in noticias %}
+
+                <article class="card-noticia">
+
+                    {% if n.imagen_url %}
+                        <img src="{{ n.imagen_url }}" alt="{{ n.titulo }}" class="card-imagen" loading="lazy">
+                    {% else %}
+                        <div class="card-imagen-placeholder">📰</div>
+                    {% endif %}
+
+                    <div class="card-body">
+
+                        <h3 class="card-titulo">{{ n.titulo }}</h3>
+
+                        {% if n.resumen %}
+                            <p class="card-resumen">{{ n.resumen }}</p>
+                        {% endif %}
+
+                        <div class="card-meta">
+                            <span>{{ n.autor or 'Redacción' }}</span>
+                            <span>·</span>
+                            <span>{{ (n.publicado_en | mx).strftime('%d/%m/%Y') if n.publicado_en else '' }}</span>
+                        </div>
+
+                        <a href="/noticias/{{ n.slug }}" class="card-link">
+                            Leer más →
+                        </a>
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="aviso">
+
+            <strong>📭 No hay noticias en esta categoría</strong>
+
+            <p>Vuelve pronto para ver contenido nuevo.</p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

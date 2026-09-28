@@ -549,3 +549,104 @@ body {
     }
 
 }
+/* ============================================================
+   HERO LISTADO (para /noticias, /categoria, /sobre)
+============================================================ */
+
+.hero-listado {
+    background: linear-gradient(135deg, #1e1b4b, #0a0d18);
+    padding: 60px 20px;
+    text-align: center;
+    border-bottom: 1px solid #232942;
+}
+
+.hero-listado h1 {
+    margin: 0 0 12px;
+    font-size: 36px;
+    font-family: 'DM Serif Display', serif;
+    background: linear-gradient(135deg, #ffffff, #a5b4fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-listado p {
+    margin: 0;
+    color: #8a93ab;
+    font-size: 16px;
+}
+
+/* ============================================================
+   CARD META (autor + fecha)
+============================================================ */
+
+.card-meta {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    color: #6b7280;
+    font-size: 12px;
+    margin: 10px 0 15px;
+}
+
+/* ============================================================
+   SOBRE NOSOTROS
+============================================================ */
+
+.sobre-contenido {
+    max-width: 780px;
+    margin: 0 auto;
+    background: #141827;
+    border: 1px solid #232942;
+    border-radius: 16px;
+    padding: 40px 35px;
+}
+
+.sobre-contenido h2 {
+    font-size: 22px;
+    margin: 35px 0 15px;
+    color: #a5b4fc;
+    font-family: 'DM Serif Display', serif;
+}
+
+.sobre-contenido h2:first-child {
+    margin-top: 0;
+}
+
+.sobre-contenido p {
+    color: #d1d5db;
+    line-height: 1.75;
+    font-size: 16px;
+    margin: 0 0 15px;
+}
+
+.sobre-contenido ul {
+    color: #d1d5db;
+    line-height: 1.9;
+    padding-left: 25px;
+    margin: 0 0 20px;
+}
+
+.sobre-contenido ul li {
+    margin-bottom: 8px;
+}
+
+.sobre-contenido a {
+    color: #a5b4fc;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.sobre-contenido a:hover {
+    color: #8b5cf6;
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+
+    .hero-listado h1 { font-size: 26px; }
+    .hero-listado p { font-size: 15px; }
+    .sobre-contenido { padding: 25px 20px; }
+    .sobre-contenido h2 { font-size: 20px; }
+
+}

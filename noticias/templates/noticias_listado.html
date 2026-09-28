@@ -1,0 +1,80 @@
+{% extends "noticias_base.html" %}
+
+{% block titulo %}Todas las noticias | Noticias del Día Azver{% endblock %}
+
+{% block descripcion %}Todas las noticias, eventos y cultura de José Azueta, Veracruz.{% endblock %}
+
+{% block contenido %}
+
+<section class="hero-listado">
+
+    <h1>📰 Todas las noticias</h1>
+
+    <p>Toda la información de José Azueta en un solo lugar.</p>
+
+</section>
+
+
+<section class="contenedor">
+
+    {% if noticias %}
+
+        <div class="grid-noticias">
+
+            {% for n in noticias %}
+
+                <article class="card-noticia">
+
+                    {% if n.imagen_url %}
+                        <img src="{{ n.imagen_url }}" alt="{{ n.titulo }}" class="card-imagen" loading="lazy">
+                    {% else %}
+                        <div class="card-imagen-placeholder">📰</div>
+                    {% endif %}
+
+                    <div class="card-body">
+
+                        {% if n.categoria_nombre %}
+                            <span class="card-categoria">
+                                {{ n.categoria_icono }} {{ n.categoria_nombre }}
+                            </span>
+                        {% endif %}
+
+                        <h3 class="card-titulo">{{ n.titulo }}</h3>
+
+                        {% if n.resumen %}
+                            <p class="card-resumen">{{ n.resumen }}</p>
+                        {% endif %}
+
+                        <div class="card-meta">
+                            <span>{{ n.autor or 'Redacción' }}</span>
+                            <span>·</span>
+                            <span>{{ (n.publicado_en | mx).strftime('%d/%m/%Y') if n.publicado_en else '' }}</span>
+                        </div>
+
+                        <a href="/noticias/{{ n.slug }}" class="card-link">
+                            Leer más →
+                        </a>
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="aviso">
+
+            <strong>🚧 Aún no hay noticias publicadas</strong>
+
+            <p>Pronto publicaremos contenido de valor.</p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}
