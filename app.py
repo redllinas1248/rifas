@@ -1,6 +1,8 @@
 import os
 import json
 import secrets
+import re
+import unicodedata
 
 from datetime import (
     datetime,
@@ -46,6 +48,49 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax",
     PERMANENT_SESSION_LIFETIME=timedelta(hours=2)
 )
+
+# ============================================================
+# HELPER: GENERAR SLUG PARA NOTICIAS
+# ============================================================
+
+def generar_slug(texto):
+
+    # Quitar acentos
+    texto = unicodedata.normalize('NFKD', texto)
+    texto = texto.encode('ascii', 'ignore').decode('ascii')
+
+    texto = texto.lower()
+
+    # Reemplazar caracteres no alfanuméricos por guiones
+    texto = re.sub(r'[^a-z0-9]+', '-', texto)
+    texto = texto.strip('-')
+
+    return texto[:200]
+
+
+def slug_unico(cursor, base_slug, noticia_id=None):
+
+    slug = base_slug
+    contador = 1
+
+    while True:
+
+        if noticia_id:
+            cursor.execute("""
+                SELECT id FROM rt_noticias
+                WHERE slug = %s AND id != %s
+            """, (slug, noticia_id))
+        else:
+            cursor.execute("""
+                SELECT id FROM rt_noticias
+                WHERE slug = %s
+            """, (slug,))
+
+        if not cursor.fetchone():
+            return slug
+
+        contador += 1
+        slug = f"{base_slug}-{contador}"
 
 
 # ============================================================
@@ -2249,6 +2294,8 @@ def cancelar_rifa(rifa_id):
     return redirect(url_for("admin_rifas"))
 
 
+
+
 # ============================================================
 # INTEGRACIÓN CON COMERCIO (appazueta.lat/comercio)
 #
@@ -2295,6 +2342,339 @@ try:
 except Exception as e:
 
     print("⚠️ No se pudo montar el portal de noticias:", e)
+
+
+# ============================================================
+# ADMIN: LISTADO DE NOTICIAS
+# ============================================================
+
+@app.route("/rifas/admin/noticias")
+@admin_required
+def admin_noticias():
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT
+                n.id,
+                n.titulo,
+                n.slug,
+                n.estado,
+                n.destacada,
+                n.vistas,
+                n.autor,
+                n.creado_en,
+                n.publicado_en,
+                c.nombre AS categoria_nombre,
+                c.icono AS categoria_icono
+            FROM rt_noticias n
+            LEFT JOIN rt_noticias_categorias c
+                ON c.id = n.categoria_id
+            ORDER BY n.creado_en DESC
+        """)
+
+        noticias = cursor.fetchall()
+
+        # Estadísticas
+        cursor.execute("""
+            SELECT
+                COUNT(*) FILTER (WHERE estado = 'publicada') AS publicadas,
+                COUNT(*) FILTER (WHERE estado = 'borrador') AS borradores,
+                COUNT(*) AS total,
+                COALESCE(SUM(vistas), 0) AS vistas_totales
+            FROM rt_noticias
+        """)
+
+        stats = cursor.fetchone()
+
+        return render_template(
+            "admin_noticias.html",
+            noticias=noticias,
+            stats=stats
+        )
+
+    finally:
+
+        db.close()
+
+
+# ============================================================
+# ADMIN: NUEVA NOTICIA
+# ============================================================
+
+@app.route("/rifas/admin/noticias/nueva")
+@admin_required
+def nueva_noticia():
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT id, nombre, slug, icono
+            FROM rt_noticias_categorias
+            ORDER BY orden
+        """)
+
+        categorias = cursor.fetchall()
+
+        return render_template(
+            "nueva_noticia.html",
+            categorias=categorias
+        )
+
+    finally:
+
+        db.close()
+
+
+@app.route("/rifas/admin/noticias/nueva", methods=["POST"])
+@admin_required
+def crear_noticia():
+
+    titulo = request.form.get("titulo", "").strip()
+    resumen = request.form.get("resumen", "").strip()
+    contenido = request.form.get("contenido", "").strip()
+    imagen_url = request.form.get("imagen_url", "").strip()
+    categoria_id = request.form.get("categoria_id", "").strip()
+    autor = request.form.get("autor", "").strip() or "Redacción"
+    estado = request.form.get("estado", "borrador").strip()
+    destacada = request.form.get("destacada") == "on"
+
+    if not titulo:
+        flash("El título es obligatorio.", "error")
+        return redirect(url_for("nueva_noticia"))
+
+    if not contenido:
+        flash("El contenido es obligatorio.", "error")
+        return redirect(url_for("nueva_noticia"))
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        base_slug = generar_slug(titulo)
+        slug = slug_unico(cursor, base_slug)
+
+        categoria = int(categoria_id) if categoria_id else None
+
+        publicado_en = "NOW()" if estado == "publicada" else "NULL"
+
+        cursor.execute(f"""
+            INSERT INTO rt_noticias (
+                titulo, slug, resumen, contenido, imagen_url,
+                categoria_id, autor, estado, destacada, publicado_en
+            )
+            VALUES (
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, {publicado_en}
+            )
+            RETURNING id
+        """, (
+            titulo, slug, resumen, contenido, imagen_url,
+            categoria, autor, estado, destacada
+        ))
+
+        db.commit()
+
+        flash(f"Noticia creada correctamente.", "success")
+
+        return redirect(url_for("admin_noticias"))
+
+    except Exception as error:
+
+        db.rollback()
+
+        print("ERROR AL CREAR NOTICIA:", error)
+
+        flash("Ocurrió un error al crear la noticia.", "error")
+
+        return redirect(url_for("nueva_noticia"))
+
+    finally:
+
+        db.close()
+
+
+# ============================================================
+# ADMIN: EDITAR NOTICIA
+# ============================================================
+
+@app.route("/rifas/admin/noticias/editar/<int:noticia_id>")
+@admin_required
+def editar_noticia(noticia_id):
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT
+                id, titulo, slug, resumen, contenido,
+                imagen_url, categoria_id, autor,
+                estado, destacada
+            FROM rt_noticias
+            WHERE id = %s
+        """, (noticia_id,))
+
+        noticia = cursor.fetchone()
+
+        if not noticia:
+            flash("La noticia no existe.", "error")
+            return redirect(url_for("admin_noticias"))
+
+        cursor.execute("""
+            SELECT id, nombre, slug, icono
+            FROM rt_noticias_categorias
+            ORDER BY orden
+        """)
+
+        categorias = cursor.fetchall()
+
+        return render_template(
+            "nueva_noticia.html",
+            noticia=noticia,
+            categorias=categorias,
+            modo_edicion=True
+        )
+
+    finally:
+
+        db.close()
+
+
+@app.route("/rifas/admin/noticias/editar/<int:noticia_id>", methods=["POST"])
+@admin_required
+def actualizar_noticia(noticia_id):
+
+    titulo = request.form.get("titulo", "").strip()
+    resumen = request.form.get("resumen", "").strip()
+    contenido = request.form.get("contenido", "").strip()
+    imagen_url = request.form.get("imagen_url", "").strip()
+    categoria_id = request.form.get("categoria_id", "").strip()
+    autor = request.form.get("autor", "").strip() or "Redacción"
+    estado = request.form.get("estado", "borrador").strip()
+    destacada = request.form.get("destacada") == "on"
+
+    if not titulo or not contenido:
+        flash("Título y contenido son obligatorios.", "error")
+        return redirect(url_for("editar_noticia", noticia_id=noticia_id))
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        # Verificar que existe
+        cursor.execute("SELECT id, estado FROM rt_noticias WHERE id = %s", (noticia_id,))
+        actual = cursor.fetchone()
+
+        if not actual:
+            flash("La noticia no existe.", "error")
+            return redirect(url_for("admin_noticias"))
+
+        base_slug = generar_slug(titulo)
+        slug = slug_unico(cursor, base_slug, noticia_id)
+
+        categoria = int(categoria_id) if categoria_id else None
+
+        # Si pasa de borrador a publicada, marcar fecha de publicación
+        if estado == "publicada" and actual["estado"] != "publicada":
+            publicado_sql = ", publicado_en = NOW()"
+        else:
+            publicado_sql = ""
+
+        cursor.execute(f"""
+            UPDATE rt_noticias
+            SET
+                titulo = %s,
+                slug = %s,
+                resumen = %s,
+                contenido = %s,
+                imagen_url = %s,
+                categoria_id = %s,
+                autor = %s,
+                estado = %s,
+                destacada = %s,
+                actualizado_en = NOW()
+                {publicado_sql}
+            WHERE id = %s
+        """, (
+            titulo, slug, resumen, contenido, imagen_url,
+            categoria, autor, estado, destacada,
+            noticia_id
+        ))
+
+        db.commit()
+
+        flash("Noticia actualizada correctamente.", "success")
+
+        return redirect(url_for("admin_noticias"))
+
+    except Exception as error:
+
+        db.rollback()
+
+        print("ERROR AL ACTUALIZAR NOTICIA:", error)
+
+        flash("Ocurrió un error al actualizar la noticia.", "error")
+
+        return redirect(url_for("editar_noticia", noticia_id=noticia_id))
+
+    finally:
+
+        db.close()
+
+
+# ============================================================
+# ADMIN: ELIMINAR NOTICIA
+# ============================================================
+
+@app.route("/rifas/admin/noticias/eliminar/<int:noticia_id>", methods=["POST"])
+@admin_required
+def eliminar_noticia(noticia_id):
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        cursor.execute("""
+            DELETE FROM rt_noticias
+            WHERE id = %s
+        """, (noticia_id,))
+
+        if cursor.rowcount == 0:
+            db.rollback()
+            flash("La noticia no existe.", "error")
+        else:
+            db.commit()
+            flash("Noticia eliminada.", "success")
+
+    except Exception as error:
+
+        db.rollback()
+
+        print("ERROR AL ELIMINAR NOTICIA:", error)
+
+        flash("Ocurrió un error al eliminar la noticia.", "error")
+
+    finally:
+
+        db.close()
+
+    return redirect(url_for("admin_noticias"))
 
 
 # ============================================================
