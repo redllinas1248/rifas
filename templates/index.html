@@ -765,7 +765,7 @@
         deferredPrompt = e;
 
         // No mostrar si el usuario ya lo cerró antes
-        if (localStorage.getItem('pwa-banner-cerrado') === '1') {
+        if (sessionStorage.getItem('pwa-banner-cerrado') === '1') {
             return;
         }
 
@@ -795,7 +795,7 @@
     if (btnCerrarBanner) {
         btnCerrarBanner.addEventListener('click', function() {
             banner.classList.remove('activo');
-            localStorage.setItem('pwa-banner-cerrado', '1');
+            sessionStorage.setItem('pwa-banner-cerrado', '1');
         });
     }
 
