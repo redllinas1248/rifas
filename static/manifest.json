@@ -1,14 +1,14 @@
 {
-  "name": "Sorteos Gratuitos",
-  "short_name": "Sorteos",
-  "description": "Participa gratis en sorteos viendo videos cortos.",
+  "name": "Noticias del Día Azver",
+  "short_name": "Azver",
+  "description": "Noticias, sorteos y comercio de José Azueta, Veracruz.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0d18",
   "theme_color": "#0a0d18",
-  "lang": "es",
+  "lang": "es-MX",
   "icons": [
     {
       "src": "/static/icons/icon-192.png",

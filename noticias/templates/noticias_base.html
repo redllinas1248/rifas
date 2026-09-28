@@ -13,6 +13,15 @@
     <meta name="theme-color" content="#0a0d18">
     <meta name="color-scheme" content="dark">
 
+        <!-- ============================================================
+         PWA (Progressive Web App)
+    ============================================================ -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Azver">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -96,6 +105,180 @@
     </div>
 
 </footer>
+
+
+<!-- ============================================
+     BANNER DE INSTALACIÓN PWA
+============================================= -->
+
+<div class="install-banner" id="installBanner">
+
+    <div class="install-icono">📰</div>
+
+    <div class="install-texto">
+        <strong>Instala nuestra app</strong>
+        <span>Acceso rápido y sin navegador</span>
+    </div>
+
+    <button class="install-btn" id="btnInstalar">Instalar</button>
+
+    <button class="install-cerrar" id="btnCerrarBanner">&times;</button>
+
+</div>
+
+
+<style>
+
+    .install-banner {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 30px);
+        max-width: 420px;
+        background: linear-gradient(135deg, #1e1b4b, #141827);
+        border: 1px solid #3b82f6;
+        border-radius: 16px;
+        padding: 15px;
+        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
+        display: none;
+        align-items: center;
+        gap: 12px;
+        z-index: 9998;
+        animation: slideUp 0.4s ease;
+    }
+
+    .install-banner.activo { display: flex; }
+
+    @keyframes slideUp {
+        from { transform: translate(-50%, 100%); opacity: 0; }
+        to { transform: translate(-50%, 0); opacity: 1; }
+    }
+
+    .install-icono { font-size: 32px; flex-shrink: 0; }
+
+    .install-texto {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .install-texto strong { color: #e8ecf4; font-size: 14px; }
+    .install-texto span { color: #8a93ab; font-size: 12px; }
+
+    .install-btn {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 13px;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: 0.2s;
+    }
+
+    .install-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+    }
+
+    .install-cerrar {
+        background: transparent;
+        border: none;
+        color: #8a93ab;
+        font-size: 22px;
+        cursor: pointer;
+        padding: 0 5px;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+
+    .install-cerrar:hover { color: #e8ecf4; }
+
+</style>
+
+
+<script>
+
+    // ============================================================
+    // SERVICE WORKER
+    // ============================================================
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker
+                .register('/service-worker.js')
+                .then(function(reg) {
+                    console.log('✅ SW registrado:', reg.scope);
+                })
+                .catch(function(err) {
+                    console.log('❌ Error SW:', err);
+                });
+        });
+    }
+
+    // ============================================================
+    // BANNER DE INSTALACIÓN PWA
+    // ============================================================
+
+    let deferredPrompt = null;
+
+    const banner = document.getElementById('installBanner');
+    const btnInstalar = document.getElementById('btnInstalar');
+    const btnCerrarBanner = document.getElementById('btnCerrarBanner');
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+
+        e.preventDefault();
+        deferredPrompt = e;
+
+        // Reaparece después de 7 días si el usuario lo cerró
+        const cerradoHasta = parseInt(localStorage.getItem('pwa-banner-cerrado') || '0');
+        if (cerradoHasta && Date.now() < cerradoHasta) {
+            return;
+        }
+
+        setTimeout(function() {
+            banner.classList.add('activo');
+        }, 3000);
+
+    });
+
+    if (btnInstalar) {
+        btnInstalar.addEventListener('click', function() {
+
+            if (!deferredPrompt) return;
+
+            deferredPrompt.prompt();
+
+            deferredPrompt.userChoice.then(function(choice) {
+                console.log('Elección:', choice.outcome);
+                deferredPrompt = null;
+                banner.classList.remove('activo');
+            });
+
+        });
+    }
+
+    if (btnCerrarBanner) {
+        btnCerrarBanner.addEventListener('click', function() {
+            banner.classList.remove('activo');
+            const sieteDias = 7 * 24 * 60 * 60 * 1000;
+            localStorage.setItem('pwa-banner-cerrado', String(Date.now() + sieteDias));
+        });
+    }
+
+    window.addEventListener('appinstalled', function() {
+        console.log('✅ App instalada');
+        banner.classList.remove('activo');
+    });
+
+</script>
+
 
 </body>
 
