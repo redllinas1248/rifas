@@ -1,0 +1,180 @@
+{% extends "noticias_base.html" %}
+
+{% block titulo %}{{ noticia.titulo }} | Noticias del Día Azver{% endblock %}
+
+{% block descripcion %}{{ noticia.resumen or noticia.titulo }}{% endblock %}
+
+{% block contenido %}
+
+<article class="articulo">
+
+    <div class="articulo-header">
+
+        <a href="/" class="articulo-volver">
+            ← Volver al inicio
+        </a>
+
+        {% if noticia.categoria_nombre %}
+            <a href="/categoria/{{ noticia.categoria_slug }}" class="articulo-categoria">
+                {{ noticia.categoria_icono }} {{ noticia.categoria_nombre }}
+            </a>
+        {% endif %}
+
+        <h1 class="articulo-titulo">{{ noticia.titulo }}</h1>
+
+        <div class="articulo-meta">
+            <span>✍️ {{ noticia.autor or 'Redacción' }}</span>
+            <span>·</span>
+            <span>📅 {{ (noticia.publicado_en | mx).strftime('%d/%m/%Y') if noticia.publicado_en else 'Sin fecha' }}</span>
+            <span>·</span>
+            <span>👁️ {{ noticia.vistas }} vistas</span>
+        </div>
+
+    </div>
+
+
+    {% if noticia.imagen_url %}
+        <div class="articulo-imagen-wrap">
+            <img
+                src="{{ noticia.imagen_url }}"
+                alt="{{ noticia.titulo }}"
+                class="articulo-imagen"
+            >
+        </div>
+    {% endif %}
+
+
+    <div class="articulo-contenido">
+
+        {% if noticia.resumen %}
+            <p class="articulo-resumen">{{ noticia.resumen }}</p>
+        {% endif %}
+
+        {# Contenido con párrafos separados por saltos de línea #}
+        {% for parrafo in noticia.contenido.split('\n\n') %}
+            {% if parrafo.strip() %}
+                <p>{{ parrafo.strip() }}</p>
+            {% endif %}
+        {% endfor %}
+
+    </div>
+
+
+    <!-- ============================================
+         COMPARTIR
+    ============================================ -->
+
+    <div class="articulo-compartir">
+
+        <p>📤 Comparte esta noticia</p>
+
+        <div class="compartir-btns">
+
+            <button onclick="compartirFB()" class="btn-share btn-fb">
+                Facebook
+            </button>
+
+            <button onclick="compartirWA()" class="btn-share btn-wa">
+                WhatsApp
+            </button>
+
+            <button onclick="copiarLink()" class="btn-share btn-copy">
+                Copiar enlace
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================
+         ANUNCIO ADSENSE
+    ============================================ -->
+
+    <div class="ad-container-articulo">
+
+        <div class="ad-label-articulo">Anuncio</div>
+
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-2084405192549609"
+             data-ad-slot="5434563537"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+
+    </div>
+
+
+    <!-- ============================================
+         NOTICIAS RELACIONADAS
+    ============================================ -->
+
+    {% if relacionadas %}
+
+        <section class="relacionadas">
+
+            <h2 class="relacionadas-titulo">
+                📰 También te puede interesar
+            </h2>
+
+            <div class="relacionadas-grid">
+
+                {% for r in relacionadas %}
+
+                    <a href="/noticias/{{ r.slug }}" class="relacionada-card">
+
+                        {% if r.imagen_url %}
+                            <img src="{{ r.imagen_url }}" alt="{{ r.titulo }}" class="relacionada-img" loading="lazy">
+                        {% else %}
+                            <div class="relacionada-img-placeholder">📰</div>
+                        {% endif %}
+
+                        <div class="relacionada-body">
+
+                            <h3 class="relacionada-titulo">{{ r.titulo }}</h3>
+
+                            <span class="relacionada-fecha">
+                                {{ (r.publicado_en | mx).strftime('%d/%m/%Y') if r.publicado_en else '' }}
+                            </span>
+
+                        </div>
+
+                    </a>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+</article>
+
+
+<script>
+
+    function compartirFB() {
+        const url = encodeURIComponent(window.location.href);
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
+    }
+
+    function compartirWA() {
+        const url = encodeURIComponent(window.location.href);
+        const txt = encodeURIComponent('{{ noticia.titulo }}');
+        window.open(`https://wa.me/?text=${txt}%20${url}`, '_blank');
+    }
+
+    function copiarLink() {
+        navigator.clipboard.writeText(window.location.href).then(function() {
+            alert('✅ Enlace copiado al portapapeles');
+        });
+    }
+
+</script>
+
+{% endblock %}
