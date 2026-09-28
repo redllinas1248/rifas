@@ -1413,7 +1413,7 @@ def admin_logout():
 
     flash("Has cerrado sesión.", "success")
 
-    return redirect(url_for("/"))
+    return redirect("/")
 
 
 # ============================================================
