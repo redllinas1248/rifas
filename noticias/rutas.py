@@ -29,6 +29,10 @@ def inicio():
 
         cursor = db.cursor()
 
+        # ----------------------------------------------------
+        # 1. Noticia destacada principal (la más reciente destacada)
+        # ----------------------------------------------------
+
         cursor.execute("""
             SELECT
                 n.id,
@@ -45,11 +49,70 @@ def inicio():
             LEFT JOIN rt_noticias_categorias c
                 ON c.id = n.categoria_id
             WHERE n.estado = 'publicada'
+              AND n.destacada = TRUE
             ORDER BY n.publicado_en DESC
-            LIMIT 12
+            LIMIT 1
         """)
 
+        destacada = cursor.fetchone()
+
+        # Si no hay destacada, usar la más reciente
+        if not destacada:
+
+            cursor.execute("""
+                SELECT
+                    n.id,
+                    n.titulo,
+                    n.slug,
+                    n.resumen,
+                    n.imagen_url,
+                    n.autor,
+                    n.publicado_en,
+                    c.nombre AS categoria_nombre,
+                    c.slug AS categoria_slug,
+                    c.icono AS categoria_icono
+                FROM rt_noticias n
+                LEFT JOIN rt_noticias_categorias c
+                    ON c.id = n.categoria_id
+                WHERE n.estado = 'publicada'
+                ORDER BY n.publicado_en DESC
+                LIMIT 1
+            """)
+
+            destacada = cursor.fetchone()
+
+        # ----------------------------------------------------
+        # 2. Últimas noticias (excluyendo la destacada)
+        # ----------------------------------------------------
+
+        destacada_id = destacada["id"] if destacada else 0
+
+        cursor.execute("""
+            SELECT
+                n.id,
+                n.titulo,
+                n.slug,
+                n.resumen,
+                n.imagen_url,
+                n.autor,
+                n.publicado_en,
+                c.nombre AS categoria_nombre,
+                c.slug AS categoria_slug,
+                c.icono AS categoria_icono
+            FROM rt_noticias n
+            LEFT JOIN rt_noticias_categorias c
+                ON c.id = n.categoria_id
+            WHERE n.estado = 'publicada'
+              AND n.id != %s
+            ORDER BY n.publicado_en DESC
+            LIMIT 9
+        """, (destacada_id,))
+
         ultimas = cursor.fetchall()
+
+        # ----------------------------------------------------
+        # 3. Categorías con contador
+        # ----------------------------------------------------
 
         cursor.execute("""
             SELECT
@@ -57,6 +120,7 @@ def inicio():
                 c.nombre,
                 c.slug,
                 c.icono,
+                c.descripcion,
                 COUNT(n.id) AS total
             FROM rt_noticias_categorias c
             LEFT JOIN rt_noticias n
@@ -67,6 +131,10 @@ def inicio():
         """)
 
         categorias = cursor.fetchall()
+
+        # ----------------------------------------------------
+        # 4. Rifas activas
+        # ----------------------------------------------------
 
         cursor.execute("""
             SELECT
@@ -85,6 +153,7 @@ def inicio():
 
         return render_template(
             "noticias_inicio.html",
+            destacada=destacada,
             ultimas=ultimas,
             categorias=categorias,
             rifas_destacadas=rifas_destacadas
@@ -93,7 +162,6 @@ def inicio():
     finally:
 
         db.close()
-
 
 # ============================================================
 # LISTADO COMPLETO

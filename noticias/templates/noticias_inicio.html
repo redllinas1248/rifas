@@ -1,26 +1,82 @@
 {% extends "noticias_base.html" %}
 
-{% block titulo %}Noticias del Día Azver | Portal informativo{% endblock %}
+{% block titulo %}Noticias del Día Azver | Portal informativo de José Azueta{% endblock %}
 
 {% block contenido %}
 
-<section class="hero">
+<!-- ============================================
+     HERO CON NOTICIA DESTACADA
+============================================= -->
 
-    <h1>Noticias del Día Azver</h1>
+{% if destacada %}
 
-    <p>
-        Información, eventos y cultura de nuestra comunidad.
-    </p>
+    <section class="destacada">
 
-</section>
+        <div class="destacada-inner">
+
+            <a href="/noticias/{{ destacada.slug }}" class="destacada-card">
+
+                {% if destacada.imagen_url %}
+                    <div class="destacada-imagen-wrap">
+                        <img
+                            src="{{ destacada.imagen_url }}"
+                            alt="{{ destacada.titulo }}"
+                            class="destacada-imagen"
+                        >
+                    </div>
+                {% endif %}
+
+                <div class="destacada-body">
+
+                    {% if destacada.categoria_nombre %}
+                        <span class="destacada-categoria">
+                            {{ destacada.categoria_icono }} {{ destacada.categoria_nombre }}
+                        </span>
+                    {% endif %}
+
+                    <h1 class="destacada-titulo">{{ destacada.titulo }}</h1>
+
+                    {% if destacada.resumen %}
+                        <p class="destacada-resumen">{{ destacada.resumen }}</p>
+                    {% endif %}
+
+                    <div class="destacada-meta">
+                        <span>✍️ {{ destacada.autor or 'Redacción' }}</span>
+                        <span>·</span>
+                        <span>{{ (destacada.publicado_en | mx).strftime('%d/%m/%Y') if destacada.publicado_en else '' }}</span>
+                    </div>
+
+                    <span class="destacada-leer">Leer más →</span>
+
+                </div>
+
+            </a>
+
+        </div>
+
+    </section>
+
+{% else %}
+
+    <section class="hero-listado">
+        <h1>📰 Noticias del Día Azver</h1>
+        <p>Pronto publicaremos contenido de valor.</p>
+    </section>
+
+{% endif %}
 
 
-<section class="contenedor">
+<!-- ============================================
+     ÚLTIMAS NOTICIAS
+============================================= -->
 
-    {% if ultimas %}
+{% if ultimas %}
 
-        <div class="seccion-titulo">
+    <section class="contenedor">
+
+        <div class="seccion-header">
             <h2>📰 Últimas noticias</h2>
+            <a href="/noticias" class="ver-todas">Ver todas →</a>
         </div>
 
         <div class="grid-noticias">
@@ -49,6 +105,12 @@
                             <p class="card-resumen">{{ n.resumen }}</p>
                         {% endif %}
 
+                        <div class="card-meta">
+                            <span>{{ n.autor or 'Redacción' }}</span>
+                            <span>·</span>
+                            <span>{{ (n.publicado_en | mx).strftime('%d/%m/%Y') if n.publicado_en else '' }}</span>
+                        </div>
+
                         <a href="/noticias/{{ n.slug }}" class="card-link">
                             Leer más →
                         </a>
@@ -61,20 +123,137 @@
 
         </div>
 
-    {% else %}
+    </section>
 
-        <div class="aviso">
+{% endif %}
 
-            <strong>🚧 Portal en construcción</strong>
 
-            <p>
-                Estamos preparando contenido de valor. Pronto encontrarás
-                noticias, eventos y guías locales.
-            </p>
+<!-- ============================================
+     CATEGORÍAS
+============================================= -->
+
+<section class="seccion-categorias">
+
+    <div class="contenedor">
+
+        <div class="seccion-header">
+            <h2>🗂️ Explora por categoría</h2>
+        </div>
+
+        <div class="categorias-grid">
+
+            {% for cat in categorias %}
+
+                <a href="/categoria/{{ cat.slug }}" class="cat-card">
+
+                    <div class="cat-icono">{{ cat.icono }}</div>
+
+                    <div class="cat-info">
+
+                        <div class="cat-nombre">{{ cat.nombre }}</div>
+
+                        <div class="cat-total">
+                            {{ cat.total }} {% if cat.total == 1 %}artículo{% else %}artículos{% endif %}
+                        </div>
+
+                    </div>
+
+                </a>
+
+            {% endfor %}
 
         </div>
 
-    {% endif %}
+    </div>
+
+</section>
+
+
+<!-- ============================================
+     SORTEOS ACTIVOS
+============================================= -->
+
+{% if rifas_destacadas %}
+
+    <section class="seccion-sorteos">
+
+        <div class="contenedor">
+
+            <div class="seccion-header">
+                <h2>🎁 Sorteos activos</h2>
+                <a href="/rifas" class="ver-todas">Ver todos →</a>
+            </div>
+
+            <p class="seccion-sub">
+                Participa gratis en nuestros sorteos. Sin pagos, sin tarjetas.
+            </p>
+
+            <div class="sorteos-grid">
+
+                {% for rifa in rifas_destacadas %}
+
+                    <a href="/rifas/participar/{{ rifa.id }}" class="sorteo-card">
+
+                        {% if rifa.imagen_url %}
+                            <img src="{{ rifa.imagen_url }}" alt="{{ rifa.titulo }}" class="sorteo-imagen" loading="lazy">
+                        {% else %}
+                            <div class="sorteo-placeholder">🎁</div>
+                        {% endif %}
+
+                        <div class="sorteo-body">
+
+                            <h3 class="sorteo-titulo">{{ rifa.titulo }}</h3>
+
+                            {% if rifa.descripcion %}
+                                <p class="sorteo-desc">{{ rifa.descripcion[:120] }}{% if rifa.descripcion|length > 120 %}...{% endif %}</p>
+                            {% endif %}
+
+                            <div class="sorteo-footer">
+                                <span class="sorteo-cta">Participar gratis →</span>
+                                <span class="sorteo-badge">🎟️ {{ rifa.cantidad_boletos }}</span>
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+{% endif %}
+
+
+<!-- ============================================
+     COMERCIO
+============================================= -->
+
+<section class="seccion-comercio">
+
+    <div class="contenedor">
+
+        <div class="comercio-cta">
+
+            <div class="comercio-emoji">🛒</div>
+
+            <h2>Compra y vende en tu comunidad</h2>
+
+            <p>
+                Publica lo que quieras vender, encuentra servicios locales
+                y conecta con vecinos de José Azueta.
+            </p>
+
+            <a href="/comercio" class="comercio-boton">
+                Visitar comercio local →
+            </a>
+
+        </div>
+
+    </div>
 
 </section>
 
