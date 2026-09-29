@@ -79,7 +79,7 @@
             <a href="/noticias" class="ver-todas">Ver todas →</a>
         </div>
 
-        <div class="grid-noticias">
+                <div class="grid-noticias">
 
             {% for n in ultimas %}
 
@@ -118,6 +118,28 @@
                     </div>
 
                 </article>
+
+                {# Insertar anuncio in-feed después de la 3ra noticia #}
+                {% if loop.index == 3 %}
+
+                    <div class="ad-in-feed">
+
+                        <div class="ad-label-banner">Anuncio</div>
+
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-format="fluid"
+                             data-ad-layout-key="-6t+ed+2i-1n-4w"
+                             data-ad-client="ca-pub-2084405192549609"
+                             data-ad-slot="4954221384"></ins>
+
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+
+                    </div>
+
+                {% endif %}
 
             {% endfor %}
 
