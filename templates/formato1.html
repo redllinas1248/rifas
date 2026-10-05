@@ -33,7 +33,7 @@
     <!-- ============ FORMATO LLENO ============ -->
     <div class="formato" id="formato">
 
-        <!-- Encabezado: LOGO IZQUIERDA · TÍTULO CENTRADO · ESPACIO DERECHA -->
+        <!-- Encabezado: LOGO izquierda · TÍTULO centrado · espacio derecha -->
         <div class="encabezado">
             <div class="lado-logo">
                 <img src="{{ url_for('static', filename='icons/logo_triage.png') }}"
@@ -55,24 +55,71 @@
 
         <hr>
 
-        <!-- Campos del paciente -->
-        <div class="campos-paciente">
-            <p><strong>Nombre del Paciente:</strong> <span class="dato">{{ datos['nombre_paciente'] }}</span></p>
-            <p><strong>Cup:</strong> <span class="dato">{{ datos['cup'] }}</span></p>
-            <p><strong>Sexo:</strong> <span class="dato">{{ datos['sexo'] }}</span></p>
-            <p><strong>Edad:</strong> <span class="dato">{{ datos['edad'] }}</span></p>
-            <p><strong>Entidad de nacimiento:</strong> <span class="dato">{{ datos['entidad_nacimiento'] }}</span></p>
-            <p><strong>Domicilio:</strong> <span class="dato">{{ datos['domicilio'] }}</span></p>
-            <p><strong>Nombre del Familiar Responsable:</strong> <span class="dato">{{ datos['familiar_responsable'] }}</span></p>
-            <p><strong>No. De Seguro Popular:</strong> <span class="dato">{{ datos['seguro_popular'] }}</span></p>
-            <p><strong>Fecha de nacimiento:</strong> <span class="dato">{{ datos['fecha_nacimiento'] }}</span></p>
-            <p><strong>C.S Adscripción:</strong> <span class="dato">{{ datos['cs_adscripcion'] }}</span></p>
+        <!-- ===== TABLA DE DATOS DEL PACIENTE (formato horizontal) ===== -->
+        <table class="tabla-triage">
+            <!-- Fila 1 -->
+            <tr>
+                <td class="celda">
+                    <span class="etiqueta">Nombre del Paciente:</span>
+                    <span class="valor">{{ datos['nombre_paciente'] }}</span>
+                </td>
+                <td class="celda">
+                    <span class="etiqueta">Cup:</span>
+                    <span class="valor">{{ datos['cup'] }}</span>
+                </td>
+                <td class="celda">
+                    <span class="etiqueta">Sexo:</span>
+                    <span class="valor">{{ datos['sexo'] }}</span>
+                </td>
+                <td class="celda">
+                    <span class="etiqueta">Edad:</span>
+                    <span class="valor">{{ datos['edad'] }}</span>
+                </td>
+            </tr>
 
-            <!-- Rótulo TRIAGE -->
-            <h2 class="triage-titulo">T R I A G E</h2>
+            <!-- Fila 2 -->
+            <tr>
+                <td class="celda" colspan="2">
+                    <span class="etiqueta">Entidad de nacimiento:</span>
+                    <span class="valor">{{ datos['entidad_nacimiento'] }}</span>
+                </td>
+                <td class="celda" colspan="2">
+                    <span class="etiqueta">Domicilio:</span>
+                    <span class="valor">{{ datos['domicilio'] }}</span>
+                </td>
+            </tr>
 
-            <p><strong>Fecha y Hora:</strong> <span class="dato">{{ datos['fecha_hora'] }}</span></p>
-        </div>
+            <!-- Fila 3 -->
+            <tr>
+                <td class="celda" colspan="2">
+                    <span class="etiqueta">Nombre del Familiar Responsable:</span>
+                    <span class="valor">{{ datos['familiar_responsable'] }}</span>
+                </td>
+                <td class="celda" colspan="2">
+                    <span class="etiqueta">No. De Seguro Popular:</span>
+                    <span class="valor">{{ datos['seguro_popular'] }}</span>
+                </td>
+            </tr>
+
+            <!-- Fila 4 -->
+            <tr>
+                <td class="celda">
+                    <span class="etiqueta">Fecha de nacimiento:</span>
+                    <span class="valor">{{ datos['fecha_nacimiento'] }}</span>
+                </td>
+                <td class="celda" colspan="2">
+                    <span class="etiqueta">C.S Adscripción:</span>
+                    <span class="valor">{{ datos['cs_adscripcion'] }}</span>
+                </td>
+                <td class="celda">
+                    <span class="etiqueta">Fecha y Hora:</span>
+                    <span class="valor">{{ datos['fecha_hora'] }}</span>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Rótulo TRIAGE -->
+        <h2 class="triage-titulo">T R I A G E</h2>
 
     </div>
 
