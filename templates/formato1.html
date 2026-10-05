@@ -15,14 +15,18 @@
 
     <form method="POST" action="/formato1" class="formulario">
         {% for clave, etiqueta in campos %}
-        <label>
-            <span>{{ etiqueta }}:</span>
-            <input type="text" name="{{ clave }}"
-                   {% if clave == 'fecha_hora' %}
-                   placeholder="Vacío = fecha y hora actual"
-                   {% endif %}>
-        </label>
-        {% endfor %}
+<label>
+    <span>{{ etiqueta }}:</span>
+    {% if clave == 'motivo_atencion' %}
+        <textarea name="{{ clave }}" rows="3">{{ datos[clave] if datos else '' }}</textarea>
+    {% else %}
+        <input type="text" name="{{ clave }}"
+               {% if clave == 'fecha_hora' %}
+               placeholder="Vacío = fecha y hora actual"
+               {% endif %}>
+    {% endif %}
+</label>
+{% endfor %}
         <div class="botones">
             <button type="submit">Generar formato</button>
             <button type="reset" class="secundario">Limpiar</button>
@@ -128,9 +132,9 @@
             <span class="etiqueta-inline">Fecha y Hora:</span>
             <span class="valor-inline">{{ datos['fecha_hora'] }}</span>
         </td>
-        <td colspan="8" class="celda celda-alta">
-            <span class="etiqueta">Motivo de Atención:</span>
-            <span class="valor valor-alto"></span>
+        <td colspan="8" class="celda-motivo">
+    <span class="etiqueta-inline">Motivo de Atención:</span>
+    <span class="valor-motivo">{{ datos['motivo_atencion'] }}</span>
         </td>
     </tr>
 
@@ -245,37 +249,32 @@
     </td>
 </tr>
 
-    <!-- Auxiliares de Diagnóstico -->
-    <tr>
-        <td colspan="12" class="celda-bloque">
+    <!-- Bloque unificado: Auxiliares, Diagnóstico, Pronóstico, Nombre y Matrícula -->
+<tr>
+    <td colspan="12" class="celda-bloque-unificado">
+
+        <div class="sub-bloque">
             <span class="etiqueta">Auxiliares de Diagnóstico:</span>
             <div class="espacio-escritura grande"></div>
-        </td>
-    </tr>
+        </div>
 
-    <!-- Diagnóstico -->
-    <tr>
-        <td colspan="12" class="celda-bloque">
+        <div class="sub-bloque">
             <span class="etiqueta">Diagnóstico:</span>
             <div class="espacio-escritura grande"></div>
-        </td>
-    </tr>
+        </div>
 
-    <!-- Pronóstico -->
-    <tr>
-        <td colspan="12" class="celda-bloque">
+        <div class="sub-bloque">
             <span class="etiqueta">Pronóstico:</span>
             <div class="espacio-escritura grande"></div>
-        </td>
-    </tr>
+        </div>
 
-    <!-- Nombre y Matrícula del Médico -->
-    <tr>
-        <td colspan="12" class="celda-bloque">
+        <div class="sub-bloque">
             <span class="etiqueta">Nombre y Matrícula del Médico:</span>
             <div class="espacio-escritura grande"></div>
-        </td>
-    </tr>
+        </div>
+
+    </td>
+</tr>
 </table>
 
     </div>

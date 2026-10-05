@@ -52,6 +52,7 @@ CAMPOS_TRIAGE = [
     ("fecha_nacimiento", "Fecha de nacimiento"),
     ("cs_adscripcion", "C.S Adscripción"),
     ("fecha_hora", "Fecha y Hora"),
+    ("motivo_atencion", "Motivo de Atención"),
 ]
 
 @app.route("/formato1", methods=["GET", "POST"])
