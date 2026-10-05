@@ -33,15 +33,16 @@
     <!-- ============ FORMATO LLENO ============ -->
     <div class="formato" id="formato">
 
-        <!-- Encabezado con logo -->
+        <!-- Encabezado: LOGO IZQUIERDA · TÍTULO CENTRADO · ESPACIO DERECHA -->
         <div class="encabezado">
-            <div class="titulo-bloque">
-                <h1>Triage y Nota Médica inicial<br>del Servicio de Urgencias</h1>
-            </div>
-            <div class="logo-bloque">
+            <div class="lado-logo">
                 <img src="{{ url_for('static', filename='icons/logo_triage.png') }}"
                      alt="Logo" class="logo">
             </div>
+            <div class="titulo-bloque">
+                <h1>Triage y Nota Médica inicial<br>del Servicio de Urgencias</h1>
+            </div>
+            <div class="lado-espacio"></div>
         </div>
 
         <!-- Fundamento legal -->
@@ -66,6 +67,10 @@
             <p><strong>No. De Seguro Popular:</strong> <span class="dato">{{ datos['seguro_popular'] }}</span></p>
             <p><strong>Fecha de nacimiento:</strong> <span class="dato">{{ datos['fecha_nacimiento'] }}</span></p>
             <p><strong>C.S Adscripción:</strong> <span class="dato">{{ datos['cs_adscripcion'] }}</span></p>
+
+            <!-- Rótulo TRIAGE -->
+            <h2 class="triage-titulo">T R I A G E</h2>
+
             <p><strong>Fecha y Hora:</strong> <span class="dato">{{ datos['fecha_hora'] }}</span></p>
         </div>
 

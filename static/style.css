@@ -83,16 +83,21 @@ button:hover, .boton:hover { background: #135ba1; }
     border: 1px solid #ddd;
 }
 
-/* --- Encabezado con logo --- */
+/* --- Encabezado: 3 columnas para centrar el título en la hoja --- */
 .encabezado {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
     align-items: center;
-    margin-bottom: 10px;
-    gap: 20px;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+.lado-logo {
+    text-align: left;
+}
+.lado-espacio {
+    /* columna vacía a la derecha para balancear */
 }
 .titulo-bloque {
-    flex: 1;
     text-align: center;
 }
 .titulo-bloque h1 {
@@ -103,9 +108,8 @@ button:hover, .boton:hover { background: #135ba1; }
     line-height: 1.35;
     letter-spacing: 0.3px;
 }
-.logo-bloque { flex: 0 0 auto; }
 .logo {
-    max-height: 75px;
+    max-height: 70px;
     max-width: 130px;
     object-fit: contain;
 }
@@ -122,23 +126,41 @@ button:hover, .boton:hover { background: #135ba1; }
 .formato hr {
     border: none;
     border-top: 1px solid #000;
-    margin: 12px 0;
+    margin: 12px 0 18px;
 }
 
 /* --- Campos del paciente --- */
 .campos-paciente p {
-    margin: 8px 0;
+    margin: 10px 0;
     font-size: 13px;
     line-height: 1.6;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: nowrap;
 }
 .campos-paciente strong {
     font-weight: bold;
+    white-space: nowrap;
 }
 .dato {
     border-bottom: 1px solid #000;
     display: inline-block;
-    min-width: 260px;
-    padding: 0 4px 1px 4px;
+    flex: 1;
+    min-width: 200px;
+    padding: 0 6px 1px 6px;
+    min-height: 1.2em;
+}
+
+/* --- Rótulo TRIAGE centrado --- */
+.triage-titulo {
+    text-align: center;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    margin: 22px 0 14px;
+    text-transform: uppercase;
 }
 
 /* ===================================================
@@ -162,7 +184,7 @@ button:hover, .boton:hover { background: #135ba1; }
         font-size: 12px;
     }
     .dato {
-        min-width: 220px;
+        min-width: 180px;
     }
     .no-print { display: none !important; }
 
