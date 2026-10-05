@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Triage - Formato 1</title>
+    <title></title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -33,100 +33,262 @@
     <!-- ============ FORMATO LLENO ============ -->
     <div class="formato" id="formato">
 
-        <!-- Encabezado: LOGO izquierda · TÍTULO centrado · espacio derecha -->
-        <div class="encabezado">
-            <div class="lado-logo">
-                <img src="{{ url_for('static', filename='icons/logo_triage.png') }}"
-                     alt="Logo" class="logo">
-            </div>
-            <div class="titulo-bloque">
-                <h1>Triage y Nota Médica inicial<br>del Servicio de Urgencias</h1>
-            </div>
-            <div class="lado-espacio"></div>
-        </div>
-
-        <!-- Fundamento legal -->
-        <p class="fundamento">
-            Fundamento NOM 027-SSA2-2013 Regulación de los Servicios de Salud, que
-            establece los criterios de funcionamiento y Atención en los Servicios de
-            Urgencias de los establecimientos para la atención médica 004: NOM
-            004-SSA3-2012 del Expediente Clínico.
-        </p>
-
-        <hr>
-
-        <!-- ===== TABLA DE DATOS DEL PACIENTE (formato horizontal) ===== -->
-        <table class="tabla-triage">
-            <!-- Fila 1 -->
+        <!-- ===== TABLA 1: ENCABEZADO ===== -->
+        <table class="tabla-encabezado">
             <tr>
-                <td class="celda">
-                    <span class="etiqueta">Nombre del Paciente:</span>
-                    <span class="valor">{{ datos['nombre_paciente'] }}</span>
+                <td class="celda-logos">
+                    <img src="{{ url_for('static', filename='icons/logo_triage.png', _external=True) }}" ...>
+                         alt="Logo" class="logo">
                 </td>
-                <td class="celda">
-                    <span class="etiqueta">Cup:</span>
-                    <span class="valor">{{ datos['cup'] }}</span>
-                </td>
-                <td class="celda">
-                    <span class="etiqueta">Sexo:</span>
-                    <span class="valor">{{ datos['sexo'] }}</span>
-                </td>
-                <td class="celda">
-                    <span class="etiqueta">Edad:</span>
-                    <span class="valor">{{ datos['edad'] }}</span>
+                <td class="celda-titulos">
+                    <div class="titulo-linea">SERVICIOS DE SALUD DE VERACRUZ</div>
+                    <div class="titulo-linea">HOSPITAL GENERAL CORDOBA YANGA</div>
+                    <div class="subtitulo-linea">Triage y Nota Médica inicial del Servicio de Urgencias</div>
                 </td>
             </tr>
-
-            <!-- Fila 2 -->
             <tr>
-                <td class="celda" colspan="2">
-                    <span class="etiqueta">Entidad de nacimiento:</span>
-                    <span class="valor">{{ datos['entidad_nacimiento'] }}</span>
-                </td>
-                <td class="celda" colspan="2">
-                    <span class="etiqueta">Domicilio:</span>
-                    <span class="valor">{{ datos['domicilio'] }}</span>
-                </td>
-            </tr>
-
-            <!-- Fila 3 -->
-            <tr>
-                <td class="celda" colspan="2">
-                    <span class="etiqueta">Nombre del Familiar Responsable:</span>
-                    <span class="valor">{{ datos['familiar_responsable'] }}</span>
-                </td>
-                <td class="celda" colspan="2">
-                    <span class="etiqueta">No. De Seguro Popular:</span>
-                    <span class="valor">{{ datos['seguro_popular'] }}</span>
-                </td>
-            </tr>
-
-            <!-- Fila 4 -->
-            <tr>
-                <td class="celda">
-                    <span class="etiqueta">Fecha de nacimiento:</span>
-                    <span class="valor">{{ datos['fecha_nacimiento'] }}</span>
-                </td>
-                <td class="celda" colspan="2">
-                    <span class="etiqueta">C.S Adscripción:</span>
-                    <span class="valor">{{ datos['cs_adscripcion'] }}</span>
-                </td>
-                <td class="celda">
-                    <span class="etiqueta">Fecha y Hora:</span>
-                    <span class="valor">{{ datos['fecha_hora'] }}</span>
+                <td colspan="2" class="celda-fundamento">
+                    Fundamento NOM 027-SSA2-2013 Regulación de los Servicios de Salud, que establece
+                    los criterios de funcionamiento y Atención en los Servicios de Urgencias de los
+                    establecimientos para la atención médica 004: NOM 004-SSA3-2012 del Expediente Clínico.
                 </td>
             </tr>
         </table>
 
-        <!-- Rótulo TRIAGE -->
-        <h2 class="triage-titulo">T R I A G E</h2>
+<!-- ===== TABLA 2: DATOS DEL PACIENTE ===== -->
+<table class="tabla-datos">
+    <colgroup>
+        <col style="width: 8.33%"><col style="width: 8.33%">
+        <col style="width: 8.33%"><col style="width: 8.33%">
+        <col style="width: 8.33%"><col style="width: 8.33%">
+        <col style="width: 8.33%"><col style="width: 8.33%">
+        <col style="width: 8.33%"><col style="width: 8.33%">
+        <col style="width: 8.33%"><col style="width: 8.37%">
+    </colgroup>
+
+    <!-- Fila 1 -->
+    <tr>
+        <td colspan="6" class="celda-inline">
+            <span class="etiqueta-inline">Nombre del Paciente:</span>
+            <span class="valor-inline">{{ datos['nombre_paciente'] }}</span>
+        </td>
+        <td colspan="3" class="celda-inline">
+            <span class="etiqueta-inline">Curp:</span>
+            <span class="valor-inline">{{ datos['cup'] }}</span>
+        </td>
+        <td colspan="2" class="celda-inline">
+            <span class="etiqueta-inline">Sexo:</span>
+            <span class="valor-inline">{{ datos['sexo'] }}</span>
+        </td>
+        <td colspan="1" class="celda-inline">
+            <span class="etiqueta-inline">Edad:</span>
+            <span class="valor-inline">{{ datos['edad'] }}</span>
+        </td>
+    </tr>
+
+    <!-- Fila 2 -->
+    <tr>
+        <td colspan="4" class="celda-inline">
+            <span class="etiqueta-inline">Entidad de nacimiento:</span>
+            <span class="valor-inline">{{ datos['entidad_nacimiento'] }}</span>
+        </td>
+        <td colspan="4" class="celda-inline">
+            <span class="etiqueta-inline">Domicilio:</span>
+            <span class="valor-inline">{{ datos['domicilio'] }}</span>
+        </td>
+        <td colspan="4" class="celda-inline">
+            <span class="etiqueta-inline">Nombre del Familiar Responsable:</span>
+            <span class="valor-inline">{{ datos['familiar_responsable'] }}</span>
+        </td>
+    </tr>
+
+    <!-- Fila 3 -->
+    <tr>
+        <td colspan="4" class="celda-inline">
+            <span class="etiqueta-inline">No. De Seguro Popular:</span>
+            <span class="valor-inline">{{ datos['seguro_popular'] }}</span>
+        </td>
+        <td colspan="4" class="celda-inline">
+            <span class="etiqueta-inline">Fecha de nacimiento:</span>
+            <span class="valor-inline">{{ datos['fecha_nacimiento'] }}</span>
+        </td>
+        <td colspan="4" class="celda-inline">
+            <span class="etiqueta-inline">C.S Adscripción:</span>
+            <span class="valor-inline">{{ datos['cs_adscripcion'] }}</span>
+        </td>
+    </tr>
+
+    <!-- Fila 4: rótulo TRIAGE -->
+    <tr>
+        <td colspan="12" class="celda-triage">T R I A G E</td>
+    </tr>
+
+    <!-- Fila 5: Fecha y Hora / Motivo -->
+    <tr>
+        <td colspan="4" class="celda-inline">
+            <span class="etiqueta-inline">Fecha y Hora:</span>
+            <span class="valor-inline">{{ datos['fecha_hora'] }}</span>
+        </td>
+        <td colspan="8" class="celda celda-alta">
+            <span class="etiqueta">Motivo de Atención:</span>
+            <span class="valor valor-alto"></span>
+        </td>
+    </tr>
+
+
+            <!-- Fila 6: Signos vitales -->
+            <tr>
+                <td colspan="3" class="celda">
+                    <span class="etiqueta">Tensión Arterial:</span>
+                    <span class="valor"></span>
+                </td>
+                <td colspan="3" class="celda">
+                    <span class="etiqueta">Frecuencia Cardíaca:</span>
+                    <span class="valor"></span>
+                </td>
+                <td colspan="3" class="celda">
+                    <span class="etiqueta">Frecuencia Respiratoria:</span>
+                    <span class="valor"></span>
+                </td>
+                <td colspan="3" class="celda">
+                    <span class="etiqueta">Temp:</span>
+                    <span class="valor"></span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="celda">
+                    <span class="etiqueta">Peso:</span>
+                    <span class="valor"></span>
+                </td>
+                <td colspan="3" class="celda">
+                    <span class="etiqueta">Talla:</span>
+                    <span class="valor"></span>
+                </td>
+                <td colspan="3" class="celda">
+                    <span class="etiqueta">Glucemia capilar:</span>
+                    <span class="valor"></span>
+                </td>
+                <td colspan="3" class="celda">
+                    <span class="etiqueta">Escala Glasglow:</span>
+                    <span class="valor"></span>
+                </td>
+            </tr>
+
+            <!-- Fila 7: Nivel de Gravedad -->
+            <tr>
+                <td colspan="12" class="celda">
+                    <span class="etiqueta">Nivel de Gravedad:</span>
+                    <div class="opciones-gravedad">
+                        <span>I: ROJO</span>
+                        <span>II: NARANJA</span>
+                        <span>III: AMARILLO</span>
+                        <span>IV: VERDE</span>
+                        <span>V: AZUL</span>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- Fila 8: Médico que clasificó -->
+            <tr>
+                <td colspan="12" class="celda">
+                    <span class="etiqueta">Nombre y Matrícula del Médico que clasificó:</span>
+                    <span class="valor"></span>
+                </td>
+            </tr>
+        </table>
+
+        <!-- ===== NOTA MÉDICA INICIAL ===== -->
+<table class="tabla-datos">
+    <tr>
+        <td colspan="12" class="celda-titulo-seccion">NOTA MÉDICA INICIAL</td>
+    </tr>
+
+    <!-- Hora de Atención -->
+    <tr>
+        <td colspan="4" class="celda-inline">
+            <span class="etiqueta-inline">Hora de Atención:</span>
+            <span class="valor-inline"></span>
+        </td>
+        <td colspan="8" class="celda-vacia"></td>
+    </tr>
+
+    <!-- Interrogatorio -->
+    <tr>
+        <td colspan="12" class="celda-bloque">
+            <span class="etiqueta">Interrogatorio:</span>
+            <div class="espacio-escritura"></div>
+        </td>
+    </tr>
+
+    <!-- Exploración Física -->
+    <tr>
+        <td colspan="12" class="celda-bloque">
+            <span class="etiqueta">Exploración Física:</span>
+            <div class="espacio-escritura grande"></div>
+        </td>
+    </tr>
+
+<!-- Signos vitales (una sola fila horizontal de 8 columnas) -->
+<tr>
+    <td colspan="12" class="celda-signos-contenedor">
+        <table class="tabla-signos">
+            <tr>
+                <td class="celda-signo"><span class="etiqueta-signo">Tensión Arterial:</span></td>
+                <td class="celda-signo"><span class="etiqueta-signo">Frecuencia Cardiaca:</span></td>
+                <td class="celda-signo"><span class="etiqueta-signo">Frecuencia Respiratoria:</span></td>
+                <td class="celda-signo"><span class="etiqueta-signo">Temp:</span></td>
+                <td class="celda-signo"><span class="etiqueta-signo">Peso:</span></td>
+                <td class="celda-signo"><span class="etiqueta-signo">Talla:</span></td>
+                <td class="celda-signo"><span class="etiqueta-signo">Glucemia Capilar:</span></td>
+                <td class="celda-signo"><span class="etiqueta-signo">Escala de Glasglow:</span></td>
+            </tr>
+        </table>
+    </td>
+</tr>
+
+    <!-- Auxiliares de Diagnóstico -->
+    <tr>
+        <td colspan="12" class="celda-bloque">
+            <span class="etiqueta">Auxiliares de Diagnóstico:</span>
+            <div class="espacio-escritura grande"></div>
+        </td>
+    </tr>
+
+    <!-- Diagnóstico -->
+    <tr>
+        <td colspan="12" class="celda-bloque">
+            <span class="etiqueta">Diagnóstico:</span>
+            <div class="espacio-escritura grande"></div>
+        </td>
+    </tr>
+
+    <!-- Pronóstico -->
+    <tr>
+        <td colspan="12" class="celda-bloque">
+            <span class="etiqueta">Pronóstico:</span>
+            <div class="espacio-escritura grande"></div>
+        </td>
+    </tr>
+
+    <!-- Nombre y Matrícula del Médico -->
+    <tr>
+        <td colspan="12" class="celda-bloque">
+            <span class="etiqueta">Nombre y Matrícula del Médico:</span>
+            <div class="espacio-escritura grande"></div>
+        </td>
+    </tr>
+</table>
 
     </div>
 
-    <div class="botones no-print">
-        <button onclick="window.print()">🖨 Imprimir</button>
+    <!-- Botonera: PDF + Nuevo -->
+    <form method="POST" action="/formato1/pdf" class="no-print botones">
+        {% for clave, _ in campos %}
+        <input type="hidden" name="{{ clave }}" value="{{ datos[clave] }}">
+        {% endfor %}
+        <button type="submit">⬇ Descargar PDF</button>
         <a href="/formato1" class="boton secundario">← Nuevo</a>
-    </div>
+    </form>
     {% endif %}
 
 </div>

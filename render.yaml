@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: rifas
+    runtime: python
+    buildCommand: |
+      apt-get update && apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libjpeg-dev libopenjp2-7-dev libffi-dev && pip install -r requirements.txt
+    startCommand: gunicorn app:app
