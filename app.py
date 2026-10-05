@@ -3,6 +3,8 @@ import json
 import secrets
 import re
 import unicodedata
+from datetime import datetime
+from flask import render_template, request
 
 from datetime import (
     datetime,
@@ -37,6 +39,34 @@ app.secret_key = os.getenv(
     "rifas-clave-local"
 )
 
+
+CAMPOS_TRIAGE = [
+    ("nombre_paciente", "Nombre del Paciente"),
+    ("cup", "Cup"),
+    ("sexo", "Sexo"),
+    ("edad", "Edad"),
+    ("entidad_nacimiento", "Entidad de nacimiento"),
+    ("domicilio", "Domicilio"),
+    ("familiar_responsable", "Nombre del Familiar Responsable"),
+    ("seguro_popular", "No. De Seguro Popular"),
+    ("fecha_nacimiento", "Fecha de nacimiento"),
+    ("cs_adscripcion", "C.S Adscripción"),
+    ("fecha_hora", "Fecha y Hora"),
+]
+
+@app.route("/formato1", methods=["GET", "POST"])
+def formato1():
+    datos = None
+    if request.method == "POST":
+        datos = {clave: request.form.get(clave, "").strip() for clave, _ in CAMPOS_TRIAGE}
+        if not datos["fecha_hora"]:
+            datos["fecha_hora"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+    return render_template(
+        "formato1.html",
+        campos=CAMPOS_TRIAGE,
+        datos=datos,
+        fecha_actual=datetime.now().strftime("%d/%m/%Y"),
+    )
 
 # ============================================================
 # CONFIGURACIÓN DE SESIONES SEGURAS

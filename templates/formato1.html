@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Triage - Formato 1</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="contenedor">
+
+    {% if not datos %}
+    <h1>Llenado de Triage</h1>
+    <p class="subtitulo">Solo campos hasta <strong>Fecha y Hora</strong></p>
+
+    <form method="POST" action="/formato1" class="formulario">
+        {% for clave, etiqueta in campos %}
+        <label>
+            <span>{{ etiqueta }}:</span>
+            <input type="text" name="{{ clave }}"
+                   {% if clave == 'fecha_hora' %}
+                   placeholder="Vacío = fecha y hora actual"
+                   {% endif %}>
+        </label>
+        {% endfor %}
+        <div class="botones">
+            <button type="submit">Generar formato</button>
+            <button type="reset" class="secundario">Limpiar</button>
+        </div>
+    </form>
+
+    {% else %}
+    <div class="formato" id="formato">
+        <h1>Triage y Nota Médica inicial del Servicio de Urgencias</h1>
+        <p class="fundamento">
+            Fundamento NOM 027-SSA2-2013 Regulación de los Servicios de Salud, que
+            establece los criterios de funcionamiento y Atención en los Servicios de
+            Urgencias de los establecimientos para la atención médica 004: NOM
+            004-SSA3-2012 del Expediente Clínico.
+        </p>
+
+        {% for clave, etiqueta in campos %}
+        <p class="linea"><strong>{{ etiqueta }}:</strong> {{ datos[clave] }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="botones no-print">
+        <button onclick="window.print()">🖨 Imprimir</button>
+        <a href="/formato1" class="boton secundario">← Nuevo</a>
+    </div>
+    {% endif %}
+
+</div>
+</body>
+</html>
