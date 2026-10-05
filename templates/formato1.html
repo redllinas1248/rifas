@@ -37,8 +37,7 @@
         <table class="tabla-encabezado">
             <tr>
                 <td class="celda-logos">
-                    <img src="{{ url_for('static', filename='icons/logo_triage.png', _external=True) }}" ...>
-                         alt="Logo" class="logo">
+                    <img src="{{ url_for('static', filename='icons/logo_triage.png') }}">
                 </td>
                 <td class="celda-titulos">
                     <div class="titulo-linea">SERVICIOS DE SALUD DE VERACRUZ</div>
@@ -281,14 +280,10 @@
 
     </div>
 
-    <!-- Botonera: PDF + Nuevo -->
-    <form method="POST" action="/formato1/pdf" class="no-print botones">
-        {% for clave, _ in campos %}
-        <input type="hidden" name="{{ clave }}" value="{{ datos[clave] }}">
-        {% endfor %}
-        <button type="submit">⬇ Descargar PDF</button>
-        <a href="/formato1" class="boton secundario">← Nuevo</a>
-    </form>
+    <div class="botones no-print">
+    <button onclick="window.print()">🖨 Imprimir</button>
+    <a href="/formato1" class="boton secundario">← Nuevo</a>
+</div>
     {% endif %}
 
 </div>

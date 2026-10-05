@@ -4,7 +4,7 @@ import secrets
 import re
 import unicodedata
 from datetime import datetime
-from flask import render_template, request
+from flask import Flask, render_template, request
 
 from datetime import (
     datetime,
@@ -68,39 +68,6 @@ def formato1():
         fecha_actual=datetime.now().strftime("%d/%m/%Y"),
     )
 
-# --- REEMPLAZA la línea de weasyprint por esta ---
-# from weasyprint import HTML
-from xhtml2pdf import pisa
-import io
-
-@app.route("/formato1/pdf", methods=["POST"])
-def formato1_pdf():
-    datos = {clave: request.form.get(clave, "").strip() for clave, _ in CAMPOS_TRIAGE}
-    if not datos["fecha_hora"]:
-        datos["fecha_hora"] = datetime.now().strftime("%d/%m/%Y %H:%M")
-
-    html = render_template(
-        "formato1.html",
-        campos=CAMPOS_TRIAGE,
-        datos=datos,
-    )
-
-    # --- Código para xhtml2pdf ---
-    result = io.BytesIO()
-    pdf = pisa.CreatePDF(
-        io.StringIO(html),
-        dest=result,
-        encoding='utf-8'
-    )
-
-    if pdf.err:
-        return "Error al generar PDF", 500
-
-    nombre = (datos["nombre_paciente"] or "paciente").replace(" ", "_")
-    response = make_response(result.getvalue())
-    response.headers["Content-Type"] = "application/pdf"
-    response.headers["Content-Disposition"] = f"inline; filename=triage_{nombre}.pdf"
-    return response
 
 # ============================================================
 # CONFIGURACIÓN DE SESIONES SEGURAS
