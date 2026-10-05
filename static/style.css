@@ -1,47 +1,173 @@
-/* Estilos del formato de triage */
+/* ===================================================
+   ESTILOS GENERALES
+   =================================================== */
+* { box-sizing: border-box; }
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 20px;
+    color: #222;
+}
+
 .contenedor {
-    max-width: 800px;
+    max-width: 850px;
     margin: 0 auto;
     background: #fff;
     padding: 30px 40px;
     border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
-.contenedor h1 { font-size: 20px; margin-top: 0; }
-.contenedor .subtitulo { color: #666; margin-bottom: 25px; }
 
-.contenedor .formulario label { display: block; margin-bottom: 14px; }
-.contenedor .formulario span {
-    display: block; font-size: 13px; color: #333;
-    margin-bottom: 4px; font-weight: 600;
-}
-.contenedor .formulario input {
-    width: 100%; padding: 8px 10px;
-    border: 1px solid #ccc; border-radius: 6px; font-size: 14px;
-}
-.contenedor .formulario input:focus {
-    outline: none; border-color: #1976d2;
-    box-shadow: 0 0 0 2px rgba(25,118,210,0.15);
-}
-.contenedor .botones { margin-top: 20px; display: flex; gap: 10px; }
-.contenedor button, .contenedor .boton {
-    padding: 10px 18px; border: none; border-radius: 6px;
-    background: #1976d2; color: #fff; font-size: 14px;
-    cursor: pointer; text-decoration: none; display: inline-block;
-}
-.contenedor button:hover, .contenedor .boton:hover { background: #135ba1; }
-.contenedor .secundario { background: #e0e0e0; color: #333; }
-.contenedor .secundario:hover { background: #c8c8c8; }
+h1 { font-size: 20px; margin-top: 0; }
+.subtitulo { color: #666; margin-bottom: 25px; }
 
-.contenedor .formato { line-height: 1.7; font-size: 14px; }
-.contenedor .formato h1 { font-size: 16px; text-align: center; }
-.contenedor .formato .fundamento {
-    font-size: 11px; color: #555; text-align: justify; margin-bottom: 20px;
+/* ===================================================
+   FORMULARIO DE ENTRADA
+   =================================================== */
+.formulario label {
+    display: block;
+    margin-bottom: 14px;
 }
-.contenedor .formato .linea { margin: 6px 0; }
+.formulario span {
+    display: block;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+.formulario input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+.formulario input:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.15);
+}
 
+.botones {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+button, .boton {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    background: #1976d2;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+button:hover, .boton:hover { background: #135ba1; }
+.secundario { background: #e0e0e0; color: #333; }
+.secundario:hover { background: #c8c8c8; }
+
+/* ===================================================
+   FORMATO DE TRIAGE (vista tipo documento)
+   =================================================== */
+.formato {
+    font-family: "Times New Roman", Times, serif;
+    color: #000;
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 20px 25px;
+    background: #fff;
+    border: 1px solid #ddd;
+}
+
+/* --- Encabezado con logo --- */
+.encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 20px;
+}
+.titulo-bloque {
+    flex: 1;
+    text-align: center;
+}
+.titulo-bloque h1 {
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0;
+    text-transform: uppercase;
+    line-height: 1.35;
+    letter-spacing: 0.3px;
+}
+.logo-bloque { flex: 0 0 auto; }
+.logo {
+    max-height: 75px;
+    max-width: 130px;
+    object-fit: contain;
+}
+
+/* --- Fundamento --- */
+.formato .fundamento {
+    font-size: 10.5px;
+    text-align: justify;
+    color: #000;
+    margin: 10px 0 12px;
+    line-height: 1.4;
+}
+
+.formato hr {
+    border: none;
+    border-top: 1px solid #000;
+    margin: 12px 0;
+}
+
+/* --- Campos del paciente --- */
+.campos-paciente p {
+    margin: 8px 0;
+    font-size: 13px;
+    line-height: 1.6;
+}
+.campos-paciente strong {
+    font-weight: bold;
+}
+.dato {
+    border-bottom: 1px solid #000;
+    display: inline-block;
+    min-width: 260px;
+    padding: 0 4px 1px 4px;
+}
+
+/* ===================================================
+   IMPRESIÓN
+   =================================================== */
 @media print {
-    body { background: #fff; padding: 0; }
-    .contenedor { box-shadow: none; border-radius: 0; padding: 0; }
+    body {
+        background: #fff;
+        padding: 0;
+        margin: 0;
+    }
+    .contenedor {
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+        max-width: 100%;
+    }
+    .formato {
+        border: none;
+        padding: 0;
+        font-size: 12px;
+    }
+    .dato {
+        min-width: 220px;
+    }
     .no-print { display: none !important; }
+
+    @page {
+        margin: 1.5cm;
+        size: letter;
+    }
 }

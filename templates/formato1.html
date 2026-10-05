@@ -9,6 +9,7 @@
 <div class="contenedor">
 
     {% if not datos %}
+    <!-- ============ FORMULARIO ============ -->
     <h1>Llenado de Triage</h1>
     <p class="subtitulo">Solo campos hasta <strong>Fecha y Hora</strong></p>
 
@@ -29,8 +30,21 @@
     </form>
 
     {% else %}
+    <!-- ============ FORMATO LLENO ============ -->
     <div class="formato" id="formato">
-        <h1>Triage y Nota Médica inicial del Servicio de Urgencias</h1>
+
+        <!-- Encabezado con logo -->
+        <div class="encabezado">
+            <div class="titulo-bloque">
+                <h1>Triage y Nota Médica inicial<br>del Servicio de Urgencias</h1>
+            </div>
+            <div class="logo-bloque">
+                <img src="{{ url_for('static', filename='icons/logo_triage.png') }}"
+                     alt="Logo" class="logo">
+            </div>
+        </div>
+
+        <!-- Fundamento legal -->
         <p class="fundamento">
             Fundamento NOM 027-SSA2-2013 Regulación de los Servicios de Salud, que
             establece los criterios de funcionamiento y Atención en los Servicios de
@@ -38,9 +52,23 @@
             004-SSA3-2012 del Expediente Clínico.
         </p>
 
-        {% for clave, etiqueta in campos %}
-        <p class="linea"><strong>{{ etiqueta }}:</strong> {{ datos[clave] }}</p>
-        {% endfor %}
+        <hr>
+
+        <!-- Campos del paciente -->
+        <div class="campos-paciente">
+            <p><strong>Nombre del Paciente:</strong> <span class="dato">{{ datos['nombre_paciente'] }}</span></p>
+            <p><strong>Cup:</strong> <span class="dato">{{ datos['cup'] }}</span></p>
+            <p><strong>Sexo:</strong> <span class="dato">{{ datos['sexo'] }}</span></p>
+            <p><strong>Edad:</strong> <span class="dato">{{ datos['edad'] }}</span></p>
+            <p><strong>Entidad de nacimiento:</strong> <span class="dato">{{ datos['entidad_nacimiento'] }}</span></p>
+            <p><strong>Domicilio:</strong> <span class="dato">{{ datos['domicilio'] }}</span></p>
+            <p><strong>Nombre del Familiar Responsable:</strong> <span class="dato">{{ datos['familiar_responsable'] }}</span></p>
+            <p><strong>No. De Seguro Popular:</strong> <span class="dato">{{ datos['seguro_popular'] }}</span></p>
+            <p><strong>Fecha de nacimiento:</strong> <span class="dato">{{ datos['fecha_nacimiento'] }}</span></p>
+            <p><strong>C.S Adscripción:</strong> <span class="dato">{{ datos['cs_adscripcion'] }}</span></p>
+            <p><strong>Fecha y Hora:</strong> <span class="dato">{{ datos['fecha_hora'] }}</span></p>
+        </div>
+
     </div>
 
     <div class="botones no-print">
