@@ -158,8 +158,6 @@ button:hover, .boton:hover { background: #135ba1; }
     vertical-align: middle;
     font-size: 12px;
     line-height: 1.4;
-    white-space: nowrap;
-    overflow: hidden;
 }
 
 .tabla-datos .etiqueta-inline {
