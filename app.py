@@ -39,6 +39,71 @@ app.secret_key = os.getenv(
     "rifas-clave-local"
 )
 
+CAMPOS_SINBA = [
+    # Identificación
+    ("clues", "CLUES"),
+    ("folio", "Folio"),
+    ("nombre", "Nombre(s)"),
+    ("primer_apellido", "Primer Apellido"),
+    ("segundo_apellido", "Segundo Apellido"),
+    ("curp", "CURP"),
+    ("fecha_nacimiento", "Fecha de Nacimiento"),
+    ("entidad_nacimiento", "Entidad o País de Nacimiento"),
+    ("edad_horas", "Edad - Horas"),
+    ("edad_dias", "Edad - Días"),
+    ("edad_meses", "Edad - Meses"),
+    ("edad_anios", "Edad - Años"),
+    ("sexo", "Sexo"),
+    # Rasgos
+    ("afiliacion", "Afiliación a los Servicios de Salud"),
+    ("num_afiliacion", "Número de Afiliación"),
+    ("clave_entidad", "Clave Entidad (4 dígitos)"),
+    ("clave_municipio", "Clave Municipio (4 dígitos)"),
+    ("clave_localidad", "Clave Localidad (5 dígitos)"),
+    ("nombre_afiliacion", "Nombre de la Afiliación"),
+    ("entidad_federativa", "Entidad Federativa / País"),
+    ("municipio", "Municipio o Alcaldía"),
+    ("localidad", "Localidad"),
+    ("codigo_postal", "Código Postal"),
+    ("tipo_vialidad", "Tipo de Vialidad"),
+    ("nombre_vialidad", "Nombre de la Vialidad"),
+    ("num_ext", "Núm. Ext."),
+    ("num_int", "Núm. Int."),
+    ("tipo_asentamiento", "Tipo de Asentamiento"),
+    ("nombre_asentamiento", "Nombre del Asentamiento"),
+    ("telefono", "Teléfono"),
+    ("indigena_v", "¿Se considera indígena? (Sí/No)"),
+    ("afromexicano_v", "¿Se considera afromexicano? (Sí/No)"),
+    ("migrante_v", "¿Es migrante retornado? (Sí/No)"),
+    ("lgbt_v", "¿Se identifica con la comunidad LGBT+? (Sí/No/Prefiere no responder)"),
+    ("como_se_identifica_v", "¿Cómo se identifica? (Mujer trans/Hombre trans/Persona no binaria/Lesbiana/Gay/Bisexual)"),
+    # Estancia (parte alta)
+    # Estancia
+    ("atencion_prehospitalaria", "Atención prehospitalaria (Sí/No)"),
+    ("tiempo_traslado_hh", "Tiempo de traslado - Horas (2 dígitos)"),
+    ("tiempo_traslado_mm", "Tiempo de traslado - Minutos (2 dígitos)"),
+    ("ingreso_dia", "Ingreso - Día (2 dígitos)"),
+    ("ingreso_mes", "Ingreso - Mes (2 dígitos)"),
+    ("ingreso_anio", "Ingreso - Año (4 dígitos)"),
+    ("ingreso_hh", "Ingreso - Hora (2 dígitos)"),
+    ("ingreso_mm", "Ingreso - Minutos (2 dígitos)"),
+    ("tipo_urgencia", "Tipo de Urgencia"),
+    ("motivo_atencion", "Motivo de Atención"),
+    ("tipo_cama", "Tipo de Cama"),
+]
+
+
+@app.route("/formato2", methods=["GET", "POST"])
+def formato2():
+    datos = None
+    if request.method == "POST":
+        datos = {clave: request.form.get(clave, "").strip() for clave, _ in CAMPOS_SINBA}
+    return render_template(
+        "formato2.html",
+        campos=CAMPOS_SINBA,
+        datos=datos,
+    )
+
 
 CAMPOS_TRIAGE = [
     ("nombre_paciente", "Nombre del Paciente"),

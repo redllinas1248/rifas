@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Formato 2 - SINBA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="contenedor">
+
+    <div class="tabs no-print">
+        <a href="/formato1" class="tab">Formato 1 - Triage</a>
+        <a href="/formato2" class="tab activo">Formato 2 - SINBA</a>
+    </div>
+
+    {% if not datos %}
+    <!-- ============ FORMULARIO ============ -->
+    <h1>Hoja Diaria del Servicio de Urgencias - SINBA</h1>
+    <p class="subtitulo">Solo campos hasta <strong>Tipo de Cama</strong></p>
+
+    <form method="POST" action="/formato2" class="formulario">
+        {% for clave, etiqueta in campos %}
+        <label>
+            <span>{{ etiqueta }}:</span>
+            <input type="text" name="{{ clave }}">
+        </label>
+        {% endfor %}
+        <div class="botones">
+            <button type="submit">Generar formato</button>
+            <button type="reset" class="secundario">Limpiar</button>
+        </div>
+    </form>
+
+    {% else %}
+    <!-- ============ FORMATO SINBA ============ -->
+    <div class="formato formato-sinba" id="formato">
+
+    <!-- ========== BLOQUE 1: ENCABEZADO ========== -->
+<table class="sinba-encabezado">
+    <tr>
+        <td class="celda-logos">
+            <img src="{{ url_for('static', filename='icons/logo_salud.png') }}"
+                 alt="Logos Salud" class="logo-salud">
+        </td>
+        <td class="celda-titulo">
+            <div class="titulo-sinba">HOJA DIARIA DEL SERVICIO DE URGENCIAS</div>
+            <div class="subtitulo-sinba">SINBA-SEUL-16-P DGIS</div>
+        </td>
+        <td class="celda-espacio"></td>
+    </tr>
+</table>
+
+<!-- ========== BLOQUE 1: CLUES + FOLIO ========== -->
+<table class="sinba-clues-folio">
+    <tr>
+        <td class="celda-clues">
+            <span class="etq-clues">CLUES:</span>
+            <span class="clues-grupos">
+
+                <span class="clues-grupo">
+                    <span class="casillas">
+                        {% for i in range(0, 2) %}<span class="casilla">{{ datos['clues'][i] if datos['clues'] and i < datos['clues']|length else '' }}</span>{% endfor %}
+                    </span>
+                    <span class="clues-label">Edo</span>
+                </span>
+
+                <span class="clues-grupo">
+                    <span class="casillas">
+                        {% for i in range(2, 5) %}<span class="casilla">{{ datos['clues'][i] if datos['clues'] and i < datos['clues']|length else '' }}</span>{% endfor %}
+                    </span>
+                    <span class="clues-label">Institución</span>
+                </span>
+
+                <span class="clues-grupo">
+                    <span class="casillas">
+                        {% for i in range(5, 10) %}<span class="casilla">{{ datos['clues'][i] if datos['clues'] and i < datos['clues']|length else '' }}</span>{% endfor %}
+                    </span>
+                    <span class="clues-label">Consecutivo</span>
+                </span>
+
+                <span class="clues-grupo">
+                    <span class="casillas">
+                        {% for i in range(10, 11) %}<span class="casilla">{{ datos['clues'][i] if datos['clues'] and i < datos['clues']|length else '' }}</span>{% endfor %}
+                    </span>
+                    <span class="clues-label">Ver</span>
+                </span>
+
+            </span>
+        </td>
+        <td class="celda-folio">
+            <span class="etq-clues">FOLIO:</span>
+            <span class="casillas">
+                {% for i in range(8) %}<span class="casilla">{{ datos['folio'][i] if datos['folio'] and i < datos['folio']|length else '' }}</span>{% endfor %}
+            </span>
+        </td>
+    </tr>
+</table>
+
+<!-- ========== WRAPPER: PACIENTE ========== -->
+<table class="sinba-paciente">
+    <tr>
+        <td class="paciente-label">PACIENTE</td>
+        <td class="paciente-contenido">
+
+<!-- ========== BLOQUE 2: IDENTIFICACIÓN PERSONAL ========== -->
+<div class="sinba-bloque2">
+
+    <!-- NOMBRE con subtítulos -->
+    <div class="sinba-fila">
+        <span class="etq-clues">NOMBRE:</span>
+        <div class="campo-nombre">
+            <div class="valor-nombre">{{ datos['nombre'] }} {{ datos['primer_apellido'] }} {{ datos['segundo_apellido'] }}</div>
+            <div class="subtitulos-nombre">
+                <span>Nombre(s)</span>
+                <span>Primer Apellido</span>
+                <span>Segundo Apellido</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- CURP + FECHA DE NACIMIENTO (2-2-4) + ENTIDAD O PAÍS -->
+    <div class="sinba-fila" style="align-items: flex-end;">
+
+        <span class="etq-clues">C.U.R.P.:</span>
+        <span class="casillas">
+            {% for i in range(18) %}<span class="casilla">{{ datos['curp'][i] if datos['curp'] and i < datos['curp']|length else '' }}</span>{% endfor %}
+        </span>
+
+        <span class="etq-clues" style="margin-left: 15px;">FECHA DE NACIMIENTO:</span>
+
+        <span class="grupo-fecha">
+            <span class="casillas">
+                {% for i in range(0, 2) %}<span class="casilla">{{ datos['fecha_nacimiento'][i] if datos['fecha_nacimiento'] and i < datos['fecha_nacimiento']|length else '' }}</span>{% endfor %}
+            </span>
+            <span class="etq-fecha">Día</span>
+        </span>
+
+        <span class="grupo-fecha">
+            <span class="casillas">
+                {% for i in range(2, 4) %}<span class="casilla">{{ datos['fecha_nacimiento'][i] if datos['fecha_nacimiento'] and i < datos['fecha_nacimiento']|length else '' }}</span>{% endfor %}
+            </span>
+            <span class="etq-fecha">Mes</span>
+        </span>
+
+        <span class="grupo-fecha">
+            <span class="casillas">
+                {% for i in range(4, 8) %}<span class="casilla">{{ datos['fecha_nacimiento'][i] if datos['fecha_nacimiento'] and i < datos['fecha_nacimiento']|length else '' }}</span>{% endfor %}
+            </span>
+            <span class="etq-fecha">Año</span>
+        </span>
+
+        <span class="etq-clues" style="margin-left: 15px;">ENTIDAD O PAÍS DE NACIMIENTO:</span>
+        <span class="valor-linea">{{ datos['entidad_nacimiento'] }}</span>
+
+    </div>
+
+    
+    <!-- EDAD CUMPLIDA (4 grupos) + SEXO -->
+<div class="sinba-fila" style="align-items: center;">
+
+    <span class="etq-clues">EDAD CUMPLIDA:</span>
+
+    <span class="grupo-edad">
+        <span class="casillas">
+            {% for i in range(0, 2) %}<span class="casilla">{{ datos['edad_horas'][i] if datos['edad_horas'] and i < datos['edad_horas']|length else '' }}</span>{% endfor %}
+        </span>
+        <span class="etq-edad">Horas (en menores de 24 hrs)</span>
+    </span>
+
+    <span class="grupo-edad">
+        <span class="casillas">
+            {% for i in range(0, 2) %}<span class="casilla">{{ datos['edad_dias'][i] if datos['edad_dias'] and i < datos['edad_dias']|length else '' }}</span>{% endfor %}
+        </span>
+        <span class="etq-edad">Días (en menores de 30 días)</span>
+    </span>
+
+    <span class="grupo-edad">
+        <span class="casillas">
+            {% for i in range(0, 2) %}<span class="casilla">{{ datos['edad_meses'][i] if datos['edad_meses'] and i < datos['edad_meses']|length else '' }}</span>{% endfor %}
+        </span>
+        <span class="etq-edad">Meses (en menores de 1 año)</span>
+    </span>
+
+    <span class="grupo-edad">
+        <span class="casillas">
+            {% for i in range(0, 3) %}<span class="casilla">{{ datos['edad_anios'][i] if datos['edad_anios'] and i < datos['edad_anios']|length else '' }}</span>{% endfor %}
+        </span>
+        <span class="etq-edad">Años (1 año y más)</span>
+    </span>
+
+    <span class="etq-clues" style="margin-left: 10px;">SEXO:</span>
+
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>Hombre</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>Mujer</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>Intersexual</em>
+    </span>
+
+</div>
+
+    <!-- AFILIACIÓN A LOS SERVICIOS DE SALUD -->
+<div class="sinba-fila" style="align-items: center;">
+
+    <span class="etq-clues">AFILIACIÓN A LOS SERVICIOS DE SALUD:</span>
+
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>No especificado</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>Ninguna</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>IMSS</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>ISSSTE</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>PEMEX</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>SEDENA</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>SEMAR</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>Otra</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>ISS FAM</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>OPD IMSS Bienestar</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>Se ignora</em>
+    </span>
+
+</div>
+
+<!-- GRATUIDAD + NÚM. AFILIACIÓN -->
+<div class="sinba-fila" style="align-items: center;">
+
+    <span class="etq-clues">GRATUIDAD:</span>
+
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>Sí</em>
+    </span>
+    <span class="sexo-opcion">
+        <span class="casilla-num"></span> <em>No</em>
+    </span>
+
+    <span class="etq-clues" style="margin-left: 40px;">NÚM. AFILIACIÓN:</span>
+    <span class="casillas">
+        {% for i in range(16) %}<span class="casilla">{{ datos['num_afiliacion'][i] if datos['num_afiliacion'] and i < datos['num_afiliacion']|length else '' }}</span>{% endfor %}
+    </span>
+
+</div>
+
+</div>
+<!-- ===== fin Bloque 2 ===== -->
+
+<!-- ========== BLOQUE 3: DOMICILIO ========== -->
+<table class="sinba-domicilio">
+    <tr>
+        <td class="domicilio-label" rowspan="4">DOMICILIO</td>
+
+        <td class="domicilio-celda">
+            <div class="sinba-fila-domicilio">
+
+                <span class="etq-clues">ENTIDAD FEDERATIVA/PAÍS:</span>
+                <span class="valor-linea largo">{{ datos['entidad_federativa'] }}</span>
+                <span class="casillas">
+                    {% for i in range(4) %}<span class="casilla">{{ datos['clave_entidad'][i] if datos['clave_entidad'] and i < datos['clave_entidad']|length else '' }}</span>{% endfor %}
+                </span>
+
+                <span class="etq-clues" style="margin-left: 10px;">MUNICIPIO O ALCALDÍA:</span>
+                <span class="valor-linea largo">{{ datos['municipio'] }}</span>
+                <span class="casillas">
+                    {% for i in range(4) %}<span class="casilla">{{ datos['clave_municipio'][i] if datos['clave_municipio'] and i < datos['clave_municipio']|length else '' }}</span>{% endfor %}
+                </span>
+
+            </div>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="domicilio-celda">
+            <div class="sinba-fila-domicilio">
+
+                <span class="etq-clues">LOCALIDAD:</span>
+                <span class="valor-linea largo">{{ datos['localidad'] }}</span>
+                <span class="casillas">
+                    {% for i in range(5) %}<span class="casilla">{{ datos['clave_localidad'][i] if datos['clave_localidad'] and i < datos['clave_localidad']|length else '' }}</span>{% endfor %}
+                </span>
+
+                <span class="etq-clues" style="margin-left: 10px;">CÓDIGO POSTAL:</span>
+                <span class="casillas">
+                    {% for i in range(5) %}<span class="casilla">{{ datos['codigo_postal'][i] if datos['codigo_postal'] and i < datos['codigo_postal']|length else '' }}</span>{% endfor %}
+                </span>
+
+                <span class="etq-clues" style="margin-left: 10px;">TIPO DE LA VIALIDAD:</span>
+                <span class="valor-linea medio">{{ datos['tipo_vialidad'] }}</span>
+
+            </div>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="domicilio-celda">
+            <div class="sinba-fila-domicilio">
+
+                <span class="etq-clues">NOMBRE DE LA VIALIDAD:</span>
+                <span class="valor-linea largo">{{ datos['nombre_vialidad'] }}</span>
+
+                <span class="etq-clues" style="margin-left: 10px;">NÚM. EXT.:</span>
+                <span class="valor-linea corta">{{ datos['num_ext'] }}</span>
+
+                <span class="etq-clues" style="margin-left: 10px;">NÚM. INT.:</span>
+                <span class="valor-linea corta">{{ datos['num_int'] }}</span>
+
+                <span class="etq-clues" style="margin-left: 10px;">TIPO DE ASENTAMIENTO:</span>
+                <span class="valor-linea medio">{{ datos['tipo_asentamiento'] }}</span>
+
+            </div>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="domicilio-celda">
+            <div class="sinba-fila-domicilio">
+
+                <span class="etq-clues">NOMBRE DE ASENTAMIENTO:</span>
+                <span class="valor-linea largo">{{ datos['nombre_asentamiento'] }}</span>
+
+                <span class="etq-clues" style="margin-left: 10px;">TELÉFONO:</span>
+                <span class="casillas">
+                    {% for i in range(10) %}<span class="casilla">{{ datos['telefono'][i] if datos['telefono'] and i < datos['telefono']|length else '' }}</span>{% endfor %}
+                </span>
+
+            </div>
+        </td>
+    </tr>
+</table>
+<!-- ===== fin Bloque 3 ===== -->
+
+<!-- ========== BLOQUE 4: RASGOS SOCIODEMOGRÁFICOS ========== -->
+<table class="sinba-rasgos">
+    <tr>
+        <!-- COLUMNA IZQUIERDA -->
+        <td class="rasgos-col">
+
+            <!-- Indígena -->
+            <div class="rasgo-item">
+                <div class="rasgo-fila">
+                    <span class="etq-clues">¿SE CONSIDERA INDÍGENA?</span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Sí</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>No</em></span>
+                </div>
+                <div class="rasgo-nota">Los menores de 5 años que sean hijos de alguna persona que se asuma indígena, serán considerados como tales.</div>
+            </div>
+
+            <!-- Migrante retornado -->
+            <div class="rasgo-item">
+                <div class="rasgo-fila">
+                    <span class="etq-clues">¿ES MIGRANTE RETORNADO?</span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Sí</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>No</em></span>
+                </div>
+                <div class="rasgo-nota">Aquella persona de nacionalidad mexicana que vive en el exterior y regresa al país de forma voluntaria, involuntaria, o temporal (paisanos).</div>
+            </div>
+
+            <!-- LGBT+ -->
+            <div class="rasgo-item">
+                <div class="rasgo-fila">
+                    <span class="etq-clues">¿SE IDENTIFICA COMO PARTE DE LA COMUNIDAD LGBT+?</span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Sí</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>No</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Prefiere no responder</em></span>
+                </div>
+                <div class="rasgo-nota centro">Personas mayores de 10 años</div>
+            </div>
+
+        </td>
+
+        <!-- COLUMNA DERECHA -->
+        <td class="rasgos-col">
+
+            <!-- Afroamexicano -->
+            <div class="rasgo-item">
+                <div class="rasgo-fila">
+                    <span class="etq-clues">¿SE CONSIDERA AFROMEXICANO?</span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Sí</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>No</em></span>
+                </div>
+                <div class="rasgo-nota">Los menores de 5 años que sean hijos de alguna persona que se asuma afromexicana, serán considerados como tales.</div>
+            </div>
+
+            <!-- Cómo se identifica -->
+            <div class="rasgo-item">
+                <div class="rasgo-fila">
+                    <span class="etq-clues">¿CÓMO SE IDENTIFICA?</span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Mujer trans</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Hombre trans</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Persona no binaria</em></span>
+                </div>
+                <div class="rasgo-fila" style="margin-top: 3px;">
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Lesbiana</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Gay</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Bisexual</em></span>
+                </div>
+            </div>
+
+        </td>
+    </tr>
+</table>
+<!-- ===== fin Bloque 4 ===== -->
+
+ </td>
+    </tr>
+</table>
+<!-- ===== fin Wrapper PACIENTE ===== -->
+
+<!-- ========== BLOQUE 5+6: ESTANCIA COMPLETA ========== -->
+<table class="sinba-estancia-wrapper">
+    <tr>
+        <td class="estancia-label">ESTANCIA</td>
+        <td class="estancia-contenido">
+
+            <!-- ===== Fila 1: Atención prehospitalaria + Tiempo traslado + Fecha y hora ingreso ===== -->
+            <div class="estancia-fila">
+                <span class="etq-clues">ATENCIÓN PREHOSPITALARIA:</span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Sí</em></span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>No</em></span>
+
+                <span class="etq-clues" style="margin-left: 25px;">TIEMPO DE TRASLADO:</span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">
+                        {% for i in range(0, 2) %}<span class="casilla">{{ datos['tiempo_traslado_hh'][i] if datos['tiempo_traslado_hh'] and i < datos['tiempo_traslado_hh']|length else '' }}</span>{% endfor %}
+                    </span>
+                    <span class="etq-tiempo">HH</span>
+                </span>
+                <span class="dos-puntos">:</span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">
+                        {% for i in range(0, 2) %}<span class="casilla">{{ datos['tiempo_traslado_mm'][i] if datos['tiempo_traslado_mm'] and i < datos['tiempo_traslado_mm']|length else '' }}</span>{% endfor %}
+                    </span>
+                    <span class="etq-tiempo">MM</span>
+                </span>
+
+                <span class="etq-clues" style="margin-left: 25px;">FECHA Y HORA DE INGRESO:</span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">
+                        {% for i in range(0, 2) %}<span class="casilla">{{ datos['ingreso_dia'][i] if datos['ingreso_dia'] and i < datos['ingreso_dia']|length else '' }}</span>{% endfor %}
+                    </span>
+                    <span class="etq-tiempo">Día</span>
+                </span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">
+                        {% for i in range(0, 2) %}<span class="casilla">{{ datos['ingreso_mes'][i] if datos['ingreso_mes'] and i < datos['ingreso_mes']|length else '' }}</span>{% endfor %}
+                    </span>
+                    <span class="etq-tiempo">Mes</span>
+                </span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">
+                        {% for i in range(0, 4) %}<span class="casilla">{{ datos['ingreso_anio'][i] if datos['ingreso_anio'] and i < datos['ingreso_anio']|length else '' }}</span>{% endfor %}
+                    </span>
+                    <span class="etq-tiempo">Año</span>
+                </span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">
+                        {% for i in range(0, 2) %}<span class="casilla">{{ datos['ingreso_hh'][i] if datos['ingreso_hh'] and i < datos['ingreso_hh']|length else '' }}</span>{% endfor %}
+                    </span>
+                    <span class="etq-tiempo">HH</span>
+                </span>
+                <span class="dos-puntos">:</span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">
+                        {% for i in range(0, 2) %}<span class="casilla">{{ datos['ingreso_mm'][i] if datos['ingreso_mm'] and i < datos['ingreso_mm']|length else '' }}</span>{% endfor %}
+                    </span>
+                    <span class="etq-tiempo">MM</span>
+                </span>
+            </div>
+
+            <!-- ===== Fila 2: Tipo de urgencia ===== -->
+            <div class="estancia-fila">
+                <span class="etq-clues">TIPO DE URGENCIA:</span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Urgencia calificada</em></span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Urgencia No calificada</em></span>
+            </div>
+
+            <!-- ===== Fila 3: Motivo de atención + Tipo de cama ===== -->
+            <div class="estancia-fila">
+                <span class="etq-clues">MOTIVO DE ATENCIÓN:</span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Accidente, envenenamiento y violencia</em></span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Médica</em></span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Gineco-obstétrica</em></span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Pediátrica</em></span>
+
+                <span class="etq-clues" style="margin-left: 20px;">TIPO DE CAMA:</span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Cama de observación</em></span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Cama de choque</em></span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Sin cama</em></span>
+            </div>
+
+            <!-- ===== Fila 4: Traslado transitorio ===== -->
+            <div class="estancia-fila">
+                <span class="etq-clues">TRASLADO TRANSITORIO:</span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Sí</em></span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>No</em></span>
+
+                <span class="etq-clues" style="margin-left: 15px;">NOMBRE DE LA UNIDAD:</span>
+                <span class="valor-linea largo"></span>
+
+                <span class="etq-clues" style="margin-left: 15px;">CLUES:</span>
+                <span class="casillas">
+                    {% for i in range(10) %}<span class="casilla"></span>{% endfor %}
+                </span>
+            </div>
+
+            <!-- ===== Fila 5: Fecha y hora de alta ===== -->
+            <div class="estancia-fila">
+                <span class="etq-clues">FECHA Y HORA DE ALTA:</span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">{% for i in range(2) %}<span class="casilla"></span>{% endfor %}</span>
+                    <span class="etq-tiempo">Día</span>
+                </span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">{% for i in range(2) %}<span class="casilla"></span>{% endfor %}</span>
+                    <span class="etq-tiempo">Mes</span>
+                </span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</span>
+                    <span class="etq-tiempo">Año</span>
+                </span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">{% for i in range(2) %}<span class="casilla"></span>{% endfor %}</span>
+                    <span class="etq-tiempo">HH</span>
+                </span>
+                <span class="dos-puntos">:</span>
+                <span class="grupo-tiempo">
+                    <span class="casillas">{% for i in range(2) %}<span class="casilla"></span>{% endfor %}</span>
+                    <span class="etq-tiempo">MM</span>
+                </span>
+            </div>
+
+            <!-- ===== Fila 6-7: ALTA POR (ENVIADO A) ===== -->
+            <div class="alta-por-bloque">
+
+                <div class="alta-fila">
+                    <span class="etq-clues">ALTA POR (ENVIADO A):</span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Hospitalización</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Consulta externa</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Traslado a otra unidad</em></span>
+                    <span class="linea-conectora">—</span>
+                    <span class="unidad-medica-bloque">
+                        <span class="etq-clues">NOMBRE DE LA UNIDAD MÉDICA:</span>
+                        <span class="valor-linea largo"></span>
+                    </span>
+                </div>
+
+                <div class="alta-fila">
+                    <span class="etq-clues" style="visibility:hidden;">ALTA POR (ENVIADO A):</span>
+                    <span class="sexo-opcion" style="margin-left: 0;"><span class="casilla-num"></span> <em>Domicilio</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Defunción</em></span>
+                    <span class="linea-conectora">—</span>
+                    <span class="etq-clues">MINISTERIO PÚBLICO:</span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Sí</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>No</em></span>
+                    <span class="etq-clues" style="margin-left: 15px;">FOLIO DEL CERTIFICADO:</span>
+                    <span class="casillas">
+                        {% for i in range(15) %}<span class="casilla"></span>{% endfor %}
+                    </span>
+                </div>
+
+                <div class="alta-fila">
+                    <span class="etq-clues" style="visibility:hidden;">ALTA POR (ENVIADO A):</span>
+                    <span class="sexo-opcion" style="margin-left: 0;"><span class="casilla-num"></span> <em>Fuga</em></span>
+                    <span class="sexo-opcion"><span class="casilla-num"></span> <em>Voluntad propia</em></span>
+                </div>
+
+            </div>
+
+            <!-- ===== Fila 8: Mujer en edad fértil ===== -->
+            <div class="estancia-fila">
+                <span class="etq-clues">MUJER EN EDAD FÉRTIL:</span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Embarazo</em></span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>Puerperio (de 0 a 42 días después del evento obstétrico)</em></span>
+                <span class="sexo-opcion"><span class="casilla-num"></span> <em>No estaba embarazada ni en puerperio</em></span>
+            </div>
+
+            <div class="estancia-fila" style="justify-content: flex-end;">
+                <span class="etq-clues">SEMANAS DE GESTACIÓN:</span>
+                <span class="casillas">
+                    {% for i in range(2) %}<span class="casilla"></span>{% endfor %}
+                </span>
+            </div>
+
+        </td>
+    </tr>
+</table>
+<!-- ===== fin Bloque 5+6 ===== -->
+
+<!-- ========== BLOQUE 7: AFECCIONES TRATADAS ========== -->
+<table class="sinba-afecciones">
+    <colgroup>
+        <col style="width: 22px;">
+        <col style="width: 22px;">
+        <col>
+        <col style="width: 90px;">
+        <col style="width: 22px;">
+    </colgroup>
+
+    <thead>
+        <tr>
+            <td class="head-vacio"></td>
+            <td class="head-vacio"></td>
+            <td class="head-vacio"></td>
+            <td class="codigo-cie-header">CÓDIGO CIE</td>
+            <td class="head-vacio"></td>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Fila 1: AFECCIÓN PRINCIPAL -->
+        <tr>
+            <td class="afecciones-label" rowspan="10">AFECCIONES TRATADAS</td>
+            <td class="ap-label" rowspan="3">A.P.</td>
+            <td class="afeccion-contenido">
+                <span class="etq-ap">AFECCIÓN PRINCIPAL:</span>
+                <div class="ap-linea"></div>
+            </td>
+            <td class="codigo-cie-col">
+                <div class="box-cie">
+                    <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+                </div>
+            </td>
+            <td class="texto-uso-codificador" rowspan="10">
+                 Para uso exclusivo de personal codificador
+            </td>
+        </tr>
+        <tr><td class="afeccion-contenido"></td><td class="codigo-cie-col"></td></tr>
+        <tr><td class="afeccion-contenido"></td><td class="codigo-cie-col"></td></tr>
+
+        <!-- Filas 4-9: COMORBILIDADES 1-6 -->
+        <tr>
+            <td class="comorb-label" rowspan="6">COMORBILIDADES</td>
+            <td class="comorb-fila">
+                <span class="comorb-num-inline">1.</span>
+                
+            </td>
+            <td class="codigo-cie-fila">
+                <div class="box-cie">
+                    <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="comorb-fila">
+                <span class="comorb-num-inline">2.</span>
+                
+            </td>
+            <td class="codigo-cie-fila">
+                <div class="box-cie">
+                    <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="comorb-fila">
+                <span class="comorb-num-inline">3.</span>
+                
+            </td>
+            <td class="codigo-cie-fila">
+                <div class="box-cie">
+                    <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="comorb-fila">
+                <span class="comorb-num-inline">4.</span>
+                
+            </td>
+            <td class="codigo-cie-fila">
+                <div class="box-cie">
+                    <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="comorb-fila">
+                <span class="comorb-num-inline">5.</span>
+                
+            </td>
+            <td class="codigo-cie-fila">
+                <div class="box-cie">
+                    <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="comorb-fila">
+                <span class="comorb-num-inline">6.</span>
+                
+            </td>
+            <td class="codigo-cie-fila">
+                <div class="box-cie">
+                    <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Fila 10: RESELECCIÓN -->
+        <tr>
+            <td class="reseleccion-contenido" colspan="2">
+                <div class="reseccion-linea"></div>
+                <div class="reseccion-label">RESELECCIÓN AF. P.</div>
+            </td>
+            <td class="codigo-cie-col">
+                <div class="box-cie">
+                    <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- ========== BLOQUE 7b: CAUSA EXTERNA ========== -->
+<table class="sinba-causa-externa">
+    <colgroup>
+        <col style="width: 22px;">
+        <col>
+        <col style="width: 90px;">
+        <col style="width: 22px;">
+    </colgroup>
+
+    <!-- Fila 1: CAUSA EXTERNA -->
+    <tr>
+        <td class="causa-externa-label" rowspan="2"></td>
+        <td class="causa-contenido">
+            <span class="etq-causa">CAUSA EXTERNA (Especifique los acontecimientos, circunstancias y condiciones que causan la lesión):</span>
+            <div class="causa-linea"></div>
+        </td>
+        <td class="codigo-cie-col">
+            <div class="box-cie">
+                <div class="casillas-cie">
+                    {% for i in range(4) %}<span class="casilla"></span>{% endfor %}
+                </div>
+            </div>
+        </td>
+        <td class="texto-uso-codificador-vacio"></td>
+    </tr>
+
+    <!-- Fila 2: LLENADO HOJA VIOLENCIA / FOLIO -->
+    <tr>
+        <td class="causa-violencia-contenido">
+            <span class="etq-causa-fuerte">LLENADO DE HOJA DE ATENCIÓN POR VIOLENCIA Y/O LESIÓN:</span>
+            <span class="sexo-opcion"><span class="casilla-num"></span> <em>Sí</em></span>
+            <span class="sexo-opcion"><span class="casilla-num"></span> <em>No</em></span>
+
+            <span class="etq-causa-fuerte" style="margin-left: 30px;">FOLIO DE LA HOJA DE LESIONES:</span>
+            <span class="casillas">
+                {% for i in range(8) %}<span class="casilla"></span>{% endfor %}
+            </span>
+        </td>
+        <td class="codigo-cie-col-vacio"></td>
+        <td class="texto-uso-codificador-vacio"></td>
+    </tr>
+</table>
+<!-- ===== fin Bloque 7 + 7b ===== -->
+
+<!-- ========== BLOQUE 8: INTERCONSULTAS ========== -->
+<table class="sinba-interconsulta">
+    <colgroup>
+        <col style="width: 24px;">
+        <col style="width: 26px;">
+        <col style="width: 34px;">
+        <col style="width: 170px;">
+        <col>
+    </colgroup>
+
+    <!-- Fila 1: encabezado + fila del 1 -->
+    <tr>
+        <td class="vert-interconsulta" rowspan="4">INTERCONSULTA</td>
+        <td class="vert-ninguna" rowspan="4">
+            <span class="check-box-ninguna"></span>
+            <span class="txt-ninguna">NINGUNA</span>
+        </td>
+        <td class="num-cell"><strong></strong></td>
+        <td class="head-especialidad">ESPECIALIDAD</td>
+        <td class="head-medico">MEDICA(O) INTERCONSULTANTE</td>
+    </tr>
+
+    <!-- Fila 2: contenido del médico 1 -->
+    <tr>
+        <td class="num-cell"><strong>1.</strong></td>
+        <td class="especialidad-cell"></td>
+        <td class="medico-cell">
+            <div class="cedula-row"><em>Cédula:</em> <span class="casillas">{% for i in range(8) %}<span class="casilla"></span>{% endfor %}</span></div>
+            <div class="nombres-row"><span>Nombre(s)</span><span>Primer Apellido</span><span>Segundo Apellido</span></div>
+            <div class="medico-linea"></div>
+            <div class="curp-row"><em>CURP:</em> <span class="casillas">{% for i in range(18) %}<span class="casilla"></span>{% endfor %}</span></div>
+        </td>
+    </tr>
+
+    <!-- Fila 3: médico 2 -->
+    <tr>
+        <td class="num-cell"><strong>2.</strong></td>
+        <td class="especialidad-cell"></td>
+        <td class="medico-cell">
+            <div class="cedula-row"><em>Cédula:</em> <span class="casillas">{% for i in range(8) %}<span class="casilla"></span>{% endfor %}</span></div>
+            <div class="nombres-row"><span>Nombre(s)</span><span>Primer Apellido</span><span>Segundo Apellido</span></div>
+            <div class="medico-linea"></div>
+            <div class="curp-row"><em>CURP:</em> <span class="casillas">{% for i in range(18) %}<span class="casilla"></span>{% endfor %}</span></div>
+        </td>
+    </tr>
+
+    <!-- Fila 4: médico 3 -->
+    <tr>
+        <td class="num-cell"><strong>3.</strong></td>
+        <td class="especialidad-cell"></td>
+        <td class="medico-cell">
+            <div class="cedula-row"><em>Cédula:</em> <span class="casillas">{% for i in range(8) %}<span class="casilla"></span>{% endfor %}</span></div>
+            <div class="nombres-row"><span>Nombre(s)</span><span>Primer Apellido</span><span>Segundo Apellido</span></div>
+            <div class="medico-linea"></div>
+            <div class="curp-row"><em>CURP:</em> <span class="casillas">{% for i in range(18) %}<span class="casilla"></span>{% endfor %}</span></div>
+        </td>
+    </tr>
+</table>
+<!-- ===== fin Bloque 8 ===== -->
+
+<!-- ========== BLOQUE 9: PROCEDIMIENTOS ========== -->
+<table class="sinba-procedimientos">
+    <colgroup>
+        <col style="width: 20px;">
+        <col style="width: 30px;">
+        <col>
+        <col style="width: 90px;">
+        <col style="width: 18px;">
+    </colgroup>
+
+    <!-- Encabezado -->
+    <tr>
+        <td class="proc-label-head"></td>
+        <td class="proc-num-head"></td>
+        <td class="proc-head"></td>
+        <td class="codigo-cie-header">CÓDIGO CIE - 9 MC</td>
+        <td class="uso-codificador-head"></td>
+    </tr>
+
+    <!-- Fila 1 -->
+    <tr>
+        <td class="proc-label" rowspan="5">PROCEDIMIENTOS</td>
+        <td class="proc-num"><strong>1.</strong></td>
+        <td class="proc-linea-cell"></td>
+        <td class="codigo-cie-col">
+            <div class="box-cie">
+                <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+            </div>
+        </td>
+        <td class="texto-uso-codificador" rowspan="5">
+            Para uso exclusivo de personal codificador
+        </td>
+    </tr>
+
+    <!-- Fila 2 -->
+    <tr>
+        <td class="proc-num"><strong>2.</strong></td>
+        <td class="proc-linea-cell"></td>
+        <td class="codigo-cie-col">
+            <div class="box-cie">
+                <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+            </div>
+        </td>
+    </tr>
+
+    <!-- Fila 3 -->
+    <tr>
+        <td class="proc-num"><strong>3.</strong></td>
+        <td class="proc-linea-cell"></td>
+        <td class="codigo-cie-col">
+            <div class="box-cie">
+                <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+            </div>
+        </td>
+    </tr>
+
+    <!-- Fila 4 -->
+    <tr>
+        <td class="proc-num"><strong>4.</strong></td>
+        <td class="proc-linea-cell"></td>
+        <td class="codigo-cie-col">
+            <div class="box-cie">
+                <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+            </div>
+        </td>
+    </tr>
+
+    <!-- Fila 5 -->
+    <tr>
+        <td class="proc-num"><strong>5.</strong></td>
+        <td class="proc-linea-cell"></td>
+        <td class="codigo-cie-col">
+            <div class="box-cie">
+                <div class="casillas-cie">{% for i in range(4) %}<span class="casilla"></span>{% endfor %}</div>
+            </div>
+        </td>
+    </tr>
+</table>
+<!-- ===== fin Bloque 9 ===== -->
+
+<!-- ========== BLOQUE 10: MEDICAMENTOS SUMINISTRADOS ========== -->
+<table class="sinba-medicamentos">
+    <colgroup>
+        <col style="width: 18px;">
+        <col style="width: 28px;">
+        <col style="width: 250px;">
+        <col style="width: 220px;">
+        <col style="width: 100px;">
+        <col>
+    </colgroup>
+
+    <!-- Encabezados -->
+    <tr>
+        <td class="med-head-vacio"></td>
+        <td class="med-head-vacio"></td>
+        <td class="med-head">Nombre genérico</td>
+        <td class="med-head">Presentación</td>
+        <td class="med-head">CÓDIGO DE<br>MEDICAMENTOS</td>
+        <td class="med-head-vacio"></td>
+    </tr>
+
+    <!-- Fila 1 -->
+    <tr class="med-fila">
+        <td class="med-label" rowspan="6">MEDICAMENTOS SUMINISTRADOS</td>
+        <td class="med-num"><strong>1.</strong></td>
+        <td class="med-linea"></td>
+        <td class="med-linea"></td>
+        <td class="med-codigo">
+            <div class="med-caja">
+                {% for r in range(1) %}
+                <div class="med-casillas">{% for i in range(9) %}<span class="casilla"></span>{% endfor %}</div>
+                {% endfor %}
+            </div>
+        </td>
+        <td class="med-edad-fert" rowspan="6">
+            <div class="edades-titulo">Para menores de 5 años</div>
+            <div class="edades-cols">
+                <div class="edades-col-izq">
+                    <div class="edades-subtitulo">IRAS</div>
+                    <div class="edad-opcion"><span class="casilla-check"></span> <em>Sintomático</em></div>
+                    <div class="edad-opcion"><span class="casilla-check"></span> <em>Con antibiótico</em></div>
+                    <div class="edad-opcion"><span class="casilla-check"></span> <em>Antivirales</em></div>
+                </div>
+                <div class="edades-col-der">
+                    <div class="edades-subtitulo">EDAS</div>
+                    <div class="edades-plan-titulo">Plan</div>
+                    <div class="edades-planes">
+                        <span class="casilla-plan">A</span>
+                        <span class="casilla-plan">B</span>
+                        <span class="casilla-plan">C</span>
+                    </div>
+                    <div class="edades-sobres">
+                        <strong>Número de sobres</strong>
+                        <span class="casillas">{% for i in range(2) %}<span class="casilla"></span>{% endfor %}</span>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+
+    <!-- Filas 2-6 -->
+    <tr class="med-fila">
+        <td class="med-num"><strong>2.</strong></td>
+        <td class="med-linea"></td>
+        <td class="med-linea"></td>
+        <td class="med-codigo">
+            <div class="med-caja">
+                {% for r in range(1) %}
+                <div class="med-casillas">{% for i in range(9) %}<span class="casilla"></span>{% endfor %}</div>
+                {% endfor %}
+            </div>
+        </td>
+    </tr>
+    <tr class="med-fila">
+        <td class="med-num"><strong>3.</strong></td>
+        <td class="med-linea"></td>
+        <td class="med-linea"></td>
+        <td class="med-codigo">
+            <div class="med-caja">
+                {% for r in range(1) %}
+                <div class="med-casillas">{% for i in range(9) %}<span class="casilla"></span>{% endfor %}</div>
+                {% endfor %}
+            </div>
+        </td>
+    </tr>
+    <tr class="med-fila">
+        <td class="med-num"><strong>4.</strong></td>
+        <td class="med-linea"></td>
+        <td class="med-linea"></td>
+        <td class="med-codigo">
+            <div class="med-caja">
+                {% for r in range(1) %}
+                <div class="med-casillas">{% for i in range(9) %}<span class="casilla"></span>{% endfor %}</div>
+                {% endfor %}
+            </div>
+        </td>
+    </tr>
+    <tr class="med-fila">
+        <td class="med-num"><strong>5.</strong></td>
+        <td class="med-linea"></td>
+        <td class="med-linea"></td>
+        <td class="med-codigo">
+            <div class="med-caja">
+                {% for r in range(1) %}
+                <div class="med-casillas">{% for i in range(9) %}<span class="casilla"></span>{% endfor %}</div>
+                {% endfor %}
+            </div>
+        </td>
+    </tr>
+    <tr class="med-fila">
+        <td class="med-num"><strong>6.</strong></td>
+        <td class="med-linea"></td>
+        <td class="med-linea"></td>
+        <td class="med-codigo">
+            <div class="med-caja">
+                {% for r in range(1) %}
+                <div class="med-casillas">{% for i in range(9) %}<span class="casilla"></span>{% endfor %}</div>
+                {% endfor %}
+            </div>
+        </td>
+    </tr>
+
+    <!-- Pie de la columna CÓDIGO -->
+    <tr class="med-pie">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="med-pie-texto" colspan="1">Para uso exclusivo del personal codificador</td>
+        <td></td>
+    </tr>
+</table>
+<!-- ===== fin Bloque 10 ===== -->
+
+<!-- ========== BLOQUE 11: PROFESIONAL DE LA SALUD RESPONSABLE ========== -->
+<table class="sinba-profesional">
+    <colgroup>
+        <col style="width: 25px;">
+        <col>
+    </colgroup>
+
+    <!-- Título sección -->
+    <tr>
+        <td colspan="2" class="prof-titulo">PROFESIONAL DE LA SALUD RESPONSABLE:</td>
+    </tr>
+
+    <!-- NOMBRE -->
+    <tr>
+        <td class="prof-etq">NOMBRE:</td>
+        <td class="prof-nombre-cell">
+            <div class="prof-nombre-linea"></div>
+            <div class="prof-nombre-sublabels">
+                <span>Nombre(s)</span>
+                <span>Primer Apellido</span>
+                <span>Segundo Apellido</span>
+            </div>
+        </td>
+    </tr>
+
+    <!-- C.U.R.P. + CÉDULA + FIRMA -->
+    <tr>
+        <td class="prof-etq">C.U.R.P.:</td>
+        <td class="prof-campos-cell">
+            <div class="prof-campos-inner">
+
+                <span class="casillas">
+                    {% for i in range(18) %}<span class="casilla"></span>{% endfor %}
+                </span>
+
+                <span class="etq-campo">CÉDULA PROFESIONAL:</span>
+                <span class="casillas">
+                    {% for i in range(8) %}<span class="casilla"></span>{% endfor %}
+                </span>
+
+                <span class="etq-campo">FIRMA:</span>
+                <span class="firma-linea"></span>
+
+            </div>
+        </td>
+    </tr>
+
+    <!-- SEUL - 2026 al pie derecha -->
+    <tr>
+        <td colspan="2" class="prof-seul">SEUL - 2026</td>
+    </tr>
+</table>
+<!-- ===== fin Bloque 11 ===== -->
+
+    <!-- ====== SIGUIENTES BLOQUES SE AGREGAN AQUÍ ====== -->
+
+</div>
+
+    <div class="botones no-print">
+        <button onclick="window.print()">🖨 Imprimir</button>
+        <a href="/formato2" class="boton secundario">← Nuevo</a>
+    </div>
+    {% endif %}
+
+</div>
+</body>
+</html>

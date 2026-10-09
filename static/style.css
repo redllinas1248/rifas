@@ -26,10 +26,7 @@ h1 { font-size: 20px; margin-top: 0; }
 /* ===================================================
    FORMULARIO DE ENTRADA
    =================================================== */
-.formulario label {
-    display: block;
-    margin-bottom: 14px;
-}
+.formulario label { display: block; margin-bottom: 14px; }
 .formulario span {
     display: block;
     font-size: 13px;
@@ -37,18 +34,7 @@ h1 { font-size: 20px; margin-top: 0; }
     margin-bottom: 4px;
     font-weight: 600;
 }
-.formulario input {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-}
-.formulario input:focus {
-    outline: none;
-    border-color: #1976d2;
-    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.15);
-}
+.formulario input,
 .formulario textarea {
     width: 100%;
     padding: 8px 10px;
@@ -56,9 +42,12 @@ h1 { font-size: 20px; margin-top: 0; }
     border-radius: 6px;
     font-size: 14px;
     font-family: inherit;
+}
+.formulario textarea {
     resize: vertical;
     min-height: 60px;
 }
+.formulario input:focus,
 .formulario textarea:focus {
     outline: none;
     border-color: #1976d2;
@@ -93,7 +82,30 @@ button:hover, .boton:hover { background: #135ba1; }
 }
 
 /* ===================================================
-   FORMATO DE TRIAGE (vista tipo documento)
+   PESTAÑAS DE NAVEGACIÓN
+   =================================================== */
+.tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #1976d2;
+}
+.tabs .tab {
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #1976d2;
+    border: 1px solid #1976d2;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    background: #eef4fb;
+    font-weight: 600;
+    font-size: 14px;
+}
+.tabs .tab.activo { background: #1976d2; color: #fff; }
+.tabs .tab:hover:not(.activo) { background: #d9e7f7; }
+
+/* ===================================================
+   FORMATO 1 - TRIAGE
    =================================================== */
 .formato {
     font-family: "Times New Roman", Times, serif;
@@ -103,15 +115,11 @@ button:hover, .boton:hover { background: #135ba1; }
     background: #fff;
 }
 
-/* ===================================================
-   TABLA 1: ENCABEZADO (logos + títulos + fundamento)
-   =================================================== */
 .tabla-encabezado {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
 }
-
 .tabla-encabezado .celda-logos {
     width: 38%;
     border: 1px solid #000;
@@ -119,13 +127,11 @@ button:hover, .boton:hover { background: #135ba1; }
     vertical-align: middle;
     text-align: left;
 }
-
 .tabla-encabezado .logo {
     max-height: 60px;
     max-width: 100%;
     object-fit: contain;
 }
-
 .tabla-encabezado .celda-titulos {
     width: 62%;
     border: 1px solid #000;
@@ -133,20 +139,17 @@ button:hover, .boton:hover { background: #135ba1; }
     vertical-align: middle;
     text-align: center;
 }
-
 .tabla-encabezado .titulo-linea {
     font-size: 12.5px;
     font-weight: bold;
     letter-spacing: 0.3px;
     line-height: 1.35;
 }
-
 .tabla-encabezado .subtitulo-linea {
     font-size: 11.5px;
     font-weight: normal;
     margin-top: 2px;
 }
-
 .tabla-encabezado .celda-fundamento {
     border: 1px solid #000;
     padding: 5px 8px;
@@ -155,16 +158,12 @@ button:hover, .boton:hover { background: #135ba1; }
     line-height: 1.35;
 }
 
-/* ===================================================
-   TABLA 2: DATOS DEL PACIENTE
-   =================================================== */
 .tabla-datos {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
     margin-top: -1px;
 }
-
 .tabla-datos .celda {
     border: 1px solid #000;
     padding: 5px 7px 6px;
@@ -172,8 +171,6 @@ button:hover, .boton:hover { background: #135ba1; }
     font-size: 12px;
     line-height: 1.4;
 }
-
-/* --- Celdas con etiqueta y valor en la MISMA línea --- */
 .tabla-datos .celda-inline {
     border: 1px solid #000;
     padding: 5px 7px;
@@ -183,28 +180,23 @@ button:hover, .boton:hover { background: #135ba1; }
     word-break: break-word;
     overflow: hidden;
 }
-
 .tabla-datos .etiqueta-inline {
     font-weight: bold;
     font-size: 11.5px;
     margin-right: 4px;
 }
-
 .tabla-datos .valor-inline {
     font-weight: normal;
     font-size: 12px;
     display: inline;
     word-break: break-word;
 }
-
-/* --- Celdas con etiqueta arriba y espacio abajo --- */
 .tabla-datos .etiqueta {
     display: block;
     font-weight: bold;
     font-size: 11.5px;
     margin-bottom: 1px;
 }
-
 .tabla-datos .valor {
     display: block;
     min-height: 1.1em;
@@ -213,14 +205,10 @@ button:hover, .boton:hover { background: #135ba1; }
     font-size: 12px;
     word-break: break-word;
 }
-
-/* --- Celda vacía sin etiqueta --- */
 .tabla-datos .celda-vacia {
     border: 1px solid #000;
     padding: 5px 7px;
 }
-
-/* --- Rótulo TRIAGE centrado --- */
 .tabla-datos .celda-triage {
     border: 1px solid #000;
     padding: 3px;
@@ -230,8 +218,6 @@ button:hover, .boton:hover { background: #135ba1; }
     letter-spacing: 5px;
     background: #fff;
 }
-
-/* --- Título de sección (NOTA MÉDICA INICIAL) --- */
 .tabla-datos .celda-titulo-seccion {
     border: 1px solid #000;
     padding: 6px;
@@ -241,12 +227,6 @@ button:hover, .boton:hover { background: #135ba1; }
     letter-spacing: 2px;
     background: #f0f0f0;
 }
-
-/* ===================================================
-   NOTA MÉDICA INICIAL - bloques y firmas
-   =================================================== */
-
-/* Fila de bloque completo con espacio para escribir */
 .tabla-datos .celda-bloque {
     border: 1px solid #000;
     padding: 6px 8px 8px;
@@ -254,23 +234,17 @@ button:hover, .boton:hover { background: #135ba1; }
     font-size: 12px;
     line-height: 1.4;
 }
-
-/* Celda única que contiene varios sub-bloques apilados */
 .tabla-datos .celda-bloque-unificado {
     border: 1px solid #000;
     padding: 0;
     vertical-align: top;
 }
-
 .sub-bloque {
     padding: 12px 8px 12px;
     border-bottom: 1px dotted #000;
 }
-.sub-bloque:last-child {
-    border-bottom: none;
-}
+.sub-bloque:last-child { border-bottom: none; }
 
-/* Espacio para escribir dentro de un bloque (línea punteada) */
 .espacio-escritura {
     border-bottom: 1px dotted #000;
     margin-top: 6px;
@@ -281,25 +255,18 @@ button:hover, .boton:hover { background: #135ba1; }
     word-break: break-word;
     white-space: pre-wrap;
 }
-.espacio-escritura.grande {
-    height: 20px;
-}
+.espacio-escritura.grande { height: 20px; }
 
-/* ===================================================
-   SIGNOS VITALES (tabla anidada en una sola fila horizontal)
-   =================================================== */
 .tabla-datos .celda-signos-contenedor {
     border: 1px solid #000;
     padding: 0;
     vertical-align: top;
 }
-
 .tabla-signos {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
 }
-
 .tabla-signos .celda-signo {
     border-right: 1px solid #000;
     border-bottom: none;
@@ -309,18 +276,9 @@ button:hover, .boton:hover { background: #135ba1; }
     line-height: 1.3;
     word-break: break-word;
 }
-.tabla-signos .celda-signo:last-child {
-    border-right: none;
-}
+.tabla-signos .celda-signo:last-child { border-right: none; }
+.etiqueta-signo { font-weight: bold; font-size: 11.5px; }
 
-.etiqueta-signo {
-    font-weight: bold;
-    font-size: 11.5px;
-}
-
-/* ===================================================
-   NIVEL DE GRAVEDAD
-   =================================================== */
 .opciones-gravedad {
     display: flex;
     justify-content: space-between;
@@ -329,7 +287,6 @@ button:hover, .boton:hover { background: #135ba1; }
     font-size: 11px;
     font-weight: bold;
 }
-
 .opciones-gravedad span {
     border: 1px solid #000;
     padding: 3px 10px;
@@ -339,30 +296,2185 @@ button:hover, .boton:hover { background: #135ba1; }
 }
 
 /* ===================================================
+   FORMATO 2 - SINBA
+   =================================================== */
+.formato-sinba {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #000;
+    font-size: 9px;
+    line-height: 1.3;
+    background: #fff;
+}
+
+/* --- Comunes SINBA --- */
+.casillas { display: inline-flex; vertical-align: middle; }
+.casilla {
+    display: inline-block;
+    width: 13px;
+    height: 16px;
+    border: 1px solid #000;
+    border-right: none;
+    text-align: center;
+    line-height: 14px;
+    font-size: 10px;
+    font-weight: bold;
+    background: #fff;
+}
+.casilla:last-child { border-right: 1px solid #000; }
+
+.etq-clues {
+    font-size: 9px;
+    font-weight: bold;
+    margin-right: 4px;
+    vertical-align: top;
+}
+
+.sexo-opcion {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-right: 6px;
+    font-size: 7.5px;
+    white-space: nowrap;
+}
+.sexo-opcion em { font-style: italic; }
+.casilla-num {
+    display: inline-block;
+    width: 12px;
+    height: 14px;
+    border: 1px solid #000;
+    text-align: center;
+    line-height: 12px;
+    font-size: 8px;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+/* ===== BLOQUE 1: ENCABEZADO ===== */
+.sinba-encabezado { width: 100%; border-collapse: collapse; }
+.sinba-encabezado .celda-logos {
+    width: 30%;
+    vertical-align: middle;
+    padding: 2px 4px;
+}
+.sinba-encabezado .logo-salud {
+    max-height: 75px;
+    max-width: 100%;
+    object-fit: contain;
+}
+.sinba-encabezado .celda-titulo {
+    width: 50%;
+    text-align: center;
+    vertical-align: middle;
+}
+.sinba-encabezado .titulo-sinba {
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+.sinba-encabezado .subtitulo-sinba {
+    font-size: 11px;
+    font-weight: bold;
+    margin-top: 4px;
+}
+.sinba-encabezado .celda-espacio { width: 20%; }
+
+.sinba-clues-folio {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+.sinba-clues-folio .celda-clues {
+    width: 50%;
+    text-align: left;
+    vertical-align: top;
+    padding: 2px 0;
+}
+.sinba-clues-folio .celda-folio {
+    width: 50%;
+    text-align: right;
+    vertical-align: top;
+    padding: 2px 0;
+}
+.clues-grupos { display: inline-flex; gap: 6px; vertical-align: top; }
+.clues-grupo { display: inline-block; text-align: center; }
+.clues-label {
+    display: block;
+    font-size: 7px;
+    font-weight: bold;
+    margin-top: 1px;
+}
+
+/* ===== BLOQUE 2: IDENTIFICACIÓN PERSONAL ===== */
+.sinba-bloque2 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 6px 8px;
+    font-size: 8px;
+}
+.sinba-bloque2 .sinba-fila {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    font-size: 9px;
+    flex-wrap: wrap;
+}
+.campo-nombre { flex: 1; display: flex; flex-direction: column; }
+.valor-nombre {
+    border-bottom: 1px solid #000;
+    padding: 1px 4px 1px;
+    min-height: 12px;
+    font-size: 10px;
+}
+.subtitulos-nombre {
+    display: flex;
+    justify-content: space-between;
+    font-size: 6.5px;
+    color: #333;
+    margin-top: 1px;
+    padding: 0 4px;
+}
+.valor-linea {
+    border-bottom: 1px solid #000;
+    padding: 1px 4px 1px;
+    min-height: 12px;
+    font-size: 10px;
+    flex: 0 0 100px;
+}
+.valor-linea.corta { flex: 0 0 80px; }
+
+.grupo-fecha { display: inline-block; text-align: center; vertical-align: top; margin-left: 4px; }
+.grupo-fecha .casillas { display: inline-flex; }
+.etq-fecha {
+    display: block;
+    font-size: 6.5px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 1px;
+    line-height: 1;
+}
+
+.grupo-edad {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+.etq-edad {
+    font-size: 6.5px;
+    font-style: italic;
+    color: #333;
+    white-space: nowrap;
+}
+
+.sinba-bloque2 .sinba-fila        { font-size: 8px; }
+.sinba-bloque2 .etq-clues         { font-size: 8px; }
+.sinba-bloque2 .valor-nombre      { font-size: 8.5px; }
+.sinba-bloque2 .valor-linea       { font-size: 8.5px; }
+.sinba-bloque2 .subtitulos-nombre { font-size: 6px; }
+.sinba-bloque2 .etq-fecha         { font-size: 6px; }
+.sinba-bloque2 .casilla           { font-size: 9px; line-height: 13px; width: 12px; height: 15px; }
+
+/* ===== BLOQUE 3: DOMICILIO ===== */
+.sinba-domicilio {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+    border: 2px solid #000;
+    margin-bottom: 10px;
+}
+.sinba-domicilio .domicilio-label {
+    width: 18px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-weight: bold;
+    font-size: 9px;
+    letter-spacing: 1px;
+    background: #f5f5f5;
+    border-right: 1px solid #000;
+    padding: 4px 0;
+}
+.sinba-domicilio .domicilio-celda {
+    padding: 5px 8px;
+    border-bottom: 1px solid #000;
+    vertical-align: middle;
+}
+.sinba-domicilio tr:last-child .domicilio-celda { border-bottom: none; }
+
+.sinba-fila-domicilio {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    flex-wrap: nowrap;
+    font-size: 8px;
+}
+.sinba-fila-domicilio .etq-clues { font-size: 8px; }
+.sinba-fila-domicilio .valor-linea {
+    border-bottom: 1px solid #000;
+    padding: 1px 4px 1px;
+    min-height: 11px;
+    font-size: 9px;
+    min-width: 40px;
+}
+.sinba-fila-domicilio .valor-linea.largo { flex: 1 1 100px; }
+.sinba-fila-domicilio .valor-linea.medio { flex: 1 1 60px; }
+.sinba-fila-domicilio .valor-linea.corta { flex: 0 0 45px; }
+.sinba-fila-domicilio .casilla {
+    width: 11px;
+    height: 14px;
+    font-size: 8px;
+    line-height: 12px;
+}
+
+/* ===== BLOQUE 4: RASGOS ===== */
+.sinba-rasgos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.sinba-rasgos .rasgos-col {
+    width: 50%;
+    vertical-align: top;
+    padding: 6px 8px;
+    border-right: 1px solid #000;
+}
+.sinba-rasgos .rasgos-col:last-child { border-right: none; }
+.rasgo-item { margin-bottom: 8px; }
+.rasgo-item:last-child { margin-bottom: 0; }
+.rasgo-fila {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    font-size: 8px;
+}
+.rasgo-fila .etq-clues { font-size: 8px; font-weight: bold; margin-right: 4px; }
+.rasgo-nota {
+    font-size: 6px;
+    font-style: italic;
+    color: #333;
+    margin-top: 1px;
+    line-height: 1.2;
+}
+.rasgo-nota.centro { text-align: center; }
+
+/* ===== WRAPPER PACIENTE ===== */
+.sinba-paciente {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid #000;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.sinba-paciente .paciente-label {
+    width: 20px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-weight: bold;
+    font-size: 11px;
+    letter-spacing: 3px;
+    background: #f0f0f0;
+    border-right: 2px solid #000;
+    padding: 6px 0;
+    vertical-align: middle;
+}
+.sinba-paciente .paciente-contenido { padding: 0; vertical-align: top; }
+
+/* ===== BLOQUE 5: ESTANCIA ===== */
+.sinba-estancia-wrapper {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+    margin-bottom: 10px;
+    border: 2px solid #000;
+}
+.sinba-estancia-wrapper .estancia-label {
+    width: 20px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-weight: bold;
+    font-size: 10px;
+    letter-spacing: 3px;
+    background: #f0f0f0;
+    border-right: 2px solid #000;
+    padding: 6px 0;
+    vertical-align: middle;
+}
+.sinba-estancia-wrapper .estancia-contenido { padding: 6px 8px; vertical-align: top; }
+
+.estancia-fila {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    font-size: 8px;
+    padding: 3px 0;
+    border-bottom: 1px dotted #ccc;
+}
+.estancia-fila:last-child { border-bottom: none; }
+.estancia-fila .etq-clues { font-size: 8px; font-weight: bold; }
+.dos-puntos { font-size: 10px; font-weight: bold; vertical-align: middle; }
+.grupo-tiempo {
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    margin: 0 2px;
+}
+.grupo-tiempo .casillas { display: inline-flex; }
+.etq-tiempo {
+    display: block;
+    font-size: 6px;
+    font-style: italic;
+    margin-top: 1px;
+    line-height: 1;
+}
+.alta-por-bloque { padding: 3px 0; border-bottom: 1px dotted #ccc; }
+.alta-fila {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    font-size: 8px;
+    padding: 2px 0;
+}
+.linea-conectora {
+    display: inline-block;
+    width: 12px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 10px;
+}
+.unidad-medica-bloque { display: inline-flex; align-items: center; gap: 4px; flex: 1; }
+.sinba-estancia-wrapper .valor-linea {
+    border-bottom: 1px solid #000;
+    padding: 1px 4px 1px;
+    min-height: 11px;
+    font-size: 9px;
+    min-width: 60px;
+}
+.sinba-estancia-wrapper .valor-linea.largo { flex: 1 1 150px; }
+.sinba-estancia-wrapper .casilla {
+    width: 11px;
+    height: 14px;
+    font-size: 8px;
+    line-height: 12px;
+}
+
+/* ===== BLOQUE 7: AFECCIONES TRATADAS ===== */
+.sinba-afecciones {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid #000;
+    margin-top: 10px;
+    margin-bottom: 0;
+    table-layout: fixed;
+}
+.sinba-afecciones .head-vacio {
+    border: none;
+    background: transparent;
+    height: 0;
+    padding: 0;
+}
+.sinba-afecciones .codigo-cie-header {
+    text-align: center;
+    font-size: 8px;
+    font-weight: bold;
+    padding: 4px 0;
+    background: #e0e0e0;
+    border: 1px solid #000;
+}
+.sinba-afecciones .afecciones-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-weight: bold;
+    font-size: 9px;
+    letter-spacing: 2px;
+    background: #d9d9d9;
+    border-right: 2px solid #000;
+    padding: 6px 0;
+    vertical-align: middle;
+}
+.sinba-afecciones .ap-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-weight: bold;
+    font-size: 8px;
+    background: #f0f0f0;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    padding: 4px 0;
+    vertical-align: middle;
+}
+.sinba-afecciones .comorb-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-weight: bold;
+    font-size: 8px;
+    letter-spacing: 1px;
+    background: #f0f0f0;
+    border-right: 1px solid #000;
+    padding: 4px 0;
+    vertical-align: middle;
+}
+.sinba-afecciones .afeccion-contenido {
+    padding: 6px 10px;
+    vertical-align: top;
+    border-bottom: 1px solid #000;
+}
+.etq-ap {
+    font-size: 8px;
+    font-weight: bold;
+    font-style: italic;
+    display: block;
+    margin-bottom: 14px;
+}
+.ap-linea { border-bottom: 1px solid #000; height: 14px; }
+.sinba-afecciones .comorb-contenido {
+    padding: 0;
+    vertical-align: top;
+    border-bottom: 1px solid #000;
+}
+.comorb-inner { width: 100%; border-collapse: collapse; }
+.comorb-inner .comorb-num {
+    width: 25px;
+    text-align: left;
+    font-size: 9px;
+    font-weight: bold;
+    padding: 7px 6px;
+    vertical-align: middle;
+    border-bottom: 1px solid #000;
+    border-right: 1px solid #000;
+}
+.comorb-inner tr:last-child .comorb-num { border-bottom: none; }
+.comorb-inner .comorb-linea { border-bottom: 1px solid #000; height: 14px; }
+.comorb-inner tr:last-child .comorb-linea { border-bottom: none; }
+
+.codigo-cie-col {
+    text-align: center;
+    padding: 4px;
+    vertical-align: middle;
+    border-left: 1px solid #000;
+    border-bottom: 1px solid #000;
+}
+.box-cie {
+    border: 1px solid #000;
+    padding: 4px 0;
+    background: #e0e0e0;
+    display: block;
+}
+.box-cie-grande { padding: 3px 0; }
+.casillas-cie { display: flex; justify-content: center; gap: 0; margin: 3px 0; }
+.box-cie-grande .casillas-cie { margin: 2px 0; }
+.casillas-cie .casilla {
+    width: 11px;
+    height: 14px;
+    font-size: 8px;
+    line-height: 12px;
+    background: #fff;
+}
+.texto-uso-codificador {
+    writing-mode: vertical-rl;
+    text-align: center;
+    font-size: 7px;
+    font-style: italic;
+    font-weight: bold;
+    color: #333;
+    background: #e0e0e0;
+    border-left: 1px solid #000;
+    padding: 4px 2px;
+    vertical-align: middle;
+}
+.reseleccion-contenido {
+    padding: 6px 10px;
+    vertical-align: middle;
+    position: relative;
+    min-height: 40px;
+}
+.reseccion-linea { border-bottom: 1px solid #000; height: 14px; margin-bottom: 8px; }
+.reseccion-label {
+    display: inline-block;
+    font-size: 8px;
+    font-weight: bold;
+    background: #e0e0e0;
+    padding: 3px 8px;
+    border: 1px solid #000;
+    float: right;
+}
+
+/* ===== BLOQUE 7b: CAUSA EXTERNA ===== */
+.sinba-causa-externa {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid #000;
+    border-top: none;
+    margin-top: 0;
+    margin-bottom: 10px;
+    table-layout: fixed;
+}
+.sinba-causa-externa .causa-externa-label {
+    background: #d9d9d9;
+    border-right: 2px solid #000;
+}
+.sinba-causa-externa .causa-contenido {
+    padding: 6px 10px 12px;
+    vertical-align: top;
+    border-bottom: 1px solid #000;
+    border-right: 1px solid #000;
+}
+.etq-causa {
+    font-size: 8px;
+    font-weight: bold;
+    font-style: italic;
+    display: block;
+    margin-bottom: 16px;
+}
+.causa-linea { border-bottom: 1px solid #000; height: 14px; }
+.sinba-causa-externa .causa-violencia-contenido {
+    padding: 6px 10px;
+    vertical-align: middle;
+    font-size: 8px;
+    border-right: 1px solid #000;
+}
+.etq-causa-fuerte { font-size: 8px; font-weight: bold; margin-right: 4px; }
+.sinba-causa-externa .codigo-cie-col-vacio { border-bottom: none; border-left: 1px solid #000; }
+.sinba-causa-externa .texto-uso-codificador-vacio {
+    background: #e0e0e0;
+    border-left: 1px solid #000;
+}
+
+/* ===== BLOQUE 8: INTERCONSULTAS ===== */
+.sinba-interconsulta {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid #000;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    table-layout: fixed;
+}
+.sinba-interconsulta .vert-interconsulta {
+    background: #d9d9d9;
+    border-right: 1px solid #000;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-weight: bold;
+    font-size: 9px;
+    letter-spacing: 3px;
+    padding: 4px 0;
+    vertical-align: middle;
+}
+.sinba-interconsulta .vert-ninguna {
+    border-right: 1px solid #000;
+    text-align: center;
+    padding: 4px 0;
+    vertical-align: top;
+}
+.check-box-ninguna {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid #000;
+    background: #fff;
+    margin: 4px auto 6px;
+}
+.txt-ninguna {
+    display: block;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-weight: bold;
+    font-size: 8px;
+    letter-spacing: 2px;
+    margin: 0 auto;
+}
+.sinba-interconsulta .head-especialidad,
+.sinba-interconsulta .head-medico {
+    text-align: center;
+    font-size: 8px;
+    font-weight: bold;
+    font-style: italic;
+    padding: 3px 0;
+    background: #e0e0e0;
+    border: 1px solid #000;
+    border-top: none;
+}
+.sinba-interconsulta .num-cell {
+    text-align: center;
+    font-size: 9px;
+    font-weight: bold;
+    padding: 4px 2px;
+    vertical-align: top;
+    border-right: 1px solid #000;
+    border-top: 1px solid #000;
+}
+.sinba-interconsulta tr:first-child .num-cell { border-top: none; }
+.sinba-interconsulta .especialidad-cell {
+    border-right: 1px solid #000;
+    border-top: 1px solid #000;
+}
+.sinba-interconsulta tr:first-child .especialidad-cell { border-top: none; }
+.sinba-interconsulta .medico-cell {
+    padding: 3px 8px 4px;
+    vertical-align: top;
+    border-top: 1px solid #000;
+}
+.sinba-interconsulta tr:first-child .medico-cell { border-top: none; }
+.cedula-row {
+    text-align: right;
+    font-size: 7px;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+.cedula-row em { font-style: italic; margin-right: 3px; }
+.cedula-row .casillas { display: inline-flex; vertical-align: middle; }
+.cedula-row .casilla {
+    width: 11px; height: 13px;
+    font-size: 8px; line-height: 11px;
+    background: #e0e0e0;
+}
+.nombres-row {
+    display: flex;
+    justify-content: space-around;
+    font-size: 6.5px;
+    font-style: italic;
+    color: #333;
+    padding: 0 6px;
+    margin-top: 4px;
+}
+.medico-linea { border-bottom: 1px solid #000; height: 14px; margin: 2px 0 3px; }
+.curp-row { text-align: right; font-size: 7px; line-height: 1; }
+.curp-row em { font-style: italic; margin-right: 3px; }
+.curp-row .casillas { display: inline-flex; vertical-align: middle; }
+.curp-row .casilla {
+    width: 11px; height: 13px;
+    font-size: 8px; line-height: 11px;
+    background: #e0e0e0;
+}
+
+/* ===== BLOQUE 9: PROCEDIMIENTOS ===== */
+.sinba-procedimientos {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid #000;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    table-layout: fixed;
+}
+.sinba-procedimientos .proc-label-head,
+.sinba-procedimientos .proc-num-head,
+.sinba-procedimientos .proc-head {
+    border: none;
+    background: transparent;
+    height: 0;
+    padding: 0;
+}
+.sinba-procedimientos .codigo-cie-header {
+    text-align: center;
+    font-size: 8px;
+    font-weight: bold;
+    padding: 4px 0;
+    background: #e0e0e0;
+    border: 1px solid #000;
+}
+.sinba-procedimientos .uso-codificador-head { border: none; background: transparent; }
+.sinba-procedimientos .proc-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-weight: bold;
+    font-size: 9px;
+    letter-spacing: 2px;
+    background: #d9d9d9;
+    border-right: 2px solid #000;
+    padding: 6px 0;
+    vertical-align: middle;
+}
+.sinba-procedimientos .proc-num {
+    text-align: center;
+    font-size: 9px;
+    font-weight: bold;
+    padding: 8px 4px;
+    vertical-align: middle;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+}
+.sinba-procedimientos tr:last-child .proc-num { border-bottom: none; }
+.sinba-procedimientos .proc-linea-cell {
+    vertical-align: middle;
+    padding: 8px 10px;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+}
+.sinba-procedimientos tr:last-child .proc-linea-cell { border-bottom: none; }
+.sinba-procedimientos .proc-linea-cell::after {
+    content: "";
+    display: block;
+    border-bottom: 1px solid #000;
+    height: 1px;
+    margin-top: 10px;
+}
+.sinba-procedimientos .codigo-cie-col {
+    text-align: center;
+    padding: 4px 2px;
+    vertical-align: middle;
+    border-left: 1px solid #000;
+    border-bottom: 1px solid #000;
+}
+.sinba-procedimientos tr:last-child .codigo-cie-col { border-bottom: none; }
+.sinba-procedimientos .box-cie {
+    border: 1px solid #000;
+    padding: 3px 0;
+    background: #e0e0e0;
+    display: block;
+}
+.sinba-procedimientos .casillas-cie {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin: 2px 0;
+}
+.sinba-procedimientos .casillas-cie .casilla {
+    width: 11px;
+    height: 14px;
+    font-size: 8px;
+    line-height: 12px;
+    background: #fff;
+}
+.sinba-procedimientos .texto-uso-codificador {
+    writing-mode: vertical-rl;
+    text-align: center;
+    font-size: 7px;
+    font-style: italic;
+    font-weight: bold;
+    color: #333;
+    background: #e0e0e0;
+    border-left: 1px solid #000;
+    padding: 4px 2px;
+    vertical-align: middle;
+}
+
+/* ===== BLOQUE 10: MEDICAMENTOS ===== */
+.sinba-medicamentos {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid #000;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    table-layout: fixed;
+}
+.sinba-medicamentos .med-head {
+    text-align: center;
+    font-size: 8px;
+    font-weight: bold;
+    font-style: italic;
+    padding: 6px 0 2px;
+    background: transparent;
+    border: none;
+    vertical-align: bottom;
+    line-height: 1.2;
+}
+.sinba-medicamentos .med-head-vacio { border: none; background: transparent; }
+.sinba-medicamentos .med-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-weight: bold;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    background: #d9d9d9;
+    border-right: 2px solid #000;
+    padding: 6px 0;
+    vertical-align: middle;
+}
+.sinba-medicamentos .med-num {
+    text-align: center;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 8px 4px;
+    vertical-align: middle;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+}
+.sinba-medicamentos tr:last-child .med-num { border-bottom: none; }
+.sinba-medicamentos .med-linea {
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    vertical-align: middle;
+    padding: 8px 10px;
+}
+.sinba-medicamentos tr:last-child .med-linea { border-bottom: none; }
+.sinba-medicamentos .med-codigo {
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    text-align: center;
+    padding: 3px 4px;
+    vertical-align: middle;
+}
+.sinba-medicamentos tr:last-child .med-codigo { border-bottom: none; }
+.med-caja { display: inline-block; padding: 2px 1px; background: #e0e0e0; }
+.med-casillas { display: flex; justify-content: center; gap: 0; margin: 1px 0; }
+.med-casillas .casilla {
+    width: 12px;
+    height: 14px;
+    font-size: 8px;
+    line-height: 12px;
+    background: #fff;
+}
+.sinba-medicamentos .med-pie td { border: none; height: 0; padding: 0; }
+.sinba-medicamentos .med-pie-texto {
+    text-align: center;
+    font-size: 6.5px;
+    font-style: italic;
+    padding: 2px 0;
+    border: none;
+    white-space: nowrap;
+}
+.sinba-medicamentos .med-edad-fert {
+    padding: 6px 8px 6px 25px;
+    vertical-align: top;
+    border-left: 1px solid #000;
+    border-top: none;
+    border-bottom: none;
+    border-right: none;
+}
+.edades-titulo {
+    text-align: center;
+    font-size: 8px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.edades-cols { display: flex; gap: 25px; padding: 0 4px; }
+.edades-col-izq { flex: 1; min-width: 0; }
+.edades-col-der { flex: 1; min-width: 0; }
+.edades-subtitulo { font-size: 8px; font-weight: bold; margin-bottom: 5px; }
+.edad-opcion {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 7px;
+    margin-bottom: 6px;
+    white-space: nowrap;
+}
+.edad-opcion em { font-style: italic; }
+.casilla-check {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border: 1px solid #000;
+    background: #fff;
+    flex-shrink: 0;
+}
+.edades-plan-titulo { font-size: 7.5px; font-style: italic; margin-bottom: 3px; }
+.edades-planes { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: nowrap; }
+.casilla-plan {
+    display: inline-block;
+    width: 14px;
+    height: 16px;
+    border: 1px solid #000;
+    text-align: center;
+    line-height: 14px;
+    font-size: 9px;
+    background: #fff;
+    flex-shrink: 0;
+}
+.edades-sobres {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 7px;
+    flex-wrap: wrap;
+}
+.edades-sobres strong { font-size: 7px; line-height: 1.1; }
+.edades-sobres .casillas { display: inline-flex; flex-shrink: 0; }
+.edades-sobres .casilla { width: 12px; height: 14px; background: #fff; }
+
+/* ===== BLOQUE 11: PROFESIONAL DE LA SALUD ===== */
+.sinba-profesional {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid #000;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    table-layout: fixed;
+}
+.sinba-profesional .prof-titulo {
+    font-size: 8.5px;
+    font-weight: bold;
+    padding: 6px 10px;
+    border-bottom: 1px solid #000;
+    background: #fff;
+    text-align: left;
+}
+.sinba-profesional .prof-etq {
+    font-size: 8px;
+    font-weight: bold;
+    padding: 6px 6px;
+    vertical-align: middle;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    white-space: nowrap;
+}
+.sinba-profesional .prof-nombre-cell {
+    padding: 12px 10px 2px;
+    vertical-align: top;
+    border-bottom: 1px solid #000;
+}
+.prof-nombre-linea {
+    border-bottom: 1px solid #000;
+    height: 14px;
+    margin-top: 4px;
+    width: 90%;
+}
+.prof-nombre-sublabels {
+    display: flex;
+    justify-content: space-around;
+    font-size: 6.5px;
+    font-style: italic;
+    color: #333;
+    margin-top: 2px;
+    padding: 0 20px;
+}
+.sinba-profesional .prof-campos-cell {
+    padding: 6px 10px;
+    vertical-align: middle;
+    border-bottom: 1px solid #000;
+}
+.prof-campos-inner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    font-size: 8px;
+    padding-left: 6px;
+}
+.prof-campos-inner .casillas { display: inline-flex; flex-shrink: 0; }
+.prof-campos-inner .casilla {
+    width: 11px;
+    height: 15px;
+    font-size: 8px;
+    line-height: 13px;
+    background: #fff;
+}
+.etq-campo {
+    font-size: 8px;
+    font-weight: bold;
+    margin-left: 15px;
+    white-space: nowrap;
+}
+.firma-linea {
+    flex: 1;
+    border-bottom: 1px solid #000;
+    height: 14px;
+    margin-left: 4px;
+    min-width: 80px;
+}
+.sinba-profesional .prof-seul {
+    text-align: right;
+    font-size: 7px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border: none;
+}
+
+/* ===================================================
    IMPRESIÓN
    =================================================== */
 @media print {
-    body {
-        background: #fff;
-        padding: 0;
-        margin: 0;
-    }
-    .contenedor {
-        box-shadow: none;
-        border-radius: 0;
-        padding: 0;
-        max-width: 100%;
-    }
-    .formato { padding: 0; }
-    .no-print { display: none !important; }
-
-    .tabla-datos .celda-titulo-seccion {
-        background: #fff !important;
-        -webkit-print-color-adjust: exact;
-    }
 
     @page {
-        margin: 1cm;
-        size: letter;
+    margin: 0.5cm 1.0cm 1.0cm 1.0cm;
+    size: 21.6cm 33cm;   /* ancho × alto = oficio vertical */
+}
+    /* Pegar CLUES/FOLIO al bloque PACIENTE */
+    .sinba-clues-folio {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    .sinba-clues-folio .celda-clues,
+    .sinba-clues-folio .celda-folio {
+        padding-bottom: 0 !important;
+    }
+    .clues-label {
+        margin-top: 0 !important;
+        line-height: 1 !important;
+        font-size: 6px !important;
+    }
+    .sinba-paciente {
+        margin-top: 2px !important;
+    }
+
+    /* Reset total */
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        width: 100% !important;
+    }
+    .contenedor {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+
+    /* Ocultar elementos no imprimibles */
+    .no-print,
+    .tabs,
+    .botones,
+    button,
+    .boton,
+    .aviso-impresion,
+    .contenedor > h1,
+    .contenedor > .subtitulo {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Zoom del formato SINBA */
+    .formato-sinba {
+        zoom: 0.80;
+    }
+        /* ===== BLOQUE 2: COMPACTAR ===== */
+
+    /* Reducir espacio entre filas */
+    .sinba-bloque2 .sinba-fila {
+        gap: 3px !important;
+        margin-bottom: 3px !important;
+    }
+
+    /* Etiquetas generales un poco más chicas */
+    .sinba-bloque2 .etq-clues {
+        font-size: 7px !important;
+        margin-right: 3px !important;
+    }
+
+    /* --- CURP + FECHA + ENTIDAD: que quepan en 1 línea --- */
+    .sinba-bloque2 .casilla {
+        width: 9px !important;
+        height: 12px !important;
+        font-size: 7px !important;
+        line-height: 10px !important;
+    }
+    .sinba-bloque2 .valor-linea {
+        font-size: 7px !important;
+        min-height: 10px !important;
+        flex: 0 0 70px !important;   /* antes 100px */
+    }
+    .sinba-bloque2 .grupo-fecha {
+        margin-left: 2px !important;
+    }
+    .sinba-bloque2 .etq-fecha {
+        font-size: 5.5px !important;
+    }
+    .sinba-bloque2 .sinba-fila .etq-clues[style*="margin-left: 15px"] {
+        margin-left: 6px !important;
+    }
+
+    /* --- EDAD + SEXO más compacto --- */
+    .sinba-bloque2 .grupo-edad {
+        margin-right: 4px !important;
+        gap: 2px !important;
+    }
+    .sinba-bloque2 .etq-edad {
+        font-size: 5.5px !important;
+    }
+    .sinba-bloque2 .sinba-fila .etq-clues[style*="margin-left: 10px"] {
+        margin-left: 5px !important;
+    }
+
+    /* --- AFILIACIÓN: las 11 opciones en 1 línea, al 90-100% --- */
+    .sinba-bloque2 .sexo-opcion {
+        margin-right: 3px !important;
+        font-size: 6.5px !important;
+        gap: 1px !important;
+    }
+    .sinba-bloque2 .casilla-num {
+        width: 10px !important;
+        height: 12px !important;
+        line-height: 10px !important;
+        font-size: 7px !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Pegar bloque 2 al DOMICILIO */
+    .sinba-bloque2 {
+        margin-bottom: 0 !important;
+        padding-bottom: 2px !important;
+    }
+        /* ===== BLOQUE 3: DOMICILIO más compacto vertical ===== */
+
+    /* Reduce espacio entre filas del domicilio */
+    .sinba-domicilio {
+        margin-bottom: 3px !important;
+        margin-top: 0 !important;
+    }
+
+    /* Reduce el padding de cada celda del domicilio */
+    .sinba-domicilio .domicilio-celda {
+        padding: 2px 6px !important;
+    }
+
+    /* Filas internas más apretadas */
+    .sinba-fila-domicilio {
+        gap: 3px !important;
+        font-size: 7px !important;
+        align-items: center !important;
+    }
+    .sinba-fila-domicilio .etq-clues {
+        font-size: 7px !important;
+        margin-right: 2px !important;
+    }
+
+    /* Líneas de captura más bajas */
+    .sinba-fila-domicilio .valor-linea {
+        font-size: 7.5px !important;
+        min-height: 9px !important;
+        padding: 0 3px !important;
+    }
+
+    /* Casillas del domicilio más chicas */
+    .sinba-fila-domicilio .casilla {
+        width: 9px !important;
+        height: 12px !important;
+        font-size: 7px !important;
+        line-height: 10px !important;
+    }
+
+    /* Etiqueta vertical DOMICILIO más angosta */
+    .sinba-domicilio .domicilio-label {
+        width: 16px !important;
+        font-size: 8px !important;
+        padding: 2px 0 !important;
+    }
+        /* ===== BLOQUE 4: RASGOS SOCIODEMOGRÁFICOS compacto ===== */
+
+    /* Márgenes del bloque */
+    .sinba-rasgos {
+        margin-top: 3px !important;
+        margin-bottom: 3px !important;
+    }
+
+    /* Columnas con menos padding */
+    .sinba-rasgos .rasgos-col {
+        padding: 3px 6px !important;
+    }
+
+    /* Items más juntos */
+    .rasgo-item {
+        margin-bottom: 4px !important;
+    }
+
+    /* Fila de cada rasgo más compacta */
+    .rasgo-fila {
+        gap: 3px !important;
+        font-size: 7px !important;
+        margin-bottom: 0 !important;
+    }
+    .rasgo-fila .etq-clues {
+        font-size: 7px !important;
+        margin-right: 3px !important;
+    }
+
+    /* Opciones del rasgo más chicas */
+    .sinba-rasgos .sexo-opcion {
+        font-size: 6.5px !important;
+        margin-right: 4px !important;
+        gap: 1px !important;
+    }
+    .sinba-rasgos .casilla-num {
+        width: 10px !important;
+        height: 12px !important;
+        line-height: 10px !important;
+        font-size: 7px !important;
+    }
+
+    /* Notas al pie más chicas */
+    .rasgo-nota {
+        font-size: 5.5px !important;
+        line-height: 1.1 !important;
+        margin-top: 0 !important;
+    }
+
+    /* Segunda fila de "¿CÓMO SE IDENTIFICA?" con menos margen */
+    .sinba-rasgos .rasgo-fila[style*="margin-top: 3px"] {
+        margin-top: 1px !important;
+    }
+
+        /* ===== BLOQUE 5+6: ESTANCIA compacta ===== */
+
+    /* Márgenes del bloque */
+    .sinba-estancia-wrapper {
+        margin-top: 3px !important;
+        margin-bottom: 3px !important;
+    }
+
+    /* Contenido con menos padding */
+    .sinba-estancia-wrapper .estancia-contenido {
+        padding: 3px 6px !important;
+    }
+
+    /* Etiqueta vertical más angosta */
+    .sinba-estancia-wrapper .estancia-label {
+        width: 16px !important;
+        font-size: 8px !important;
+        padding: 3px 0 !important;
+    }
+
+    /* Cada fila de la estancia más apretada */
+    .estancia-fila {
+        gap: 3px !important;
+        font-size: 7px !important;
+        padding: 1px 0 !important;
+        margin-bottom: 0 !important;
+    }
+    .estancia-fila .etq-clues {
+        font-size: 7px !important;
+        margin-right: 2px !important;
+    }
+
+    /* Reducir márgenes específicos de las etiquetas (25px, 20px, 15px) */
+    .sinba-estancia-wrapper .etq-clues[style*="margin-left"] {
+        margin-left: 6px !important;
+    }
+
+    /* Opciones (Sí/No, urgencia, motivo, tipo de cama) más chicas */
+    .sinba-estancia-wrapper .sexo-opcion {
+        font-size: 6.5px !important;
+        margin-right: 3px !important;
+        gap: 1px !important;
+    }
+    .sinba-estancia-wrapper .casilla-num {
+        width: 10px !important;
+        height: 12px !important;
+        line-height: 10px !important;
+        font-size: 7px !important;
+    }
+
+    /* Casillas (HH, MM, Día, Mes, Año, CLUES) más chicas */
+    .sinba-estancia-wrapper .casilla {
+        width: 9px !important;
+        height: 12px !important;
+        font-size: 7px !important;
+        line-height: 10px !important;
+    }
+
+    /* Grupos de tiempo más pegados */
+    .grupo-tiempo {
+        margin: 0 1px !important;
+    }
+    .etq-tiempo {
+        font-size: 5px !important;
+        margin-top: 0 !important;
+    }
+    .dos-puntos {
+        font-size: 8px !important;
+    }
+
+    /* Líneas de captura (NOMBRE DE LA UNIDAD, etc.) más bajas */
+    .sinba-estancia-wrapper .valor-linea {
+        font-size: 7px !important;
+        min-height: 9px !important;
+        padding: 0 3px !important;
+    }
+
+    /* Bloque ALTA POR más compacto */
+    .alta-por-bloque {
+        padding: 1px 0 !important;
+    }
+    .alta-fila {
+        gap: 3px !important;
+        font-size: 7px !important;
+        padding: 1px 0 !important;
+        margin-bottom: 0 !important;
+    }
+    .linea-conectora {
+        width: 8px !important;
+        font-size: 8px !important;
+    }
+    .unidad-medica-bloque {
+        gap: 2px !important;
+    }
+    
+        /* ===================================================
+       BLOQUE 7: AFECCIONES TRATADAS
+       =================================================== */
+    .sinba-afecciones {
+        width: 100%;
+        border-collapse: collapse;
+        border: 2px solid #000;
+        margin-top: 3px !important;
+        margin-bottom: 0 !important;
+        table-layout: fixed;
+    }
+    .sinba-afecciones .head-vacio {
+        border: none;
+        background: transparent;
+        height: 0;
+        padding: 0;
+    }
+    .sinba-afecciones .codigo-cie-header {
+        text-align: center;
+        font-size: 7px !important;
+        font-weight: bold;
+        padding: 2px 0 !important;
+        background: #e0e0e0;
+        border: 1px solid #000;
+    }
+    .sinba-afecciones .afecciones-label {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        text-align: center;
+        font-weight: bold;
+        font-size: 7px !important;
+        letter-spacing: 1px;
+        background: #d9d9d9;
+        border-right: 2px solid #000;
+        padding: 2px 0 !important;
+        vertical-align: middle;
+    }
+    .sinba-afecciones .ap-label,
+    .sinba-afecciones .comorb-label {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        text-align: center;
+        font-weight: bold;
+        font-size: 7px !important;
+        background: #f0f0f0;
+        border-right: 1px solid #000;
+        padding: 2px 0 !important;
+        vertical-align: middle;
+    }
+
+    /* AFECCIÓN PRINCIPAL */
+    .sinba-afecciones .afeccion-contenido {
+        padding: 2px 6px !important;
+        vertical-align: top;
+        border-bottom: 1px solid #000;
+        border-right: 1px solid #000;
+    }
+    .sinba-afecciones .etq-ap {
+        font-size: 7px !important;
+        font-weight: bold;
+        font-style: italic;
+        display: block;
+        margin-bottom: 4px !important;
+    }
+    .sinba-afecciones .ap-linea {
+        border-bottom: 1px solid #000;
+        height: 10px !important;
+    }
+
+    /* COMORBILIDADES (1-6) */
+    .sinba-afecciones .comorb-fila {
+        padding: 2px 6px !important;
+        vertical-align: middle;
+        border-bottom: 1px solid #000;
+        border-right: 1px solid #000;
+        height: 14px;
+    }
+    .sinba-afecciones .comorb-num-inline {
+        display: inline-block;
+        width: 16px;
+        font-size: 8px !important;
+        font-weight: bold;
+        vertical-align: middle;
+    }
+    .sinba-afecciones .comorb-linea-inline {
+        display: inline-block;
+        border-bottom: 1px solid #000;
+        width: calc(100% - 22px);
+        height: 9px;
+        vertical-align: middle;
+    }
+
+    /* CELDAS CIE (afectación, comorbilidades, reselección) */
+    .sinba-afecciones .codigo-cie-fila,
+    .sinba-afecciones .codigo-cie-col {
+        text-align: center;
+        padding: 1px 2px !important;
+        vertical-align: middle;
+        border-left: 1px solid #000;
+        border-bottom: 1px solid #000;
+        background: #f5f5f5;
+    }
+    .sinba-afecciones .box-cie {
+        border: 1px solid #000;
+        padding: 1px 0 !important;
+        background: #e0e0e0;
+        display: block;
+    }
+    .sinba-afecciones .casillas-cie {
+        display: flex;
+        justify-content: center;
+        gap: 0;
+        margin: 0 !important;
+    }
+    .sinba-afecciones .casillas-cie .casilla {
+        width: 9px !important;
+        height: 10px !important;
+        font-size: 6px !important;
+        line-height: 8px !important;
+        background: #fff;
+    }
+
+    /* Texto vertical derecho */
+    .sinba-afecciones .texto-uso-codificador {
+        writing-mode: vertical-rl;
+        text-align: center;
+        font-size: 6px !important;
+        font-style: italic;
+        font-weight: bold;
+        color: #333;
+        background: #e0e0e0;
+        border-left: 1px solid #000;
+        padding: 2px 1px !important;
+        vertical-align: middle;
+    }
+
+    /* RESELECCIÓN AF. P. */
+    .sinba-afecciones .reseleccion-contenido {
+        padding: 2px 6px !important;
+        vertical-align: middle;
+        position: relative;
+        min-height: 20px !important;
+        border-bottom: 1px solid #000;
+    }
+    .sinba-afecciones .reseccion-linea {
+        border-bottom: 1px solid #000;
+        height: 8px !important;
+        margin-bottom: 3px !important;
+    }
+    .sinba-afecciones .reseccion-label {
+        display: inline-block;
+        font-size: 7px !important;
+        font-weight: bold;
+        background: #e0e0e0;
+        padding: 2px 6px !important;
+        border: 1px solid #000;
+        float: right;
+    }
+
+    /* ===================================================
+       BLOQUE 7b: CAUSA EXTERNA
+       =================================================== */
+    .sinba-causa-externa {
+        width: 100%;
+        border-collapse: collapse;
+        border: 2px solid #000;
+        border-top: none;
+        margin-top: 0 !important;
+        margin-bottom: 3px !important;
+        table-layout: fixed;
+    }
+
+    /* Fila 1: CAUSA EXTERNA con CIE alineado */
+    .sinba-causa-externa tr:first-child {
+        height: 40px !important;
+    }
+    .sinba-causa-externa .causa-externa-label {
+        background: #d9d9d9;
+        border-right: 2px solid #000;
+        vertical-align: middle;
+    }
+    .sinba-causa-externa .causa-contenido {
+        padding: 3px 8px !important;
+        vertical-align: middle !important;
+        border-bottom: 1px solid #000;
+        border-right: 1px solid #000;
+    }
+    .sinba-causa-externa .etq-causa {
+        font-size: 7px !important;
+        font-weight: bold;
+        font-style: italic;
+        display: block;
+        margin-bottom: 6px !important;
+    }
+    .sinba-causa-externa .causa-linea {
+        border-bottom: 1px solid #000;
+        height: 10px !important;
+    }
+
+    /* Columna CIE fila 1 */
+    .sinba-causa-externa .codigo-cie-col {
+        text-align: center !important;
+        padding: 2px !important;
+        vertical-align: middle !important;
+        border-left: 1px solid #000;
+        border-bottom: 1px solid #000;
+    }
+    .sinba-causa-externa .box-cie {
+        border: 1px solid #000;
+        padding: 2px 0 !important;
+        background: #e0e0e0;
+        display: block;
+    }
+    .sinba-causa-externa .casillas-cie {
+        display: flex;
+        justify-content: center;
+        gap: 0;
+        margin: 0 !important;
+    }
+    .sinba-causa-externa .casillas-cie .casilla {
+        width: 9px !important;
+        height: 10px !important;
+        font-size: 6px !important;
+        line-height: 8px !important;
+        background: #fff;
+    }
+
+    /* Fila 2: LLENADO HOJA VIOLENCIA */
+    .sinba-causa-externa .causa-violencia-contenido {
+        padding: 3px 6px !important;
+        vertical-align: middle !important;
+        font-size: 7px !important;
+        border-right: 1px solid #000;
+    }
+    .sinba-causa-externa .etq-causa-fuerte {
+        font-size: 7px !important;
+        font-weight: bold;
+        margin-right: 3px !important;
+    }
+    .sinba-causa-externa .sexo-opcion {
+        font-size: 6.5px !important;
+        margin-right: 3px !important;
+        gap: 1px !important;
+    }
+    .sinba-causa-externa .casilla-num {
+        width: 10px !important;
+        height: 12px !important;
+        line-height: 10px !important;
+        font-size: 7px !important;
+    }
+    .sinba-causa-externa .casilla {
+        width: 9px !important;
+        height: 12px !important;
+        font-size: 7px !important;
+        line-height: 10px !important;
+    }
+
+    /* Celda CIE vacía de la fila 2 */
+    .sinba-causa-externa .codigo-cie-col-vacio {
+        border-bottom: none;
+        border-left: 1px solid #000;
+    }
+
+    /* Franja gris derecha (continúa el texto vertical) */
+    .sinba-causa-externa .texto-uso-codificador-vacio {
+        background: #e0e0e0;
+        border-left: 1px solid #000;
+    }
+
+    /* ===================================================
+       BLOQUE 8: INTERCONSULTAS
+       =================================================== */
+    .sinba-interconsulta {
+        width: 100%;
+        border-collapse: collapse;
+        border: 2px solid #000;
+        margin-top: 3px !important;
+        margin-bottom: 3px !important;
+        table-layout: fixed;
+    }
+
+    /* Encabezados (ESPECIALIDAD / MEDICA(O) INTERCONSULTANTE) */
+    .sinba-interconsulta .head-especialidad,
+    .sinba-interconsulta .head-medico {
+        text-align: center;
+        font-size: 7px !important;
+        font-weight: bold;
+        font-style: italic;
+        padding: 2px 0 !important;
+        background: #e0e0e0;
+        border: 1px solid #000;
+        border-top: none;
+    }
+
+    /* Columna INTERCONSULTA (vertical gris) */
+    .sinba-interconsulta .vert-interconsulta {
+        background: #d9d9d9;
+        border-right: 1px solid #000;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        text-align: center;
+        font-weight: bold;
+        font-size: 7px !important;
+        letter-spacing: 2px;
+        padding: 2px 0 !important;
+        vertical-align: middle;
+    }
+
+    /* Columna NINGUNA (vertical con checkbox) */
+    .sinba-interconsulta .vert-ninguna {
+        border-right: 1px solid #000;
+        text-align: center;
+        padding: 2px 0 !important;
+        vertical-align: top;
+    }
+    .sinba-interconsulta .check-box-ninguna {
+        display: block;
+        width: 11px !important;
+        height: 11px !important;
+        border: 1.5px solid #000;
+        background: #fff;
+        margin: 2px auto 3px !important;
+    }
+    .sinba-interconsulta .txt-ninguna {
+        display: block;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        text-align: center;
+        font-weight: bold;
+        font-size: 6.5px !important;
+        letter-spacing: 1px;
+        margin: 0 auto;
+    }
+
+    /* Columna del número (1, 2, 3) */
+    .sinba-interconsulta .num-cell {
+        text-align: center;
+        font-size: 8px !important;
+        font-weight: bold;
+        padding: 2px 1px !important;
+        vertical-align: top;
+        border-right: 1px solid #000;
+        border-top: 1px solid #000;
+    }
+    .sinba-interconsulta tr:first-child .num-cell {
+        border-top: none;
+    }
+
+    /* Columna ESPECIALIDAD (vacía para escribir) */
+    .sinba-interconsulta .especialidad-cell {
+        border-right: 1px solid #000;
+        border-top: 1px solid #000;
+    }
+    .sinba-interconsulta tr:first-child .especialidad-cell {
+        border-top: none;
+    }
+
+    /* Columna MEDICA(O) INTERCONSULTANTE */
+    .sinba-interconsulta .medico-cell {
+        padding: 2px 6px 3px !important;
+        vertical-align: top;
+        border-top: 1px solid #000;
+    }
+    .sinba-interconsulta tr:first-child .medico-cell {
+        border-top: none;
+    }
+
+    /* Fila de Cédula (arriba derecha) */
+    .sinba-interconsulta .cedula-row {
+        text-align: right;
+        font-size: 6.5px !important;
+        line-height: 1;
+        margin-bottom: 1px !important;
+    }
+    .sinba-interconsulta .cedula-row em {
+        font-style: italic;
+        margin-right: 2px;
+    }
+    .sinba-interconsulta .cedula-row .casillas {
+        display: inline-flex;
+        vertical-align: middle;
+    }
+    .sinba-interconsulta .cedula-row .casilla {
+        width: 9px !important;
+        height: 11px !important;
+        font-size: 7px !important;
+        line-height: 9px !important;
+        background: #e0e0e0;
+    }
+
+    /* Sub-labels Nombre(s) / Primer Apellido / Segundo Apellido */
+    .sinba-interconsulta .nombres-row {
+        display: flex;
+        justify-content: space-around;
+        font-size: 5.5px !important;
+        font-style: italic;
+        color: #333;
+        padding: 0 6px;
+        margin-top: 2px !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* Línea para escribir el nombre */
+    .sinba-interconsulta .medico-linea {
+        border-bottom: 1px solid #000;
+        height: 8px !important;
+        margin: 1px 0 2px !important;
+    }
+
+    /* Fila de CURP (abajo derecha) */
+    .sinba-interconsulta .curp-row {
+        text-align: right;
+        font-size: 6.5px !important;
+        line-height: 1;
+    }
+    .sinba-interconsulta .curp-row em {
+        font-style: italic;
+        margin-right: 2px;
+    }
+    .sinba-interconsulta .curp-row .casillas {
+        display: inline-flex;
+        vertical-align: middle;
+    }
+    .sinba-interconsulta .curp-row .casilla {
+        width: 9px !important;
+        height: 11px !important;
+        font-size: 7px !important;
+        line-height: 9px !important;
+        background: #e0e0e0;
+    }
+
+    /* ===================================================
+       BLOQUE 10: MEDICAMENTOS SUMINISTRADOS
+       =================================================== */
+    .sinba-medicamentos {
+        width: 100%;
+        border-collapse: collapse;
+        border: 2px solid #000;
+        margin-top: 3px !important;
+        margin-bottom: 3px !important;
+        table-layout: fixed;
+    }
+
+    /* Encabezados */
+    .sinba-medicamentos .med-head {
+        text-align: center;
+        font-size: 7px !important;
+        font-weight: bold;
+        font-style: italic;
+        padding: 3px 0 1px !important;
+        background: transparent;
+        border: none;
+        vertical-align: bottom;
+        line-height: 1.1;
+    }
+    .sinba-medicamentos .med-head-vacio {
+        border: none;
+        background: transparent;
+    }
+
+    /* Etiqueta vertical izquierda */
+    .sinba-medicamentos .med-label {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        text-align: center;
+        font-weight: bold;
+        font-size: 7px !important;
+        letter-spacing: 1px;
+        background: #d9d9d9;
+        border-right: 2px solid #000;
+        padding: 3px 0 !important;
+        vertical-align: middle;
+    }
+
+    /* Columna número */
+    .sinba-medicamentos .med-num {
+        text-align: center;
+        font-size: 8px !important;
+        font-weight: bold;
+        padding: 3px 2px !important;
+        vertical-align: middle;
+        border-right: 1px solid #000;
+        border-bottom: 1px solid #000;
+    }
+    .sinba-medicamentos tr:last-child .med-num {
+        border-bottom: none;
+    }
+
+    /* Columnas Nombre genérico y Presentación (líneas) */
+    .sinba-medicamentos .med-linea {
+        border-right: 1px solid #000;
+        border-bottom: 1px solid #000;
+        vertical-align: middle;
+        padding: 3px 6px !important;
+        height: 14px !important;
+    }
+    .sinba-medicamentos tr:last-child .med-linea {
+        border-bottom: none;
+    }
+
+    /* Columna CÓDIGO */
+    .sinba-medicamentos .med-codigo {
+        border-right: 1px solid #000;
+        border-bottom: 1px solid #000;
+        text-align: center;
+        padding: 2px 2px !important;
+        vertical-align: middle;
+    }
+    .sinba-medicamentos tr:last-child .med-codigo {
+        border-bottom: none;
+    }
+    .sinba-medicamentos .med-caja {
+        display: inline-block;
+        padding: 1px 1px !important;
+        background: #e0e0e0;
+    }
+    .sinba-medicamentos .med-casillas {
+        display: flex;
+        justify-content: center;
+        gap: 0;
+        margin: 0 !important;
+    }
+    .sinba-medicamentos .med-casillas .casilla {
+        width: 9px !important;
+        height: 11px !important;
+        font-size: 7px !important;
+        line-height: 9px !important;
+        background: #fff;
+    }
+
+    /* Pie "Para uso exclusivo..." */
+    .sinba-medicamentos .med-pie td {
+        border: none;
+        height: 0;
+        padding: 0;
+    }
+    .sinba-medicamentos .med-pie-texto {
+        text-align: center;
+        font-size: 6px !important;
+        font-style: italic;
+        padding: 1px 0 !important;
+        border: none;
+        white-space: nowrap;
+    }
+
+    /* ===== Columna derecha "Para menores de 5 años" ===== */
+    .sinba-medicamentos .med-edad-fert {
+        padding: 3px 6px 3px 15px !important;
+        vertical-align: top;
+        border-left: 1px solid #000;
+        border-top: none;
+        border-bottom: none;
+        border-right: none;
+    }
+
+    .sinba-medicamentos .edades-titulo {
+        text-align: center;
+        font-size: 7px !important;
+        font-weight: bold;
+        margin-bottom: 5px !important;
+    }
+
+    .sinba-medicamentos .edades-cols {
+        display: flex;
+        gap: 15px !important;
+        padding: 0 4px;
+    }
+
+    .sinba-medicamentos .edades-col-izq,
+    .sinba-medicamentos .edades-col-der {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .sinba-medicamentos .edades-subtitulo {
+        font-size: 7px !important;
+        font-weight: bold;
+        margin-bottom: 3px !important;
+    }
+
+    .sinba-medicamentos .edad-opcion {
+        display: flex;
+        align-items: center;
+        gap: 3px !important;
+        font-size: 6.5px !important;
+        margin-bottom: 4px !important;
+        white-space: nowrap;
+    }
+    .sinba-medicamentos .edad-opcion em {
+        font-style: italic;
+    }
+
+    .sinba-medicamentos .casilla-check {
+        display: inline-block;
+        width: 9px !important;
+        height: 9px !important;
+        border: 1px solid #000;
+        background: #fff;
+        flex-shrink: 0;
+    }
+
+    .sinba-medicamentos .edades-plan-titulo {
+        font-size: 6.5px !important;
+        font-style: italic;
+        margin-bottom: 2px !important;
+    }
+
+    .sinba-medicamentos .edades-planes {
+        display: flex;
+        gap: 5px !important;
+        margin-bottom: 6px !important;
+        flex-wrap: nowrap;
+    }
+
+    .sinba-medicamentos .casilla-plan {
+        display: inline-block;
+        width: 12px !important;
+        height: 14px !important;
+        border: 1px solid #000;
+        text-align: center;
+        line-height: 12px !important;
+        font-size: 8px !important;
+        background: #fff;
+        flex-shrink: 0;
+    }
+
+    .sinba-medicamentos .edades-sobres {
+        display: flex;
+        align-items: center;
+        gap: 3px !important;
+        font-size: 6px !important;
+        flex-wrap: wrap;
+    }
+    .sinba-medicamentos .edades-sobres strong {
+        font-size: 6px !important;
+        line-height: 1.1;
+    }
+    .sinba-medicamentos .edades-sobres .casillas {
+        display: inline-flex;
+        flex-shrink: 0;
+    }
+    .sinba-medicamentos .edades-sobres .casilla {
+        width: 10px !important;
+        height: 12px !important;
+        background: #fff;
+    }
+
+        /* ===================================================
+       BLOQUE 11: PROFESIONAL DE LA SALUD RESPONSABLE
+       =================================================== */
+    .sinba-profesional {
+        width: 100%;
+        border-collapse: collapse;
+        border: 2px solid #000;
+        margin-top: 3px !important;
+        margin-bottom: 3px !important;
+        table-layout: fixed;
+    }
+
+    /* Título de la sección */
+    .sinba-profesional .prof-titulo {
+        font-size: 7.5px !important;
+        font-weight: bold;
+        padding: 3px 8px !important;
+        border-bottom: 1px solid #000;
+        background: #fff;
+        text-align: left;
+    }
+
+    /* Etiquetas NOMBRE: y C.U.R.P.: */
+    .sinba-profesional .prof-etq {
+        font-size: 7.5px !important;
+        font-weight: bold;
+        padding: 3px 5px !important;
+        vertical-align: middle;
+        border-right: 1px solid #000;
+        border-bottom: 1px solid #000;
+        white-space: nowrap;
+    }
+
+    /* NOMBRE con sublabels */
+    .sinba-profesional .prof-nombre-cell {
+        padding: 6px 8px 1px !important;
+        vertical-align: top;
+        border-bottom: 1px solid #000;
+    }
+    .sinba-profesional .prof-nombre-linea {
+        border-bottom: 1px solid #000;
+        height: 10px !important;
+        margin-top: 2px !important;
+        width: 95% !important;
+    }
+    .sinba-profesional .prof-nombre-sublabels {
+        display: flex;
+        justify-content: space-around;
+        font-size: 5.5px !important;
+        font-style: italic;
+        color: #333;
+        margin-top: 1px !important;
+        padding: 0 15px;
+    }
+
+    /* Fila CURP + Cédula + Firma */
+    .sinba-profesional .prof-campos-cell {
+        padding: 3px 8px !important;
+        vertical-align: middle;
+        border-bottom: 1px solid #000;
+    }
+    .sinba-profesional .prof-campos-inner {
+        display: flex;
+        align-items: center;
+        gap: 4px !important;
+        flex-wrap: nowrap;
+        font-size: 7.5px !important;
+        padding-left: 4px !important;
+    }
+    .sinba-profesional .prof-campos-inner .casillas {
+        display: inline-flex;
+        flex-shrink: 0;
+    }
+    .sinba-profesional .prof-campos-inner .casilla {
+        width: 9px !important;
+        height: 12px !important;
+        font-size: 7px !important;
+        line-height: 10px !important;
+        background: #fff;
+    }
+    .sinba-profesional .etq-campo {
+        font-size: 7.5px !important;
+        font-weight: bold;
+        margin-left: 10px !important;
+        white-space: nowrap;
+    }
+    .sinba-profesional .firma-linea {
+        flex: 1;
+        border-bottom: 1px solid #000;
+        height: 10px !important;
+        margin-left: 3px !important;
+        min-width: 60px !important;
+    }
+
+    /* Pie SEUL - 2026 */
+    .sinba-profesional .prof-seul {
+        text-align: right;
+        font-size: 6px !important;
+        font-weight: bold;
+        padding: 2px 8px !important;
+        border: none;
+    }
+
+    /* Forzar colores de fondo */
+    .sinba-afecciones .afecciones-label,
+    .sinba-afecciones .comorb-label,
+    .sinba-afecciones .ap-label,
+    .sinba-procedimientos .proc-label,
+    .sinba-medicamentos .med-label,
+    .sinba-interconsulta .vert-interconsulta,
+    .sinba-domicilio .domicilio-label,
+    .sinba-estancia-wrapper .estancia-label,
+    .sinba-paciente .paciente-label,
+    .box-cie,
+    .med-caja,
+    .reseccion-label,
+    .sinba-afecciones .codigo-cie-header,
+    .sinba-procedimientos .codigo-cie-header,
+    .head-especialidad,
+    .head-medico {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 }
+
+    /* ===================================================
+       LÍNEAS MÁS DELGADAS EN IMPRESIÓN
+       =================================================== */
+
+    /* Todos los bordes generales a 0.5pt */
+    .sinba-encabezado td,
+    .sinba-clues-folio td,
+    .sinba-bloque2,
+    .sinba-domicilio,
+    .sinba-domicilio td,
+    .sinba-rasgos,
+    .sinba-rasgos td,
+    .sinba-paciente,
+    .sinba-paciente td,
+    .sinba-estancia-wrapper,
+    .sinba-estancia-wrapper td,
+    .sinba-afecciones,
+    .sinba-afecciones td,
+    .sinba-afecciones th,
+    .sinba-causa-externa,
+    .sinba-causa-externa td,
+    .sinba-interconsulta,
+    .sinba-interconsulta td,
+    .sinba-procedimientos,
+    .sinba-procedimientos td,
+    .sinba-medicamentos,
+    .sinba-medicamentos td,
+    .sinba-profesional,
+    .sinba-profesional td {
+        border-width: 0.5pt !important;
+    }
+
+    /* Líneas internas más finas todavía (separadores) */
+    .sinba-fila-domicilio .valor-linea,
+    .estancia-fila,
+    .alta-fila,
+    .sinba-bloque2 .sinba-fila,
+    .comorb-fila,
+    .medico-linea,
+    .ap-linea,
+    .causa-linea,
+    .reseccion-linea,
+    .prof-nombre-linea,
+    .firma-linea,
+    .sinba-profesional .prof-nombre-linea,
+    .valor-linea,
+    .valor-nombre {
+        border-bottom-width: 0.5pt !important;
+    }
+
+    /* Casillas más finas */
+    .casilla,
+    .casilla-num,
+    .check-box,
+    .casilla-check,
+    .casilla-plan,
+    .check-box-ninguna {
+        border-width: 0.5pt !important;
+    }
+
+    /* Contornos dobles o gruesos (marcos principales) más delgados */
+    .sinba-afecciones .afecciones-label,
+    .sinba-paciente .paciente-label,
+    .sinba-estancia-wrapper .estancia-label,
+    .sinba-domicilio .domicilio-label,
+    .sinba-procedimientos .proc-label,
+    .sinba-medicamentos .med-label,
+    .sinba-interconsulta .vert-interconsulta,
+    .sinba-afecciones .codigo-cie-header,
+    .sinba-procedimientos .codigo-cie-header {
+        border-width: 0.5pt !important;
+    }
+        /* Pegar tablas 7 y 7b sin espacio */
+    .sinba-afecciones {
+        margin-bottom: 0 !important;
+    }
+    .sinba-causa-externa {
+        margin-top: 0 !important;
+        border-top: none !important;
+    }
+
+    /* Pegar tablas 9 y 10 sin espacio */
+    .sinba-procedimientos {
+        margin-bottom: 0 !important;
+    }
+    .sinba-medicamentos {
+        margin-top: 0 !important;
+        border-top: none !important;
+    }
+
+    /* Pegar todas las tablas consecutivas del SINBA */
+    .sinba-afecciones + .sinba-causa-externa,
+    .sinba-causa-externa + .sinba-interconsulta,
+    .sinba-interconsulta + .sinba-procedimientos,
+    .sinba-procedimientos + .sinba-medicamentos,
+    .sinba-medicamentos + .sinba-profesional {
+        margin-top: 0 !important;
+    }
