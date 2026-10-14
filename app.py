@@ -93,6 +93,8 @@ CAMPOS_SINBA = [
 ]
 
 
+
+
 @app.route("/formato2", methods=["GET", "POST"])
 def formato2():
     datos = None
@@ -1374,6 +1376,134 @@ def service_worker():
 def ganadores():
     return render_template("ganadores.html")
 
+
+# ============================================================
+# SITEMAP.XML (para Google Search Console)
+#
+# Lista todas las URLs públicas del portal para que Google
+# las descubra y las indexe más rápido.
+# ============================================================
+
+@app.route("/sitemap.xml")
+def sitemap():
+
+    db = get_db()
+
+    try:
+
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT
+                slug,
+                actualizado_en
+            FROM rt_noticias
+            WHERE estado = 'publicada'
+            ORDER BY actualizado_en DESC
+        """)
+
+        noticias = cursor.fetchall()
+
+        # Fecha actual en formato YYYY-MM-DD
+        hoy = datetime.now().strftime("%Y-%m-%d")
+
+        # Construir el XML
+        xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+
+        # Página principal
+        xml += '  <url>\n'
+        xml += f'    <loc>https://appazueta.lat/</loc>\n'
+        xml += f'    <lastmod>{hoy}</lastmod>\n'
+        xml += '    <changefreq>daily</changefreq>\n'
+        xml += '    <priority>1.0</priority>\n'
+        xml += '  </url>\n'
+
+        # Listado de noticias
+        xml += '  <url>\n'
+        xml += f'    <loc>https://appazueta.lat/noticias</loc>\n'
+        xml += f'    <lastmod>{hoy}</lastmod>\n'
+        xml += '    <changefreq>daily</changefreq>\n'
+        xml += '    <priority>0.9</priority>\n'
+        xml += '  </url>\n'
+
+        # Páginas estáticas
+        paginas_estaticas = [
+            ("sorteos", "0.8"),
+            ("comercio", "0.8"),
+            ("sobre", "0.6"),
+            ("faq", "0.6"),
+            ("ganadores", "0.6"),
+            ("contacto", "0.5"),
+            ("privacidad", "0.3"),
+            ("terminos", "0.3"),
+        ]
+
+        rutas_estaticas = {
+            "sorteos": "https://appazueta.lat/rifas",
+            "comercio": "https://appazueta.lat/comercio",
+            "sobre": "https://appazueta.lat/sobre",
+            "faq": "https://appazueta.lat/faq",
+            "ganadores": "https://appazueta.lat/ganadores",
+            "contacto": "https://appazueta.lat/contacto",
+            "privacidad": "https://appazueta.lat/privacidad",
+            "terminos": "https://appazueta.lat/terminos",
+        }
+
+        for nombre, prioridad in paginas_estaticas:
+
+            url = rutas_estaticas.get(nombre)
+
+            if url:
+
+                xml += '  <url>\n'
+                xml += f'    <loc>{url}</loc>\n'
+                xml += '    <changefreq>weekly</changefreq>\n'
+                xml += f'    <priority>{prioridad}</priority>\n'
+                xml += '  </url>\n'
+
+        # Categorías de noticias
+        cursor.execute("""
+            SELECT slug
+            FROM rt_noticias_categorias
+            ORDER BY orden
+        """)
+
+        categorias = cursor.fetchall()
+
+        for cat in categorias:
+
+            xml += '  <url>\n'
+            xml += f'    <loc>https://appazueta.lat/categoria/{cat["slug"]}</loc>\n'
+            xml += '    <changefreq>weekly</changefreq>\n'
+            xml += '    <priority>0.7</priority>\n'
+            xml += '  </url>\n'
+
+        # Noticias individuales
+        for noticia in noticias:
+
+            fecha = ""
+
+            if noticia["actualizado_en"]:
+                fecha = noticia["actualizado_en"].strftime("%Y-%m-%d")
+
+            xml += '  <url>\n'
+            xml += f'    <loc>https://appazueta.lat/noticias/{noticia["slug"]}</loc>\n'
+
+            if fecha:
+                xml += f'    <lastmod>{fecha}</lastmod>\n'
+
+            xml += '    <changefreq>monthly</changefreq>\n'
+            xml += '    <priority>0.8</priority>\n'
+            xml += '  </url>\n'
+
+        xml += '</urlset>'
+
+        return xml, 200, {'Content-Type': 'application/xml'}
+
+    finally:
+
+        db.close()
 
 # ============================================================
 # CONSULTAR MI PARTICIPACIÓN
